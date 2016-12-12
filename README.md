@@ -4,6 +4,9 @@
 
 A high performance polymorphic serializer for the .NET framework.
 
+## License
+Licensed under Apache 2.0, see [LICENSE](LICENSE) for the full text.
+
 ## Polymorphic serializations
 
 Wire was designed to safely transfer messages in distributed systems, for example service bus or actor model based systems.
