@@ -25,7 +25,7 @@ namespace Hyperion.ValueSerializers
         public static char ReadValueImpl(Stream stream, byte[] bytes)
         {
             stream.Read(bytes, 0, Size);
-            return (char) BitConverter.ToSingle(bytes, 0);
+            return BitConverter.ToChar(bytes, 0);
         }
 
         public static void WriteValueImpl(Stream stream, char ch, byte[] bytes)
