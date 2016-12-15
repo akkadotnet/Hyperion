@@ -28,7 +28,7 @@ pushd %~dp0
 
 .nuget\NuGet.exe install NUnit.Console -ConfigFile .nuget\Nuget.Config -OutputDirectory packages\FAKE -ExcludeVersion -Version 3.2.1
 .nuget\NuGet.exe install xunit.runner.console -ConfigFile .nuget\Nuget.Config -OutputDirectory packages\FAKE -ExcludeVersion -Version 2.0.0
-.nuget\NuGet.exe install NBench.Runner -OutputDirectory packages -ExcludeVersion -Version 0.3.1
+.nuget\NuGet.exe install NBench.Runner -OutputDirectory packages -ExcludeVersion -Version 0.3.3
 .nuget\NuGet.exe install Microsoft.SourceBrowser -OutputDirectory packages -ExcludeVersion
 
 if not exist packages\SourceLink.Fake\tools\SourceLink.fsx (

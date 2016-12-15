@@ -17,10 +17,10 @@ cd __SOURCE_DIRECTORY__
 //--------------------------------------------------------------------------------
 
 
-let product = "Wire"
+let product = "Hyperion"
 let authors = [ "Roger Johansson" ]
-let copyright = "Copyright © 2013-2016 AsynkronIT"
-let company = "AsynkronIT"
+let copyright = "Copyright ï¿½ 2016 Akka.NET Team"
+let company = "Akka.NET Team"
 let description = "Binary serializer for POCO objects"
 let tags = [ "serializer" ]
 let configuration = "Release"
@@ -31,7 +31,7 @@ let AzCopyDir = toolDir @@ "AzCopy"
 // Read release notes and version
 
 let root = @".\"
-let solutionName = "Wire.sln"
+let solutionName = "Hyperion.sln"
 let solutionPath = root @@ solutionName
 let parsedRelease =
     File.ReadLines "RELEASE_NOTES.md"
@@ -112,9 +112,9 @@ Target "AssemblyInfo" <| fun _ ->
 //--------------------------------------------------------------------------------
 // Build the solution
 
-Target "Build" <| fun _ ->
+Target "Build" <| fun _ -> 
     !! solutionPath
-    |> MSBuildRelease "" "Rebuild"
+    |> MSBuild "" "Rebuild" [ "Configuration", "Release"; "DefineConstants", "NBENCH;NET45" ]
     |> ignore
     
 //--------------------------------------------------------------------------------
@@ -204,7 +204,7 @@ Target "CopyOutput" <| fun _ ->
         let src = root @@ project @@ @"bin/Release/"
         let dst = binDir @@ project
         CopyDir dst src allFiles
-    [ "Wire" ]
+    [ "Hyperion" ]
     |> List.iter copyOutput
 
 Target "BuildRelease" DoNothing
@@ -221,7 +221,7 @@ Target "CleanTests" <| fun _ ->
 
 open Fake.Testing
 Target "RunTests" <| fun _ ->  
-    let testAssemblies = !! (root @@ "**/bin/Release/Wire.Tests.dll")
+    let testAssemblies = !! (root @@ "**/bin/Release/Hyperion.Tests.dll")
 
     mkdir testOutput
     let xunitToolPath = findToolInSubPath "xunit.console.exe" (root @@ "packages/xunit.runner.console*/tools")
@@ -235,7 +235,7 @@ Target "RunTests" <| fun _ ->
 // NBench targets 
 //--------------------------------------------------------------------------------
 Target "NBench" <| fun _ ->
-    let testSearchPath = !! (root @@ "**/bin/Release/Wire.Tests.Performance.dll")
+    let testSearchPath = !! (root @@ "**/bin/Release/Hyperion.Tests.Performance.dll")
 
     mkdir perfOutput
     let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (root @@ "packges/NBench.Runner*")
@@ -249,6 +249,7 @@ Target "NBench" <| fun _ ->
                 |> append (sprintf "output-directory=\"%s\"" perfOutput)
                 |> append (sprintf "concurrent=\"%b\"" true)
                 |> append (sprintf "trace=\"%b\"" true)
+                |> append (sprintf "teamcity=\"%b\"" true)
                 |> toText
 
         let result = ExecProcess(fun info -> 
@@ -288,7 +289,7 @@ let createNugetPackages _ =
     let mutable dirId = 1
 
     ensureDirectory nugetDir
-    for nuspec in !! (root @@ "**/Wire.nuspec") do
+    for nuspec in !! (root @@ "**/Hyperion.nuspec") do
         printfn "Creating nuget packages for %s" nuspec
         
         let tempBuildDir = workingDir + dirId.ToString()
