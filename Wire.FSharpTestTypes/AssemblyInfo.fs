@@ -3,7 +3,7 @@ open System
 open System.Reflection
 open System.Runtime.InteropServices
 
-[<assembly: AssemblyTitleAttribute("Wire")>]
+[<assembly: AssemblyTitleAttribute("Hyperion")>]
 [<assembly: AssemblyProductAttribute("Wire")>]
 [<assembly: AssemblyDescriptionAttribute("Binary serializer for POCO objects")>]
 [<assembly: AssemblyCopyrightAttribute("Copyright � 2013-2016 AsynkronIT")>]

@@ -19,8 +19,8 @@ cd __SOURCE_DIRECTORY__
 
 let product = "Wire"
 let authors = [ "Roger Johansson" ]
-let copyright = "Copyright © 2013-2016 AsynkronIT"
-let company = "AsynkronIT"
+let copyright = "Copyright © 2016 Akka.NET Team"
+let company = "Akka.NET Team"
 let description = "Binary serializer for POCO objects"
 let tags = [ "serializer" ]
 let configuration = "Release"
@@ -112,9 +112,9 @@ Target "AssemblyInfo" <| fun _ ->
 //--------------------------------------------------------------------------------
 // Build the solution
 
-Target "Build" <| fun _ ->
+Target "Build" <| fun _ -> 
     !! solutionPath
-    |> MSBuildRelease "" "Rebuild"
+    |> MSBuild "" "Rebuild" [ "Configuration", "Release"; "DefineConstants", "NBENCH;NET45" ]
     |> ignore
     
 //--------------------------------------------------------------------------------
@@ -249,6 +249,7 @@ Target "NBench" <| fun _ ->
                 |> append (sprintf "output-directory=\"%s\"" perfOutput)
                 |> append (sprintf "concurrent=\"%b\"" true)
                 |> append (sprintf "trace=\"%b\"" true)
+                |> append (sprintf "teamcity=\"%b\"" true)
                 |> toText
 
         let result = ExecProcess(fun info -> 
