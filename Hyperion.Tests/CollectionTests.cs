@@ -63,7 +63,7 @@ namespace Hyperion.Tests
             Assert.Equal(expected.ToList(), actual.ToList());
         }
 
-        [Fact(Skip="FIXME: deserializes 'z' to '\\0'")]
+        [Fact]
         public void CanSerializeDictionaryKeysAndValuesByteChar()
         {
             var instance = new Dictionary<byte, char> {{0, 'z'}, {255, 'z'}, {3, char.MinValue}};
