@@ -1,6 +1,6 @@
-# Wire
+# Hyperion
 
-[![Join the chat at https://gitter.im/akkadotnet/Wire](https://badges.gitter.im/akkadotnet/Wire.svg)](https://gitter.im/akkadotnet/Wire?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Join the chat at https://gitter.im/akkadotnet/Hyperion](https://badges.gitter.im/akkadotnet/Hyperion.svg)](https://gitter.im/akkadotnet/Hyperion?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A high performance polymorphic serializer for the .NET framework.
 
@@ -9,7 +9,7 @@ Licensed under Apache 2.0, see [LICENSE](LICENSE) for the full text.
 
 ## Polymorphic serializations
 
-Wire was designed to safely transfer messages in distributed systems, for example service bus or actor model based systems.
+Hyperion was designed to safely transfer messages in distributed systems, for example service bus or actor model based systems.
 In message based systems, it is common to receive different types of messages and apply pattern matching over those messages.
 If the messages does not carry over all the relevant type information to the receiveing side, the message might no longer match exactly what your system expect.
 
@@ -31,12 +31,12 @@ var envelope = new Envelope { Payload = (float)1.2 };
 
 If you for example are using a Json based serializer, it is very likely that the value `1.2` will be deserialized as a `double` as Json has no way to describe the type of the decimal value.
 While if you use some sort of binary serializer like Google Protobuf, all messages needs to be designed with a strict contract up front.
-Wire solves this by encoding a manifest for each value - a single byte prefix for primitive values, and fully qualified assembly names for complex types.
+Hyperion solves this by encoding a manifest for each value - a single byte prefix for primitive values, and fully qualified assembly names for complex types.
 
 ## Surrogates
 
 Sometimes, you might have objects that simply can't be serialized in a safe way, the object might be contextual in some way.
-Wire can solve those problems using "Surrogates", surrogates are a way to translate an object from and back to the context bound representation.
+Hyperion can solve those problems using "Surrogates", surrogates are a way to translate an object from and back to the context bound representation.
 
 ```csharp
 var surrogate = Surrogate.Create<IMyContextualInterface,IMySurrogate>(original => original.ToSurrogate(), surrogate => surrogate.Restore(someContext));
@@ -48,37 +48,37 @@ This is essential for frameworks like Akka.NET where we need to be able to resol
 
 ## Version Tolerance
 
-Wire has been designed to work in multiple modes in terms of version tolerance vs. performance.
+Hyperion has been designed to work in multiple modes in terms of version tolerance vs. performance.
 
-1. Pre Register Types, when using "Pre registered types", Wire will only emit a type ID in the output stream.
+1. Pre Register Types, when using "Pre registered types", Hyperion will only emit a type ID in the output stream.
 This results in the best performance, but is also fragile if different clients have different versions of the contract types.
 2. Non Versioned, this is largely the same as the above, but the serializer does not need to know about your types up front. it will embed the fully qualified typename
 in the outputstream. this results in a larger payload and some performance overhead.
-3. Versioned, in this mode, Wire will emit both type names and field information in the output stream.
+3. Versioned, in this mode, Hyperion will emit both type names and field information in the output stream.
 This allows systems to have slightly different versions of the contract types where some fields may have been added or removed.
 
-Wire has been designed as a wire format, point to point for soft realtime scenarios.
+Hyperion has been designed as a wire format, point to point for soft realtime scenarios.
 If you need a format that is durable for persistence over time.
 e.g. EventSourcing or for message queues, then Protobuf or MS Bond is probably a better choise as those formats have been designed for true versiom tolerance.
 
 ## Performance
 
-Wire has been designed with a performance first mindset.
-It is not _the_ most important aspect of Wire, Surrogates and polymorphism is more critical for what we want to solve.
-But even with it's rich featureset, Wire performs extremely well.
+Hyperion has been designed with a performance first mindset.
+It is not _the_ most important aspect of Hyperion, Surrogates and polymorphism is more critical for what we want to solve.
+But even with it's rich featureset, Hyperion performs extremely well.
 
 ```text
-Wire - preregister types
+Hyperion - preregister types
    Serialize                      312 ms
    Deserialize                    261 ms
    Size                           38 bytes
    Total                          573 ms
-Wire - no version data
+Hyperion - no version data
    Serialize                      327 ms
    Deserialize                    354 ms
    Size                           73 bytes
    Total                          681 ms
-Wire - preserve object refs
+Hyperion - preserve object refs
    Serialize                      400 ms
    Deserialize                    369 ms
    Size                           73 bytes
@@ -88,7 +88,7 @@ MS Bond
    Deserialize                    404 ms
    Size                           50 bytes
    Total                          833 ms
-Wire - version tolerant
+Hyperion - version tolerant
    Serialize                      423 ms
    Deserialize                    674 ms
    Size                           195 bytes

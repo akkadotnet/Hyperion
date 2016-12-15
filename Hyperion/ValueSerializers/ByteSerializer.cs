@@ -1,0 +1,24 @@
+﻿using System.IO;
+
+namespace Hyperion.ValueSerializers
+{
+    public class ByteSerializer : SessionIgnorantValueSerializer<byte>
+    {
+        public const byte Manifest = 4;
+        public static readonly ByteSerializer Instance = new ByteSerializer();
+
+        public ByteSerializer() : base(Manifest, () => WriteValueImpl, () => ReadValueImpl)
+        {
+        }
+
+        public static void WriteValueImpl(Stream stream, byte b)
+        {
+            stream.WriteByte(b);
+        }
+
+        public static byte ReadValueImpl(Stream stream)
+        {
+            return (byte) stream.ReadByte();
+        }
+    }
+}
