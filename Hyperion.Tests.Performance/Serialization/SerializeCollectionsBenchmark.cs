@@ -29,7 +29,7 @@ namespace Hyperion.Tests.Performance.Serialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 5000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 4800000)]
         public void Serialize_ByteArray()
         {
             SerializeAndCount(new byte[] { 123, 134, 11, 122, 1 });
@@ -42,7 +42,7 @@ namespace Hyperion.Tests.Performance.Serialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 1200000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 300000)]
         public void Serialize_StringArray()
         {
             SerializeAndCount(new string[] { "abc", "cbd0", "sdsd4", "4dfg", "sfsdf44g" });
@@ -55,7 +55,7 @@ namespace Hyperion.Tests.Performance.Serialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 500000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 360000)]
         public void Serialize_Dictionary()
         {
             var dictionary = new Dictionary<string, string>
@@ -74,7 +74,7 @@ namespace Hyperion.Tests.Performance.Serialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 650000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 550000)]
         public void Serialize_List()
         {
             SerializeAndCount(new List<string> { "asdad", "asdabs3", "sfsdf44g", "asdf4r", "sfsdf44g" });

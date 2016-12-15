@@ -329,7 +329,7 @@ namespace Hyperion.Tests.Performance.Serialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 700000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 600000)]
         public void Serialize_Tuple8()
         {
             SerializeAndCount(Tuple.Create(123, true, "x", 123.3f, "asdasdac", false, (byte)0xf, 1234));

@@ -84,7 +84,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 13000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 12000000)]
         public void Deserialize_Int32()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
@@ -110,7 +110,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 11000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 10000000)]
         public void Deserialize_Int64()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
@@ -136,7 +136,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 17000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 15000000)]
         public void Deserialize_SByte()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
@@ -162,7 +162,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 12000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 11000000)]
         public void Deserialize_UInt16()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
@@ -214,7 +214,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 12000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 9000000)]
         public void Deserialize_UInt64()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
@@ -292,7 +292,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 6500000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 6200000)]
         public void Deserialize_Decimal()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
@@ -423,7 +423,7 @@ namespace Hyperion.Tests.Performance.Deserialization
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
             TestMode = TestMode.Test)]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 12000000)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 10000000)]
         public void Deserialize_DateTime()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work
