@@ -80,15 +80,14 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(new List<string> { "asdad", "asdabs3", "sfsdf44g", "asdf4r", "sfsdf44g" });
         }
 
-        [NBenchFact(Skip = "FIXME: Stack overflow exception")]
+        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark linked list serialization",
             NumberOfIterations = StandardIterationCount,
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
-            TestMode = TestMode.Test,
-            Skip = "FIXME: Stack overflow exception")]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 210000)]
+            TestMode = TestMode.Test)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 500000)]
         public void Serialize_LinkedList()
         {
             var list = new LinkedList<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" });
