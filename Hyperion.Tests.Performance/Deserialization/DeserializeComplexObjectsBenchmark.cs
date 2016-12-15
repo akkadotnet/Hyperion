@@ -1,6 +1,15 @@
-﻿using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
+﻿#region copyright
+// -----------------------------------------------------------------------
+//  <copyright file="DeserializeComplexObjectsBenchmark.cs" company="Akka.NET Team">
+//      Copyright (C) 2015-2016 AsynkronIT <https://github.com/AsynkronIT>
+//      Copyright (C) 2016-2016 Akka.NET Team <https://github.com/akkadotnet>
+//  </copyright>
+// -----------------------------------------------------------------------
+#endregion
+
 using Hyperion.Tests.Performance.Types;
+using NBench;
+using Pro.NBench.xUnit.XunitExtensions;
 using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Deserialization

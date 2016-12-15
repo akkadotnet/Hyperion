@@ -1,4 +1,13 @@
-﻿using System.Diagnostics;
+﻿#region copyright
+// -----------------------------------------------------------------------
+//  <copyright file="PerfTestBase.cs" company="Akka.NET Team">
+//      Copyright (C) 2015-2016 AsynkronIT <https://github.com/AsynkronIT>
+//      Copyright (C) 2016-2016 Akka.NET Team <https://github.com/akkadotnet>
+//  </copyright>
+// -----------------------------------------------------------------------
+#endregion
+
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using NBench;

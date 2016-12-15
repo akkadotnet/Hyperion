@@ -1,5 +1,13 @@
+#region copyright
+// -----------------------------------------------------------------------
+//  <copyright file="StringEx.cs" company="Akka.NET Team">
+//      Copyright (C) 2015-2016 AsynkronIT <https://github.com/AsynkronIT>
+//      Copyright (C) 2016-2016 Akka.NET Team <https://github.com/akkadotnet>
+//  </copyright>
+// -----------------------------------------------------------------------
+#endregion
+
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace Hyperion.Extensions
 {
