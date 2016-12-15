@@ -142,15 +142,14 @@ namespace Hyperion.Tests.Performance.Deserialization
             InitStreamWith(new LinkedList<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
         }
 
-        [NBenchFact(Skip = "FIXME: some problem with recursion, StackOverflowException")]
+        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark linked list deserialization",
             NumberOfIterations = StandardIterationCount,
             RunMode = RunMode.Throughput,
             RunTimeMilliseconds = StandardRunTime,
-            TestMode = TestMode.Test,
-            Skip = "FIXME: some problem with recursion, StackOverflowException")]
-        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 80000)]
+            TestMode = TestMode.Test)]
+        [CounterThroughputAssertion(TestCounterName, MustBe.GreaterThan, 150000)]
         public void Deserialize_LinkedList()
         {
             Stream.Position = 0; // don't move it up to Setup, I don't know why it needed here to work

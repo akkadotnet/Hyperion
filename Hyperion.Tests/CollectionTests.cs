@@ -167,6 +167,30 @@ namespace Hyperion.Tests
             Assert.Equal(expected, actual);
         }
 
+        [Fact]
+        public void CanSerializeLinkedList()
+        {
+            var expected = new LinkedList<Something>(new[]
+            {
+                new Something
+                {
+                    BoolProp = true,
+                    Else = new Else
+                    {
+                        Name = "Yoho"
+                    },
+                    Int32Prop = 999,
+                    StringProp = "Yesbox!"
+                },
+                new Something(), new Something(), null
+            });
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<LinkedList<Something>>();
+            Assert.Equal(expected, actual);
+        }
+
         [Fact(Skip = "add support for multi dimentional arrays")]
         public void CanSerializeMultiDimentionalArray()
         {
