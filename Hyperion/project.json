@@ -1,5 +1,8 @@
 ﻿{
   "version": "0.8.1-*",
+  "buildOptions": {
+    "allowUnsafe": true
+  },
   "description": "Hyperion, fast binary POCO serializer",
   "authors": [
     "Roger Johansson"
@@ -18,12 +21,14 @@
   },
 
   "frameworks": {
-    "netstandard1.6": {
-      "imports": "dnxcore50",
+    "netcoreapp1.0": {
       "dependencies": {
         "NETStandard.Library": "1.6.0",
         "Microsoft.CSharp": "4.0.1"
-      }
+      },
+      "imports": [
+        "netstandard1.6"
+      ]
     },
     "net450": {
       "imports": "dotnet5.4",

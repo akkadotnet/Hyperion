@@ -71,7 +71,7 @@ namespace Hyperion.SerializerFactories
             var stackTypeDef = Type.GetType(ImmutableCollectionsNamespace + ".IImmutableStack`1, " + ImmutableCollectionsAssembly, true);
             var stackInterface = stackTypeDef.MakeGenericType(genericTypes[0]);
 
-            var isStack = stackInterface.IsAssignableFrom(type);
+            var isStack = stackInterface.GetTypeInfo().IsAssignableFrom(type);
 
             var createRange = creatorType != null
                 ? creatorType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static)
