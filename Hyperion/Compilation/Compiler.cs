@@ -124,7 +124,7 @@ namespace Hyperion.Compilation
             return _expressions.Count - 1;
         }
 
-        public int WriteField(FieldInfo field, int target, int value)
+        public int WriteField(FieldInfo field, int typedTarget, int target, int value)
         {
             if (field.IsInitOnly)
             {
@@ -133,9 +133,9 @@ namespace Hyperion.Compilation
                     .GetMethod(nameof(FieldInfo.SetValue), new[] {typeof(object), typeof(object)});
                 var fld = Constant(field);
                 var valueToObject = Convert<object>(value);
-                return Call(method, fld, target, valueToObject);
+                return Call(method, fld, target, valueToObject); 
             }
-            var targetExp = _expressions[target];
+            var targetExp = _expressions[typedTarget];
             var valueExp = _expressions[value];
             var accessExp = Expression.Field(targetExp, field);
             var writeExp = Expression.Assign(accessExp, valueExp);

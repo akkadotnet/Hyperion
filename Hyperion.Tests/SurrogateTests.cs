@@ -7,11 +7,15 @@
 // -----------------------------------------------------------------------
 #endregion
 
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace Hyperion.Tests
 {
+    #region test support classes
+    
     public interface IOriginal
     {
         ISurrogate ToSurrogate();
@@ -26,13 +30,10 @@ namespace Hyperion.Tests
     {
         public string Bar { get; set; }
 
-        public ISurrogate ToSurrogate()
+        public ISurrogate ToSurrogate() => new FooSurrogate
         {
-            return new FooSurrogate
-            {
-                Bar = Bar
-            };
-        }
+            Bar = Bar
+        };
     }
 
     public class FooSurrogate : ISurrogate
@@ -60,6 +61,34 @@ namespace Hyperion.Tests
             };
         }
     }
+
+    public class SurrogatedKey : IOriginal
+    {
+        public readonly string Key;
+
+        public SurrogatedKey(string key)
+        {
+            Key = key;
+        }
+
+        public ISurrogate ToSurrogate() => new KeySurrogate(Key);
+        public override bool Equals(object obj) => obj is SurrogatedKey && Key == ((SurrogatedKey) obj).Key;
+        public override int GetHashCode() => Key?.GetHashCode() ?? 0;
+    }
+
+    public class KeySurrogate : ISurrogate
+    {
+        public readonly string Key;
+
+        public KeySurrogate(string key)
+        {
+            Key = key;
+        }
+
+        public IOriginal FromSurrogate() => new SurrogatedKey(Key);
+    }
+
+    #endregion
 
     public class SurrogateTests
     {
@@ -113,6 +142,41 @@ namespace Hyperion.Tests
             var actual = serializer.Deserialize<Foo>(stream);
             Assert.Equal(foo.Bar, actual.Bar);
             Assert.True(surrogateHasBeenInvoked);
+        }
+
+        [Fact]
+        public void CanSerializeWithSurrogateInCollection()
+        {
+            var invoked = new List<ISurrogate>();
+            var surrogates = new[]
+            {
+                Surrogate.Create<IOriginal, ISurrogate>(from => from.ToSurrogate(), surrogate =>
+                {
+                    invoked.Add(surrogate);
+                    return surrogate.FromSurrogate();
+                })
+            };
+            var stream = new MemoryStream();
+            var serializer = new Serializer(new SerializerOptions(surrogates: surrogates));
+            var key = new SurrogatedKey("test key");
+            var foo = new Foo
+            {
+                Bar = "I will be replaced!"
+            };
+
+            var dictionary = new Dictionary<SurrogatedKey, Foo>
+            {
+                [key] = foo
+            };
+
+            serializer.Serialize(dictionary, stream);
+            stream.Position = 0;
+
+            var actual = serializer.Deserialize<Dictionary<SurrogatedKey, Foo>> (stream);
+
+            Assert.Equal(key, actual.Keys.First());
+            Assert.Equal(foo.Bar, actual[key].Bar);
+            Assert.Equal(2, invoked.Count);
         }
     }
 }

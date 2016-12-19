@@ -141,9 +141,9 @@ namespace Hyperion.Compilation
             return _expressions.Count - 1;
         }
 
-        public int WriteField(FieldInfo field, int target, int value)
+        public int WriteField(FieldInfo field, int typedTarget, int target, int value)
         {
-            var exp = new IlWriteField(field, _expressions[target], _expressions[value]);
+            var exp = new IlWriteField(field, _expressions[typedTarget], _expressions[value]);
             _expressions.Add(exp);
             return _expressions.Count - 1;
         }

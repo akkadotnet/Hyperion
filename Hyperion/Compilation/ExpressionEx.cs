@@ -10,6 +10,7 @@
 using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.Serialization;
 using Hyperion.Extensions;
 
 namespace Hyperion.Compilation
@@ -20,18 +21,17 @@ namespace Hyperion.Compilation
         {
             return Expression.Constant(self);
         }
-
-
+        
         public static Expression GetNewExpression(Type type)
         {
             if (type.GetTypeInfo().IsValueType)
             {
-                var x =  Expression.Constant(Activator.CreateInstance(type));
+                var x = Expression.Constant(Activator.CreateInstance(type));
                 var convert = Expression.Convert(x, typeof(object));
                 return convert;
             }
 #if SERIALIZATION
-            var defaultCtor = type.GetTypeInfo().GetConstructor(new Type[] {});
+            var defaultCtor = type.GetTypeInfo().GetConstructor(new Type[] { });
             var il = defaultCtor?.GetMethodBody()?.GetILAsByteArray();
             var sideEffectFreeCtor = il != null && il.Length <= 8; //this is the size of an empty ctor
             if (sideEffectFreeCtor)
@@ -42,7 +42,7 @@ namespace Hyperion.Compilation
 #endif
             var emptyObjectMethod = typeof(TypeEx).GetTypeInfo().GetMethod(nameof(TypeEx.GetEmptyObject));
             var emptyObject = Expression.Call(null, emptyObjectMethod, type.ToConstant());
-            
+
             return emptyObject;
         }
     }
