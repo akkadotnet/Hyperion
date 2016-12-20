@@ -1,8 +1,8 @@
 ﻿{
-  "version": "0.8.1-*",
+  "version": "0.9.0-*",
   "description": "Hyperion, fast binary POCO serializer",
   "authors": [
-    "Roger Johansson"
+    "akkadotnet"
   ],
   "packOptions": {
     "tags": [
@@ -12,7 +12,7 @@
     ],
     "projectUrl": "https://github.com/akkadotnet/Hyperion",
     "licenseUrl": "https://github.com/akkadotnet/Hyperion/blob/master/LICENSE",
-    "iconUrl": "https://raw.githubusercontent.com/hmemcpy/NServiceBus.Hyperion/master/icon.png"
+    "iconUrl": ""
   },
   "dependencies": {
   },

@@ -18,8 +18,8 @@ cd __SOURCE_DIRECTORY__
 
 
 let product = "Hyperion"
-let authors = [ "Roger Johansson" ]
-let copyright = "Copyright � 2016 Akka.NET Team"
+let authors = [ "akkadotnet" ]
+let copyright = "Copyright 2016 Akka.NET Team"
 let company = "Akka.NET Team"
 let description = "Binary serializer for POCO objects"
 let tags = [ "serializer" ]
