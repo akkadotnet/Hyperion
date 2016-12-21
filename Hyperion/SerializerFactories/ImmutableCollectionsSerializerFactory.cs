@@ -59,15 +59,25 @@ namespace Hyperion.SerializerFactories
             var genericSufixIdx = typeName.IndexOf('`');
             typeName = genericSufixIdx != -1 ? typeName.Substring(0, genericSufixIdx) : typeName;
             var creatorType =
-                Type.GetType(
-                    ImmutableCollectionsNamespace + "." + typeName + ", " + ImmutableCollectionsAssembly, true);
+                Type.GetType(ImmutableCollectionsNamespace + "." + typeName + ", " + ImmutableCollectionsAssembly);
 
             var genericTypes = elementType.GetTypeInfo().IsGenericType
                    ? elementType.GetTypeInfo().GetGenericArguments()
                    : new[] { elementType };
-            var createRange = creatorType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static)
+
+            // if creatorType == null it means that type is probably an interface
+            // we propagate null to create mock serializer - it won't be used anyway
+            
+            var stackTypeDef = Type.GetType(ImmutableCollectionsNamespace + ".IImmutableStack`1, " + ImmutableCollectionsAssembly, true);
+            var stackInterface = stackTypeDef.MakeGenericType(genericTypes[0]);
+
+            var isStack = stackInterface.IsAssignableFrom(type);
+
+            var createRange = creatorType != null
+                ? creatorType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(methodInfo => methodInfo.Name == "CreateRange" && methodInfo.GetParameters().Length == 1)
-                .MakeGenericMethod(genericTypes);
+                .MakeGenericMethod(genericTypes)
+                : null;
 
             ObjectWriter writer = (stream, o, session) =>
             {
@@ -90,24 +100,49 @@ namespace Hyperion.SerializerFactories
                     session.TrackSerializedObject(o);
                 }
             };
+            ObjectReader reader;
 
-            ObjectReader reader = (stream, session) =>
+            if (isStack)
             {
-                var count = stream.ReadInt32(session);
-                var items = Array.CreateInstance(elementType, count);
-                for (var i = 0; i < count; i++)
+                // if we are dealing with stack, we need to apply arguments in reverse order
+                reader = (stream, session) =>
                 {
-                    var value = stream.ReadObject(session);
-                    items.SetValue(value, i);
-                }
-               
-                var instance = createRange.Invoke(null, new object[] {items});
-                if (preserveObjectReferences)
+                    var count = stream.ReadInt32(session);
+                    var items = Array.CreateInstance(elementType, count);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var value = stream.ReadObject(session);
+                        items.SetValue(value, count - i - 1);
+                    }
+
+                    var instance = createRange.Invoke(null, new object[] { items });
+                    if (preserveObjectReferences)
+                    {
+                        session.TrackDeserializedObject(instance);
+                    }
+                    return instance;
+                };
+            }
+            else
+            {
+                reader = (stream, session) =>
                 {
-                    session.TrackDeserializedObject(instance);
-                }
-                return instance;
-            };
+                    var count = stream.ReadInt32(session);
+                    var items = Array.CreateInstance(elementType, count);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var value = stream.ReadObject(session);
+                        items.SetValue(value, i);
+                    }
+
+                    var instance = createRange.Invoke(null, new object[] { items });
+                    if (preserveObjectReferences)
+                    {
+                        session.TrackDeserializedObject(instance);
+                    }
+                    return instance;
+                };
+            }
             x.Initialize(reader, writer);
             return x;
         }
