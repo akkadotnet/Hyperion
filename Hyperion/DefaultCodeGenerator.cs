@@ -21,6 +21,8 @@ namespace Hyperion
 {
     public class DefaultCodeGenerator : ICodeGenerator
     {
+        public const string PreallocatedByteBuffer = "PreallocatedByteBuffer";
+
         public void BuildSerializer([NotNull] Serializer serializer, [NotNull] ObjectSerializer objectSerializer)
         {
             var type = objectSerializer.Type;
@@ -32,7 +34,7 @@ namespace Hyperion
             objectSerializer.Initialize(reader, writer, preallocatedBufferSize);
         }
 
-        private ObjectReader GetFieldsReader([NotNull] Serializer serializer, [NotNull] IEnumerable<FieldInfo> fields,
+        private ObjectReader GetFieldsReader([NotNull] Serializer serializer, [NotNull] FieldInfo[] fields,
             [NotNull] Type type)
         {
             var c = new Compiler<ObjectReader>();
@@ -72,8 +74,7 @@ namespace Hyperion
             //}
 
             var typedTarget = c.CastOrUnbox(target, type);
-            var fieldsArray = fields.ToArray();
-            var serializers = fieldsArray.Select(field => serializer.GetSerializerByType(field.FieldType)).ToArray();
+            var serializers = fields.Select(field => serializer.GetSerializerByType(field.FieldType)).ToArray();
 
             var preallocatedBufferSize = serializers.Length != 0 ? serializers.Max(s => s.PreallocatedByteBufferSize) : 0;
             if (preallocatedBufferSize > 0)
@@ -82,9 +83,9 @@ namespace Hyperion
                     typeof(DeserializerSession).GetTypeInfo().GetMethod(nameof(DeserializerSession.GetBuffer)));
             }
 
-            for (var i = 0; i < fieldsArray.Length; i++)
+            for (var i = 0; i < fields.Length; i++)
             {
-                var field = fieldsArray[i];
+                var field = fields[i];
                 var s = serializers[i];
 
                 int read;
@@ -103,8 +104,7 @@ namespace Hyperion
                     read = c.Convert(read, field.FieldType);
                 }
 
-
-                var assignReadToField = c.WriteField(field, typedTarget, read);
+                var assignReadToField = c.WriteField(field, typedTarget, target, read);
                 c.Emit(assignReadToField);
             }
             c.Emit(target);
@@ -192,7 +192,5 @@ namespace Hyperion
 
             return c.Compile();
         }
-
-        public const string PreallocatedByteBuffer = "PreallocatedByteBuffer";
     }
 }
