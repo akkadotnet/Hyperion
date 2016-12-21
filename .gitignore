@@ -6,6 +6,11 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.dotnet
+*.idea
+*.nuget
+*.lock.json
+*tools
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -198,3 +203,5 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
+

@@ -7,8 +7,10 @@
 // -----------------------------------------------------------------------
 #endregion
 
+#if NET45
 using Akka.Actor;
 using Hyperion.FSharpTestTypes;
+#endif
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
@@ -17,6 +19,7 @@ using Xunit;
 
 namespace Hyperion.Tests
 {
+#if NET45
     public class FSharpTests : TestBase
     {
 
@@ -114,4 +117,5 @@ namespace Hyperion.Tests
             Assert.Equal(expected, actual);
         }
     }
+#endif
 }

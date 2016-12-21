@@ -38,12 +38,9 @@ namespace Hyperion.SerializerFactories
                 var owner = stream.ReadObject(session) as Type;
                 var arguments = stream.ReadObject(session) as Type[];
 
-#if NET45
                 var ctor = owner.GetTypeInfo().GetConstructor(arguments);
                 return ctor;
-#else
-                return null;
-#endif
+
             };
             ObjectWriter writer = (stream, obj, session) =>
             {

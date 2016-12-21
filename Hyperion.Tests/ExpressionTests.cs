@@ -35,7 +35,7 @@ namespace Hyperion.Tests
         {
             protected DummyException(
                 SerializationInfo info,
-                StreamingContext context) : base(info, context)
+                StreamingContext context) //: base(info, context)
             {
             }
         }
@@ -337,7 +337,11 @@ namespace Hyperion.Tests
             }
         }
 
+        #if NET45
         [Fact]
+        #else
+        [Fact(Skip= "constructor Exception(SerializationInfo info, StreamingContext context) is not implemented in .netcore1.0")]
+        #endif
         public void CanSerializeCatchBlock()
         {
             var expr = Expression.Catch(typeof(DummyException), Expression.Constant(2));

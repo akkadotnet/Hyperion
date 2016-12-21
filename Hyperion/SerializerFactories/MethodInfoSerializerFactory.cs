@@ -49,7 +49,9 @@ namespace Hyperion.SerializerFactories
                     null);
                 return method;
 #else
-                return null;
+                var method = owner.GetTypeInfo()
+                    .GetMethod(name, arguments);
+                return method;
 #endif
             };
             ObjectWriter writer = (stream, obj, session) =>
