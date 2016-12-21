@@ -247,7 +247,7 @@ Target "NBench" <| fun _ ->
         let args = new StringBuilder()
                 |> append assembly
                 |> append (sprintf "output-directory=\"%s\"" perfOutput)
-                |> append (sprintf "concurrent=\"%b\"" true)
+                |> append (sprintf "concurrent=\"%b\"" false)
                 |> append (sprintf "trace=\"%b\"" true)
                 |> append (sprintf "teamcity=\"%b\"" true)
                 |> toText
