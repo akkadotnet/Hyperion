@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
@@ -49,8 +50,14 @@ namespace Hyperion.SerializerFactories
                     null);
                 return method;
 #else
-                var method = owner.GetTypeInfo()
-                    .GetMethod(name, arguments);
+                var methods = owner.GetTypeInfo()
+                    .GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
+                                BindingFlags.NonPublic);
+                var method = methods.FirstOrDefault(m => m.Name == name &&
+                                                         //m.CallingConvention == CallingConventions.Any &&
+                                                         m.GetParameters()
+                                                             .Select(p => p.ParameterType)
+                                                             .SequenceEqual(arguments));
                 return method;
 #endif
             };
