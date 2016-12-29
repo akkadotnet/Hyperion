@@ -28,7 +28,7 @@
         "Microsoft.CSharp": "4.0.1"
       },
       "imports": [
-        "netstandard1.6"
+        "netstandard1.2"
       ]
     },
     "net450": {
