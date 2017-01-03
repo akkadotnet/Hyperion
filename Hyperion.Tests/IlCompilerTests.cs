@@ -18,6 +18,7 @@ using Xunit;
 
 namespace Hyperion.Tests
 {
+#if NET45
     public class Poco
     {
         public string StringProp { get; set; }
@@ -304,4 +305,5 @@ namespace Hyperion.Tests
             return readAllFields;
         }
     }
+#endif
 }
