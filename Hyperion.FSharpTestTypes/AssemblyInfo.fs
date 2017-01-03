@@ -6,7 +6,7 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyTitleAttribute("Hyperion")>]
 [<assembly: AssemblyProductAttribute("Hyperion")>]
 [<assembly: AssemblyDescriptionAttribute("Binary serializer for POCO objects")>]
-[<assembly: AssemblyCopyrightAttribute("Copyright � 2016 Akka.NET Team")>]
+[<assembly: AssemblyCopyrightAttribute("Copyright 2016 Akka.NET Team")>]
 [<assembly: AssemblyCompanyAttribute("Akka.NET Team")>]
 [<assembly: ComVisibleAttribute(false)>]
 [<assembly: CLSCompliantAttribute(true)>]

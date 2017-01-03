@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SharedAssemblyInfo.cs">
+      <Link>Properties\SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Internal\Annotations.cs" />
     <Compile Include="ByteArrayKey.cs" />
     <Compile Include="ByteArrayKeyComparer.cs" />
@@ -118,6 +121,7 @@
     <Compile Include="ValueSerializers\ValueSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Hyperion.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
