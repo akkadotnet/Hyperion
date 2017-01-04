@@ -8,6 +8,7 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Dynamic;
@@ -317,6 +318,68 @@ namespace Hyperion.Tests
             }
 
             Assert.True(msg.SequenceEqual(deserialized));
+        }
+
+        #region test classes
+
+        public class CustomAdd : IEnumerable<int>
+        {
+            public IImmutableList<int> Inner { get; }
+            public int Count => Inner.Count;
+
+            public CustomAdd(IImmutableList<int> inner)
+            {
+                this.Inner = inner;
+            }
+
+            public CustomAdd Add(int item) => new CustomAdd(Inner.Add(item));
+
+            public IEnumerator<int> GetEnumerator() => Inner.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        public class CustomAddRange : IEnumerable<int>
+        {
+            public IImmutableList<int> Inner { get; }
+            public int Count => Inner.Count;
+
+            public CustomAddRange(IImmutableList<int> inner)
+            {
+                this.Inner = inner;
+            }
+
+            public CustomAddRange AddRange(string newLabel, int[] items) => new CustomAddRange(Inner.AddRange(items));
+
+            public IEnumerator<int> GetEnumerator() => Inner.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        #endregion
+
+        [Fact]
+        public void CanSerializeCustomEnumerableWithNonStandardAddSignature()
+        {
+            var init = new CustomAdd(ImmutableList<int>.Empty);
+            var expected = init.Add(1).Add(2);
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<CustomAdd>();
+            Assert.True(expected.SequenceEqual(actual));
+        }
+
+        [Fact]
+        public void CanSerializeCustomEnumerableWithNonStandardAddRangeSignature()
+        {
+            var init = new CustomAddRange(ImmutableList<int>.Empty);
+            var expected = init.AddRange("label", new []{ 1, 2, 3 });
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<CustomAddRange>();
+            Assert.True(expected.SequenceEqual(actual));
         }
     }
 }
