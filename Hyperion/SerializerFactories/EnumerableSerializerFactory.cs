@@ -43,7 +43,7 @@ namespace Hyperion.SerializerFactories
 
         private static bool IsAddMethod(MethodInfo methodInfo) => 
             (methodInfo.Name == "AddRange" || methodInfo.Name == "Add")
-            && methodInfo.ReturnType == typeof(void)
+            && (methodInfo.ReturnType == typeof(void) || methodInfo.ReturnType == typeof(bool)) // sets return bool on Add
             && !methodInfo.IsStatic
             && HasValidParameters(methodInfo);
 
