@@ -51,24 +51,26 @@ namespace Hyperion.SerializerFactories
             {
                 var bin = new byte[size];
 
-                var ptr = Marshal.AllocHGlobal(size);
+                var handle = GCHandle.Alloc(bin, GCHandleType.Pinned);
+                var ptr = handle.AddrOfPinnedObject();
                 Marshal.StructureToPtr(value, ptr, true);
                 Marshal.Copy(ptr, bin, 0, size);
-                Marshal.FreeHGlobal(ptr);
 
                 stream.Write(bin, 0, size);
+                handle.Free();
             };
 
             ObjectReader reader = (stream, session) =>
             {
-                var ptr = Marshal.AllocHGlobal(size);
                 var bin = new byte[size];
                 stream.Read(bin, 0, size);
+                var handle = GCHandle.Alloc(bin, GCHandleType.Pinned);
+                var ptr = handle.AddrOfPinnedObject();
 
                 Marshal.Copy(bin, 0, ptr, size);
 
                 var value = Marshal.PtrToStructure(ptr, type);
-                Marshal.FreeHGlobal(ptr);
+                handle.Free();
                 return value;
             };
             ser.Initialize(reader, writer);
