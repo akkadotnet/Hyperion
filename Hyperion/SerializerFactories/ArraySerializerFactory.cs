@@ -9,7 +9,10 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
@@ -21,7 +24,7 @@ namespace Hyperion.SerializerFactories
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
-        private static void WriteValues<T>(T[] array,Stream stream,Type elementType, ValueSerializer elementSerializer, SerializerSession session)
+        private static void WriteValues<T>(T[] array, Stream stream, Type elementType, ValueSerializer elementSerializer, SerializerSession session)
         {
             Int32Serializer.WriteValueImpl(stream, array.Length, session);
             var preserveObjectReferences = session.Serializer.Options.PreserveObjectReferences;
@@ -43,7 +46,7 @@ namespace Hyperion.SerializerFactories
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var arraySerializer = new ObjectSerializer(type);
-            
+
             var elementType = type.GetElementType();
             var elementSerializer = serializer.GetSerializerByType(elementType);
             var preserveObjectReferences = serializer.Options.PreserveObjectReferences;
@@ -57,7 +60,7 @@ namespace Hyperion.SerializerFactories
                     session.TrackDeserializedObject(array);
                 }
 
-                ReadValues(length, stream, session, (dynamic) array);
+                ReadValues(length, stream, session, (dynamic)array);
 
                 return array;
             };
@@ -68,8 +71,7 @@ namespace Hyperion.SerializerFactories
                     session.TrackSerializedObject(arr);
                 }
 
-                WriteValues((dynamic) arr, stream, elementType, elementSerializer, session);
- 
+                WriteValues((dynamic)arr, stream, elementType, elementSerializer, session);
             };
             arraySerializer.Initialize(reader, writer);
             typeMapping.TryAdd(type, arraySerializer);
