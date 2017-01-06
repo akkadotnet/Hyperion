@@ -19,7 +19,7 @@ cd __SOURCE_DIRECTORY__
 
 let product = "Hyperion"
 let authors = [ "akkadotnet" ]
-let copyright = "Copyright 2016 Akka.NET Team"
+let copyright = "Copyright 2016 - 2017 Akka.NET Team"
 let company = "Akka.NET Team"
 let description = "Binary serializer for POCO objects"
 let tags = [ "serializer" ]
@@ -30,7 +30,7 @@ let AzCopyDir = toolDir @@ "AzCopy"
 
 // Read release notes and version
 
-let root = @"./"
+let root = @""
 let solutionName = "Hyperion.sln"
 let solutionPath = root @@ solutionName
 let parsedRelease =
