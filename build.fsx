@@ -19,7 +19,7 @@ cd __SOURCE_DIRECTORY__
 
 let product = "Hyperion"
 let authors = [ "akkadotnet" ]
-let copyright = "Copyright 2016 Akka.NET Team"
+let copyright = "Copyright 2016 - 2017 Akka.NET Team"
 let company = "Akka.NET Team"
 let description = "Binary serializer for POCO objects"
 let tags = [ "serializer" ]
@@ -30,7 +30,7 @@ let AzCopyDir = toolDir @@ "AzCopy"
 
 // Read release notes and version
 
-let root = @".\"
+let root = @""
 let solutionName = "Hyperion.sln"
 let solutionPath = root @@ solutionName
 let parsedRelease =
@@ -57,7 +57,7 @@ let perfOutput = FullName "PerfResults"
 
 let nugetDir = binDir @@ "nuget"
 let workingDir = binDir @@ "build"
-let libDir = workingDir @@ @"lib\net45\"
+let libDir = workingDir @@ "lib" @@ "net45"
 let nugetExe = FullName (root @@ @".nuget\NuGet.exe")
 let docDir = "bin" @@ "doc"
 let sourceBrowserDocsDir = binDir @@ "sourcebrowser"
@@ -238,7 +238,7 @@ Target "NBench" <| fun _ ->
     let testSearchPath = !! (root @@ "**/bin/Release/Hyperion.Tests.Performance.dll")
 
     mkdir perfOutput
-    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (root @@ "packges/NBench.Runner*")
+    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (root @@ "packages" @@ "NBench.Runner*")
     printfn "Using NBench.Runner: %s" nbenchTestPath
 
     let runNBench assembly =
