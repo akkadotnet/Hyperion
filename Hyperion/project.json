@@ -31,7 +31,7 @@
         "netstandard1.2"
       ]
     },
-    "net450": {
+    "net452": {
       "imports": "dotnet5.4",
       "dependencies": {},
        "define": [ "SERIALIZATION" ]
