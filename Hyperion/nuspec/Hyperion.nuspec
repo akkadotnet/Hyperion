@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>Hyperion</id>
+    <title>Hyperion</title>
+    <version>0.0.0</version>
+    <authors>akkadotnet</authors>
+    <owners>akkadotnet</owners>
+    <description>Binary serializer for POCO objects</description>
+    <licenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/akkadotnet/Hyperion</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>@copyright@</copyright>
+  </metadata>
+</package>
