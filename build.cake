@@ -58,34 +58,34 @@ Task("AssemblyInfo")
 Task("Clean")
   .Does(() =>
 {
-  //Clean artifact directories.
-  CleanDirectories(new DirectoryPath[] {
-    output, outputBinaries, outputNuGet,
-    outputBinariesNet451, outputBinariesNetstandard
-  });
+    //Clean artifact directories.
+    CleanDirectories(new DirectoryPath[] {
+      output, outputBinaries, outputNuGet,
+      outputBinariesNet451, outputBinariesNetstandard
+    });
 
-  if(!skipClean) {
-    // Clean output directories.
-    CleanDirectories("./**/bin/" + configuration);
-    CleanDirectories("./**/obj/" + configuration);
-  }
+    if(!skipClean) {
+        // Clean output directories.
+        CleanDirectories("./**/bin/" + configuration);
+        CleanDirectories("./**/obj/" + configuration);
+    }
 });
 
 Task("Restore-NuGet-Packages")
   .Description("Restores dependencies")
   .Does(() =>
 {
-  DotNetCoreRestore("./", new DotNetCoreRestoreSettings
-  {
-    Verbose = false,
-    Verbosity = DotNetCoreRestoreVerbosity.Warning,
-    Sources = new [] {
-      "https://www.myget.org/F/xunit/api/v3/index.json",
-      "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json",
-      "https://dotnet.myget.org/F/cli-deps/api/v3/index.json",
-      "https://api.nuget.org/v3/index.json",
-    }
-  });
+    DotNetCoreRestore("./", new DotNetCoreRestoreSettings
+    {
+        Verbose = false,
+        Verbosity = DotNetCoreRestoreVerbosity.Warning,
+        Sources = new [] {
+          "https://www.myget.org/F/xunit/api/v3/index.json",
+          "https://dotnet.myget.org/F/dotnet-core/api/v3/index.json",
+          "https://dotnet.myget.org/F/cli-deps/api/v3/index.json",
+          "https://api.nuget.org/v3/index.json",
+        }
+    });
 });
 
 
@@ -100,32 +100,34 @@ Task("Build")
 });
 
 
-// Task("CleanTests")
-//   .Does(() =>
-// {
-//   CleanDirectories(new DirectoryPath[] { outputTests });
-// });
+Task("CleanTests")
+    .Does(() =>
+    {
+        CleanDirectories(new DirectoryPath[] { outputTests });
+    });
 
 Task("RunTests")
   .Description("Executes xUnit tests")
   .WithCriteria(!skipTests)
-  //.IsDependentOn("CleanTests")
+  .IsDependentOn("CleanTests")
   .Does(() =>
 {
-  var projects = GetFiles("./Hyperion.Tests/*.xproj");
+    var projects = GetFiles("./Hyperion.Tests/*.xproj");
   //   - GetFiles("./tests/**/*.Performance.xproj");
   // var projects = GetFiles("./tests/**/*.xproj")
   //   - GetFiles("./tests/**/*.Performance.xproj");
 
-  foreach(var project in projects)
-  {
-    DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings
+    foreach(var project in projects)
     {
-      Configuration = configuration,
-      OutputDirectory = outputTests,
-      Verbose = false
-    });
-  }
+        DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings
+        {
+            Configuration = configuration,
+            NoBuild = true,
+            Verbose = false,
+            ArgumentCustomization = args =>
+              args.Append("-xml").Append(outputTests.Path.CombineWithFilePath(project.GetFilenameWithoutExtension()).FullPath + ".xml")
+        });
+    }
 });
 
 
@@ -163,34 +165,34 @@ Task("Package-NuGet")
   .Description("Generates NuGet packages for each project that contains a nuspec")
   .Does(() =>
 {
-  var projects = GetFiles("./src/**/*.xproj");
-  foreach(var project in projects)
-  {
-    DotNetCorePack(project.GetDirectory().FullPath, new DotNetCorePackSettings {
-      Configuration = configuration,
-      OutputDirectory = outputNuGet
+    var projects = GetFiles("./src/**/*.xproj");
+    foreach(var project in projects)
+    {
+        DotNetCorePack(project.GetDirectory().FullPath, new DotNetCorePackSettings {
+            Configuration = configuration,
+            OutputDirectory = outputNuGet
+        });
+    }
+
+    // Cake - .NET 4.5
+    NuGetPack("./Hyperion/nuspec/Hyperion.nuspec", new NuGetPackSettings {
+        Version = version,
+        ReleaseNotes = releaseNote.Notes.ToList(),
+        BasePath = outputBinariesNet451,
+        OutputDirectory = outputNuGet,
+        Symbols = false,
+        NoPackageAnalysis = true
     });
-  }
 
-  // Cake - .NET 4.5
-  NuGetPack("./Hyperion/nuspec/Hyperion.nuspec", new NuGetPackSettings {
-    Version = version,
-    ReleaseNotes = releaseNote.Notes.ToList(),
-    BasePath = outputBinariesNet451,
-    OutputDirectory = outputNuGet,
-    Symbols = false,
-    NoPackageAnalysis = true
-  });
-
-  // Cake - .NET Core
-  NuGetPack("./Hyperion/nuspec/Hyperion.Core.nuspec", new NuGetPackSettings {
-    Version = version,
-    ReleaseNotes = releaseNote.Notes.ToList(),
-    BasePath = outputBinariesNetstandard,
-    OutputDirectory = outputNuGet,
-    Symbols = false,
-    NoPackageAnalysis = true
-  });
+    // Cake - .NET Core
+    NuGetPack("./Hyperion/nuspec/Hyperion.Core.nuspec", new NuGetPackSettings {
+        Version = version,
+        ReleaseNotes = releaseNote.Notes.ToList(),
+        BasePath = outputBinariesNetstandard,
+        OutputDirectory = outputNuGet,
+        Symbols = false,
+        NoPackageAnalysis = true
+    });
 });
 
 
@@ -198,18 +200,18 @@ Task("Publish-NuGet")
   .IsDependentOn("Package-Nuget")
   .Does(() =>
 {
-  if(string.IsNullOrWhiteSpace(apiKey)){
-    throw new CakeException("No NuGet API key provided.");
-  }
+    if(string.IsNullOrWhiteSpace(apiKey)){
+        throw new CakeException("No NuGet API key provided.");
+    }
 
-  var packages = GetFiles(outputNuGet.Path.FullPath + "/*" + version + ".nupkg");
-  foreach(var package in packages)
-  {
-    NuGetPush(package, new NuGetPushSettings {
-      Source = source,
-      ApiKey = apiKey
-    });
-  }
+    var packages = GetFiles(outputNuGet.Path.FullPath + "/*" + version + ".nupkg");
+    foreach(var package in packages)
+    {
+        NuGetPush(package, new NuGetPushSettings {
+            Source = source,
+            ApiKey = apiKey
+        });
+    }
 })
 .OnError(exception =>
 {
@@ -218,16 +220,16 @@ Task("Publish-NuGet")
 });
 
 Task("BuildRelease")
-  .IsDependentOn("Clean")
-  .IsDependentOn("AssemblyInfo")
-  .IsDependentOn("Restore-NuGet-Packages")
-  .IsDependentOn("Build");
+    .IsDependentOn("Clean")
+    .IsDependentOn("AssemblyInfo")
+    .IsDependentOn("Restore-NuGet-Packages")
+    .IsDependentOn("Build");
 
 Task("CreateNuget")
-  .IsDependentOn("Copy-Files")
-  .IsDependentOn("Package-Nuget");
+    .IsDependentOn("Copy-Files")
+    .IsDependentOn("Package-Nuget");
 
 Task("PublishNuget")
-  .IsDependentOn("Publish-NuGet");
+    .IsDependentOn("Publish-NuGet");
 
 RunTarget(target);
