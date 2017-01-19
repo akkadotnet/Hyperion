@@ -5,14 +5,14 @@ using System.Xml.XPath;
 
 // Arguments
 var target = Argument<string>("target", "Default");
-var source = Argument<string>("source", null);
+var apiUrl = Argument<string>("apiurl", null);
 var apiKey = Argument<string>("apikey", null);
 var releaseNote = ParseReleaseNotes("./RELEASE_NOTES.md");
 var buildNumber = EnvironmentVariable("BUILD_NUMBER") ?? "0";
 var version = Argument<string>("targetversion", string.Format("{0}.{1}", releaseNote.Version, buildNumber ));
 var skipClean = Argument<bool>("skipclean", false);
 var skipTests = Argument<bool>("skiptests", false);
-var nogit = Argument<bool>("nogit", false);
+//var nogit = Argument<bool>("nogit", false);
 
 // Variables
 var configuration = IsRunningOnWindows() ? "Release" : "MonoRelease";
@@ -28,30 +28,33 @@ var outputBinariesNetstandard = outputBinaries + Directory("netcoreapp1.0");
 var outputNuGet = output + Directory("nuget");
 var outputPerfResults = Directory("perfResults");
 
-var root = @".\";
+var root = @"./";
+var src = @"./";
 var product = "Hyperion";
 //var authors = [ "Roger Johansson" ];
 var copyright = "Copyright � 2016 Akka.NET Team";
 var company = "Akka.NET Team";
 var description = "Binary serializer for POCO objects";
-//var tags = [ "serializer" ]
-//var configuration = "Release";
+//var tags = [ "serializer" ];
 var toolDir = "tools";
 var publishingError = false;
-//var CloudCopyDir = toolDir @@ "CloudCopy";
-//var AzCopyDir = toolDir @@ "AzCopy"
+
 
 Task("AssemblyInfo")
   .Does(() => 
 {
-    CreateAssemblyInfo(root + "SharedAssemblyInfo.cs", new AssemblyInfoSettings {
-        Product = product,
-        Version = version,
-        FileVersion = version,
-        //InformationalVersion = semVersion,
-        InformationalVersion = version,
-        Copyright = copyright
-    });
+    var assemblyInfosPaths = GetFiles(src + "Hyperion/**/AssemblyInfo.cs");
+    
+    foreach (var assemblyInfoPath in assemblyInfosPaths) {
+        CreateAssemblyInfo(assemblyInfoPath.FullPath, new AssemblyInfoSettings {
+            Product = product,
+            Version = version,
+            FileVersion = version,
+            //InformationalVersion = semVersion,
+            InformationalVersion = version,
+            Copyright = copyright
+        });
+    }
 });
 
 
@@ -119,14 +122,31 @@ Task("RunTests")
 
     foreach(var project in projects)
     {
-        DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings
-        {
-            Configuration = configuration,
-            NoBuild = true,
-            Verbose = false,
-            ArgumentCustomization = args =>
-              args.Append("-xml").Append(outputTests.Path.CombineWithFilePath(project.GetFilenameWithoutExtension()).FullPath + ".xml")
-        });
+        if (IsRunningOnWindows()) {
+            DotNetCoreTest(project.GetDirectory().FullPath, new DotNetCoreTestSettings
+            {
+                Configuration = configuration,
+                NoBuild = true,
+                Verbose = false,
+                ArgumentCustomization = args =>
+                  args.Append("-xml").Append(outputTests.Path.CombineWithFilePath(project.GetFilenameWithoutExtension()).FullPath + ".xml")
+            });
+        }
+        else {
+            var name = project.GetFilenameWithoutExtension();
+            var dirPath = project.GetDirectory().FullPath;
+            var xunit = GetFiles(dirPath + "/bin/" + configuration + "/net452/*/dotnet-test-xunit.exe").First().FullPath;
+            var testfile = GetFiles(dirPath + "/bin/" + configuration + "/net452/*/" + name + ".dll").First().FullPath;
+
+            using(var process = StartAndReturnProcess("mono", new ProcessSettings{ Arguments = xunit + " " + testfile }))
+            {
+                process.WaitForExit();
+                if (process.GetExitCode() != 0)
+                {
+                    throw new Exception("Mono tests failed!");
+                }
+            }
+        }
     }
 });
 
@@ -197,25 +217,28 @@ Task("Package-NuGet")
 
 
 Task("Publish-NuGet")
-  .IsDependentOn("Package-Nuget")
   .Does(() =>
 {
     if(string.IsNullOrWhiteSpace(apiKey)){
-        throw new CakeException("No NuGet API key provided.");
+        throw new InvalidOperationException("No NuGet API key provided.");
     }
 
-    var packages = GetFiles(outputNuGet.Path.FullPath + "/*" + version + ".nupkg");
+    if(string.IsNullOrEmpty(apiUrl)) {
+        throw new InvalidOperationException("Could not resolve NuGet API url.");
+    }
+
+    var packages = GetFiles(outputNuGet.Path.FullPath + "/*.nupkg");
     foreach(var package in packages)
     {
         NuGetPush(package, new NuGetPushSettings {
-            Source = source,
+            Source = apiUrl,
             ApiKey = apiKey
         });
     }
 })
 .OnError(exception =>
 {
-    Information("Publish-MyGet Task failed, but continuing with next Task...");
+    Information("Publish-NuGet Task failed, but continuing with next Task...");
     publishingError = true;
 });
 
@@ -230,6 +253,18 @@ Task("CreateNuget")
     .IsDependentOn("Package-Nuget");
 
 Task("PublishNuget")
-    .IsDependentOn("Publish-NuGet");
+    .IsDependentOn("Publish-NuGet")
+    .Finally(() => 
+    {
+        if(publishingError)
+        {
+            throw new Exception("An error occurred during the publishing of Cake.  All publishing tasks have been attempted.");
+        }
+    });
+
+Task("All")
+    .IsDependentOn("BuildRelease")
+    .IsDependentOn("RunTests")
+    .IsDependentOn("CreateNuget");
 
 RunTarget(target);

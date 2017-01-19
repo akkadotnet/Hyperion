@@ -11,6 +11,7 @@
 *.nuget
 *.lock.json
 *tools
+*AssemblyInfo.cs
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -203,5 +204,6 @@ FakesAssemblies/
 
 # Visual Studio 6 workspace options file
 *.opt
+
 
 
