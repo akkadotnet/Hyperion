@@ -35,8 +35,6 @@
       ]
     },
     "net45": {
-      "imports": "dotnet5.4",
-      "dependencies": {},
        "define": [ "SERIALIZATION" ]
     }
   }
