@@ -23,7 +23,7 @@ var nuget = Directory(".nuget");
 var output = Directory("build");
 var outputTests = Directory("TestResults");
 var outputBinaries = output + Directory("binaries");
-var outputBinariesNet451 = outputBinaries + Directory("net452");
+var outputBinariesNet45 = outputBinaries + Directory("net45");
 var outputBinariesNetstandard = outputBinaries + Directory("netcoreapp1.0");
 var outputNuGet = output + Directory("nuget");
 var outputPerfResults = Directory("perfResults");
@@ -64,7 +64,7 @@ Task("Clean")
     //Clean artifact directories.
     CleanDirectories(new DirectoryPath[] {
       output, outputBinaries, outputNuGet,
-      outputBinariesNet451, outputBinariesNetstandard
+      outputBinariesNet45, outputBinariesNetstandard
     });
 
     if(!skipClean) {
@@ -158,8 +158,8 @@ Task("Copy-Files")
     // .NET 4.5
     DotNetCorePublish("./Hyperion", new DotNetCorePublishSettings
     {
-        Framework = "net452",
-        OutputDirectory = outputBinariesNet451,
+        Framework = "net45",
+        OutputDirectory = outputBinariesNet45,
         Configuration = configuration,
         NoBuild = true,
         Verbose = false
@@ -176,7 +176,7 @@ Task("Copy-Files")
     });
 
     // Copy license
-    CopyFileToDirectory("./LICENSE", outputBinariesNet451);
+    CopyFileToDirectory("./LICENSE", outputBinariesNet45);
     CopyFileToDirectory("./LICENSE", outputBinariesNetstandard);
 });
 
@@ -198,7 +198,7 @@ Task("Package-NuGet")
     NuGetPack("./Hyperion/nuspec/Hyperion.nuspec", new NuGetPackSettings {
         Version = version,
         ReleaseNotes = releaseNote.Notes.ToList(),
-        BasePath = outputBinariesNet451,
+        BasePath = outputBinariesNet45,
         OutputDirectory = outputNuGet,
         Symbols = false,
         NoPackageAnalysis = true

@@ -9,12 +9,10 @@
   },
   "frameworks": {
     "net452": {
-      "buildOptions": {
-        "define": [ "THREADPOOL", "APPDOMAIN", "SERIALIZATION" ]
-      },
       "dependencies": {
         "System.Collections.Immutable": "1.3.0",
         "FSharp.Core": "4.0.0",
+        "Akka": "1.1",
         "xunit": "2.1.0",
         "dotnet-test-xunit": "1.0.0-rc2-192208-24",
         "xunit.abstractions": "2.0.0",
