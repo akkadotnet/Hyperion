@@ -1,0 +1,22 @@
+sudo: required
+dist: trusty
+
+language: csharp
+mono:
+  - latest
+
+addons:
+  apt:
+    packages:
+    - gettext
+    - libunwind8
+    - libicu52
+    - dbus
+
+branches:
+  only:
+    - coreclr
+
+script:
+  - ./build.sh All
+ 

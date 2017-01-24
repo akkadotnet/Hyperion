@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------
 #endregion
 
+#if NET45
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -305,3 +306,4 @@ namespace Hyperion.Tests
         }
     }
 }
+#endif

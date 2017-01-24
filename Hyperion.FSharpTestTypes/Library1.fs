@@ -1,8 +1,8 @@
 ﻿namespace Hyperion.FSharpTestTypes
 
+#if AKKA
 open Akka.Actor
-
-
+#endif
 
 type DU1 = 
 | A of int
@@ -16,11 +16,13 @@ type HubType =
     | Task of unit 
     | Chat of unit 
 
+#if AKKA
 type Connection =
   { username : string
     id : string
     hubType : HubType
     signalrAref : IActorRef }
+#endif
 
 [<CustomEquality;CustomComparison>]
 type User = 
