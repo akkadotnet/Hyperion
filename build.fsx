@@ -142,6 +142,22 @@ Target "CreateNuget" (fun _ ->
                 OutputPath = outputNuGet })
 )
 
+Target "PublishNuget" (fun _ ->
+    let projects = !! "./build/nuget/*.nupkg" -- "./build/nuget/*.symbols.nupkg"
+    let apiKey = getBuildParamOrDefault "nugetkey" ""
+    let source = getBuildParamOrDefault "nugetpublishurl" ""
+    let symbolSource = getBuildParamOrDefault "symbolspublishurl" ""
+
+    let runSingleProject project =
+        DotNetCli.RunCommand
+            (fun p -> 
+                { p with 
+                    TimeOut = TimeSpan.FromMinutes 10. })
+            (sprintf "nuget push %s --api-key %s --source %s --symbol-source %s" project apiKey source symbolSource)
+
+    projects |> Seq.iter (runSingleProject)
+)
+
 //--------------------------------------------------------------------------------
 // Help 
 //--------------------------------------------------------------------------------
