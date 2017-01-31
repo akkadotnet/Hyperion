@@ -111,6 +111,10 @@ Target "CopyOutput" (fun _ ->
                 Configuration = configuration })
 )
 
+//--------------------------------------------------------------------------------
+// NBench targets 
+//--------------------------------------------------------------------------------
+
 Target "NBench" (fun _ ->
     if (isWindows) then
         let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
@@ -131,6 +135,10 @@ Target "NBench" (fun _ ->
             info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
         if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
 )
+
+//--------------------------------------------------------------------------------
+// Nuget targets 
+//--------------------------------------------------------------------------------
 
 Target "CreateNuget" (fun _ ->
     DotNetCli.Pack
@@ -165,7 +173,7 @@ Target "PublishNuget" (fun _ ->
 Target "Help" <| fun _ ->
     List.iter printfn [
       "usage:"
-      "./build.ps1 [target]"
+      "/build [target]"
       ""
       " Targets for building:"
       " * Build      Builds"
@@ -177,12 +185,41 @@ Target "Help" <| fun _ ->
       " * Help       Display this help" 
       ""]
 
+Target "HelpNuget" <| fun _ ->
+    List.iter printfn [
+      "usage: "
+      "build Nuget [nugetkey=<key> [nugetpublishurl=<url>]] "
+      "            [symbolspublishurl=<url>] "
+      ""
+      "In order to publish a nuget package, keys must be specified."
+      "If a key is not specified the nuget packages will only be created on disk"
+      "After a build you can find them in build/nuget"
+      ""
+      "For pushing nuget packages to nuget.org and symbols to symbolsource.org"
+      "you need to specify nugetkey=<key>"
+      "   build Nuget nugetKey=<key for nuget.org>"
+      ""
+      "For pushing the ordinary nuget packages to another place than nuget.org specify the url"
+      "  nugetkey=<key>  nugetpublishurl=<url>  "
+      ""
+      "For pushing symbols packages specify:"
+      "  symbolskey=<key>  symbolspublishurl=<url> "
+      ""
+      "Examples:"
+      "  build Nuget                      Build nuget packages to the build/nuget folder"
+      ""
+      "  build Nuget nugetkey=123         Build and publish to nuget.org and symbolsource.org"
+      ""
+      "  build Nuget nugetprerelease=dev nugetkey=123 nugetpublishurl=http://abcsymbolspublishurl=http://xyz"
+      ""]
+
 //--------------------------------------------------------------------------------
 //  Target dependencies
 //--------------------------------------------------------------------------------
 
 Target "BuildRelease" DoNothing
 Target "All" DoNothing
+Target "Nuget" DoNothing
 
 // build dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
@@ -193,6 +230,8 @@ Target "All" DoNothing
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
+"CreateNuget" ==> "PublishNuget"
+"PublishNuget" ==> "Nuget"
 
 // all
 "BuildRelease" ==> "All"
