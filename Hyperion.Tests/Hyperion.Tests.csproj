@@ -87,6 +87,7 @@
     <Compile Include="IlCompilerTests.cs" />
     <Compile Include="ImmutableCollectionsTests.cs" />
     <Compile Include="InterfaceTests.cs" />
+    <Compile Include="MarshalSerializerTests.cs" />
     <Compile Include="UnsupportedTypeSerializerTests.cs" />
     <Compile Include="ISerializableTests.cs" />
     <Compile Include="PrimitivesTests.cs" />
