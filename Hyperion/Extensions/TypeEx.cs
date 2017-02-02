@@ -121,8 +121,7 @@ namespace Hyperion.Extensions
             return TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-                var typename = ToQualifiedAssemblyName(shortName);
-                return Type.GetType(typename, true);
+                return GetTypeFromShortName(shortName);
             });
         }
 
@@ -199,29 +198,32 @@ namespace Hyperion.Extensions
             throw new NotSupportedException();
         }
 
-        private static readonly string CoreAssemblyName = GetCoreAssemblyName();
-
-        private static string GetCoreAssemblyName()
+        public static string GetShortAssemblyQualifiedName(this Type type)
         {
-            var name = 1.GetType().AssemblyQualifiedName;
-            var part = name.Substring( name.IndexOf(", Version", StringComparison.Ordinal));
-            return part;
+            string fullName;
+
+            if (type.IsGenericType)
+            {
+                var args = type.GetGenericArguments().Select(t => "[" + GetShortAssemblyQualifiedName(t) + "]");
+                fullName = type.Namespace + "." + type.Name + "[" + String.Join(",", args) + "]";
+            }
+            else
+            {
+                fullName = type.FullName;
+            }
+
+            return fullName + ", " + type.Assembly.GetName().Name;
         }
 
-        public static string GetShortAssemblyQualifiedName(this Type self)
+        public static Type GetTypeFromShortName(string shortName)
         {
-            var name = self.AssemblyQualifiedName;
-            name = name.Replace(CoreAssemblyName, ",%core%");
-            name = name.Replace(", Culture=neutral", "");
-            name = name.Replace(", PublicKeyToken=null", "");
-            name = name.Replace(", Version=1.0.0.0", ""); //TODO: regex or whatever...
-            return name;
+            return Type.GetType(shortName, ShortNameAssemblyResolver, null, true);
         }
 
-        public static string ToQualifiedAssemblyName(string shortName)
+        private static Assembly ShortNameAssemblyResolver(AssemblyName name)
         {
-            var res = shortName.Replace(",%core%", CoreAssemblyName);
-            return res;
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => String.Equals(a.GetName().Name, name.Name, StringComparison.OrdinalIgnoreCase));
+            return assembly ?? Assembly.Load(name);
         }
     }
 }
