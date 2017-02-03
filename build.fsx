@@ -141,12 +141,15 @@ Target "NBench" (fun _ ->
 //--------------------------------------------------------------------------------
 
 Target "CreateNuget" (fun _ ->
+    let versionSuffix = getBuildParamOrDefault "versionsuffix" ""
+
     DotNetCli.Pack
         (fun p -> 
             { p with
                 Project = "./Hyperion/Hyperion.csproj"
                 Configuration = configuration
                 AdditionalArgs = ["--include-symbols"]
+                VersionSuffix = versionSuffix
                 OutputPath = outputNuGet })
 )
 
@@ -207,6 +210,8 @@ Target "HelpNuget" <| fun _ ->
       ""
       "Examples:"
       "  build Nuget                      Build nuget packages to the build/nuget folder"
+      ""
+      "  build Nuget versionsuffix=beta1  Build nuget packages with the custom version suffix"
       ""
       "  build Nuget nugetkey=123         Build and publish to nuget.org and symbolsource.org"
       ""
