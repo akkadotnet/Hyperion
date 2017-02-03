@@ -21,6 +21,9 @@ namespace Hyperion.Extensions
 {
     public static class TypeEx
     {
+        private static ConcurrentDictionary<string, Type> _shortNameToTypeCache = new ConcurrentDictionary<string, Type>();
+        private static ConcurrentDictionary<Type, string> _typeToShortNameCache = new ConcurrentDictionary<Type, string>();
+
         //Why not inline typeof you ask?
         //Because it actually generates calls to get the type.
         //We prefetch all primitives here
@@ -200,24 +203,27 @@ namespace Hyperion.Extensions
 
         public static string GetShortAssemblyQualifiedName(this Type type)
         {
-            string fullName;
-
-            if (type.IsGenericType)
+            return _typeToShortNameCache.GetOrAdd(type, t =>
             {
-                var args = type.GetGenericArguments().Select(t => "[" + GetShortAssemblyQualifiedName(t) + "]");
-                fullName = type.Namespace + "." + type.Name + "[" + String.Join(",", args) + "]";
-            }
-            else
-            {
-                fullName = type.FullName;
-            }
+                string fullName;
 
-            return fullName + ", " + type.Assembly.GetName().Name;
+                if (t.IsGenericType)
+                {
+                    var args = t.GetGenericArguments().Select(gt => "[" + GetShortAssemblyQualifiedName(gt) + "]");
+                    fullName = t.Namespace + "." + t.Name + "[" + String.Join(",", args) + "]";
+                }
+                else
+                {
+                    fullName = t.FullName;
+                }
+
+                return fullName + ", " + t.Assembly.GetName().Name;
+            });
         }
 
         public static Type GetTypeFromShortName(string shortName)
         {
-            return Type.GetType(shortName, ShortNameAssemblyResolver, null, true);
+            return _shortNameToTypeCache.GetOrAdd(shortName, name => Type.GetType(shortName, ShortNameAssemblyResolver, null, true));
         }
 
         private static Assembly ShortNameAssemblyResolver(AssemblyName name)
