@@ -9,23 +9,17 @@
 
 using Hyperion.Tests.Performance.Types;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Deserialization
 {
     public class StructDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public StructDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(LargeStruct.Create());
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark struct deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -42,16 +36,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public class ClassDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public ClassDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(TypicalPersonData.MakeRandom());
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark class deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -68,9 +58,6 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public class CyclicReferenceDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public CyclicReferenceDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
@@ -83,7 +70,6 @@ namespace Hyperion.Tests.Performance.Deserialization
             InitStreamWith(a);
         }
 
-        [NBenchFact(Skip="FIXME: Stack overflow exception")]
         [PerfBenchmark(
             Description = "Benchmark cyclic reference deserialization",
             NumberOfIterations = StandardIterationCount,

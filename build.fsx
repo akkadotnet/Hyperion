@@ -118,7 +118,7 @@ Target "CopyOutput" (fun _ ->
 Target "NBench" (fun _ ->
     if (isWindows) then
         let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
-        let assembly = __SOURCE_DIRECTORY__ @@ "Hyperion.Tests.Performance/bin/Release/net451/Hyperion.Tests.Performance.dll"
+        let assembly = __SOURCE_DIRECTORY__ @@ "Hyperion.Tests.Performance/bin/Release/net45/Hyperion.Tests.Performance.dll"
         
         let spec = getBuildParam "spec"
 

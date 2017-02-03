@@ -9,20 +9,11 @@
 
 using System.Collections.Generic;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Serialization
 {
     public class SerializeCollectionsBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public SerializeCollectionsBenchmark(ITestOutputHelper output) : base(output, new SerializerOptions(preserveObjectReferences: true, versionTolerance: true))
-        {
-        }
-#endif
-
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark byte array serialization",
             NumberOfIterations = StandardIterationCount,
@@ -35,7 +26,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(new byte[] { 123, 134, 11, 122, 1 });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark string array serialization",
             NumberOfIterations = StandardIterationCount,
@@ -48,7 +38,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(new string[] { "abc", "cbd0", "sdsd4", "4dfg", "sfsdf44g" });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark dictionary serialization",
             NumberOfIterations = StandardIterationCount,
@@ -67,7 +56,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(dictionary);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark list serialization",
             NumberOfIterations = StandardIterationCount,
@@ -80,7 +68,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(new List<string> { "asdad", "asdabs3", "sfsdf44g", "asdf4r", "sfsdf44g" });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark linked list serialization",
             NumberOfIterations = StandardIterationCount,
@@ -94,7 +81,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(list);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark hash set serialization",
             NumberOfIterations = StandardIterationCount,
@@ -108,7 +94,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(set);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark sorted set serialization",
             NumberOfIterations = StandardIterationCount,

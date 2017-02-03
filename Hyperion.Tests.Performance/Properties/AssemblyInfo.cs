@@ -9,7 +9,6 @@
 
 using System.Reflection;
 using System.Runtime.InteropServices;
-using Xunit;
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -29,4 +28,3 @@ using Xunit;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: CollectionBehavior(DisableTestParallelization = true)]

@@ -9,9 +9,6 @@
 
 using Hyperion.Tests.Performance.Types;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
-
 namespace Hyperion.Tests.Performance.Serialization
 {
     public class SerializeComplexObjectsBenchmark : PerfTestBase
@@ -19,13 +16,6 @@ namespace Hyperion.Tests.Performance.Serialization
         private LargeStruct _testStruct;
         private TypicalPersonData _testObject;
         private CyclicA _cyclic;
-
-#if !NBENCH
-        public SerializeComplexObjectsBenchmark(ITestOutputHelper output)
-            : base(output, new SerializerOptions(versionTolerance: false, preserveObjectReferences: true))
-        {
-        }
-#endif
 
         public override void Setup(BenchmarkContext context)
         {
@@ -41,7 +31,6 @@ namespace Hyperion.Tests.Performance.Serialization
             _cyclic = a;
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark struct serialization",
             NumberOfIterations = StandardIterationCount,
@@ -53,8 +42,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount(_testStruct);
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark big object serialization",
             NumberOfIterations = StandardIterationCount,
@@ -68,7 +56,6 @@ namespace Hyperion.Tests.Performance.Serialization
         }
 
         //TODO: PerfBenchmark.Skip doesn't work
-        [NBenchFact(Skip = "FIXME: stack overflow")]
         [PerfBenchmark(
             Description = "Benchmark cyclic reference serialization",
             NumberOfIterations = StandardIterationCount,
