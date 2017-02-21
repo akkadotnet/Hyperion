@@ -11,23 +11,17 @@ using Hyperion.FSharpTestTypes;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Deserialization
 {
     public class DiscriminatedUnionDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public DiscriminatedUnionDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(DU2.NewC(DU1.NewB("test", 123)));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark dyscriminated union deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -44,9 +38,6 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public class RecordDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public RecordDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
@@ -57,7 +48,6 @@ namespace Hyperion.Tests.Performance.Deserialization
             InitStreamWith(record);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark record deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -74,16 +64,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public class FSharpMapDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public FSharpMapDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(TestMap.createRecordWithMap);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark F# map deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -100,9 +86,6 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public class FSharpListDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public FSharpListDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
@@ -110,7 +93,6 @@ namespace Hyperion.Tests.Performance.Deserialization
             InitStreamWith(list);
         }
 
-        [NBenchFact(Skip = "FIXME: counter is always 0")]
         [PerfBenchmark(
             Description = "Benchmark F# list deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -128,9 +110,6 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public class FSharpSetDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public FSharpSetDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
@@ -138,7 +117,6 @@ namespace Hyperion.Tests.Performance.Deserialization
             InitStreamWith(set);
         }
 
-        [NBenchFact(Skip = "FIXME: counter is always 0")]
         [PerfBenchmark(
             Description = "Benchmark F# list deserialization",
             NumberOfIterations = StandardIterationCount,

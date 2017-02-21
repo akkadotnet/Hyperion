@@ -9,23 +9,17 @@
 
 using System.Collections.Generic;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Deserialization
 {
     public class ByteArrayDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public ByteArrayDeserializationBenchmark(ITestOutputHelper output) : base(output) { }
-#endif
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(new byte[] { 123, 134, 11, 122, 1 });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark byte array deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -42,18 +36,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public sealed class StringArrayDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public StringArrayDeserializationBenchmark(ITestOutputHelper output)
-           : base(output) { }
-#endif
-
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(new string[] { "abc", "cbd0", "sdsd4", "4dfg", "sfsdf44g" });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark string array deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -70,11 +58,6 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public sealed class DictionaryDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public DictionaryDeserializationBenchmark(ITestOutputHelper output) : base(output)
-        { }
-#endif
-
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
@@ -86,7 +69,6 @@ namespace Hyperion.Tests.Performance.Deserialization
             });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark dictionary deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -103,18 +85,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public sealed class ListDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public ListDeserializationBenchmark(ITestOutputHelper output) : base(output)
-        { }
-#endif
-
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(new List<string> { "asdad", "asdabs3", "sfsdf44g", "asdf4r", "sfsdf44g" });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark list deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -131,18 +107,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public sealed class LinkedListDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public LinkedListDeserializationBenchmark(ITestOutputHelper output) : base(output)
-        { }
-#endif
-
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(new LinkedList<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark linked list deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -159,18 +129,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public sealed class HashSetDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public HashSetDeserializationBenchmark(ITestOutputHelper output) : base(output)
-        { }
-#endif
-
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(new HashSet<string> { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark hash set deserialization",
             NumberOfIterations = StandardIterationCount,
@@ -187,18 +151,12 @@ namespace Hyperion.Tests.Performance.Deserialization
 
     public sealed class SortedSetDeserializationBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public SortedSetDeserializationBenchmark(ITestOutputHelper output) : base(output)
-        { }
-#endif
-
         public override void Setup(BenchmarkContext context)
         {
             base.Setup(context);
             InitStreamWith(new SortedSet<string> { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" });
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark sorted set deserialization",
             NumberOfIterations = StandardIterationCount,

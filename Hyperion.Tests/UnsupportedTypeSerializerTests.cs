@@ -10,6 +10,7 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Hyperion.ValueSerializers;
 using Xunit;
 
@@ -20,7 +21,7 @@ namespace Hyperion.Tests
         [Fact]
         public void DoUnsupportedTypesNotHangOnExceptions()
         {
-            var th = new Thread(() =>
+            var tsk = Task.Run(() =>
             {
                 var serializer = new Serializer();
                 var t = new TestElement();
@@ -39,10 +40,8 @@ namespace Hyperion.Tests
                     }
                 }
             });
-            th.Start();
-            if (!th.Join(TimeSpan.FromSeconds(5)))
+            if (!tsk.Wait(TimeSpan.FromSeconds(5)))
             {
-                th.Abort();
                 Assert.True(false, "Serializer did not complete in 5 seconds");
             }
         }

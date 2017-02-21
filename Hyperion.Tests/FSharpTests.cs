@@ -7,7 +7,9 @@
 // -----------------------------------------------------------------------
 #endregion
 
+#if AKKA
 using Akka.Actor;
+#endif
 using Hyperion.FSharpTestTypes;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
@@ -81,12 +83,14 @@ namespace Hyperion.Tests
             Assert.Equal(expected, actual);
         }
 
+#if AKKA
         public class FooActor : UntypedActor
         {
             protected override void OnReceive(object message)
             {                
             }
         }
+#endif
 
         [Fact]
         public void CanSerializeUser()

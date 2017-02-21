@@ -12,8 +12,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using NBench;
 using NBench.Sdk;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance
 {
@@ -40,14 +38,6 @@ namespace Hyperion.Tests.Performance
         {
             this.options = options;
             new TestRunner(null).SetProcessPriority(concurrent: false);
-        }
-
-        protected PerfTestBase(ITestOutputHelper output, SerializerOptions options = null)
-        {
-            this.options = null;
-
-            Trace.Listeners.Clear();
-            Trace.Listeners.Add(new XunitTraceListener(output));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
