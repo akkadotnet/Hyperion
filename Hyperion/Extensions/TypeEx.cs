@@ -121,7 +121,8 @@ namespace Hyperion.Extensions
             return TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-                return GetTypeFromShortName(shortName);
+                var typename = ToQualifiedAssemblyName(shortName);
+                return Type.GetType(typename, true);
             });
         }
 
@@ -198,32 +199,29 @@ namespace Hyperion.Extensions
             throw new NotSupportedException();
         }
 
-        public static string GetShortAssemblyQualifiedName(this Type type)
+        private static readonly string CoreAssemblyName = GetCoreAssemblyName();
+
+        private static string GetCoreAssemblyName()
         {
-            string fullName;
-
-            if (type.IsGenericType)
-            {
-                var args = type.GetGenericArguments().Select(t => "[" + GetShortAssemblyQualifiedName(t) + "]");
-                fullName = type.Namespace + "." + type.Name + "[" + String.Join(",", args) + "]";
-            }
-            else
-            {
-                fullName = type.FullName;
-            }
-
-            return fullName + ", " + type.Assembly.GetName().Name;
+            var name = 1.GetType().AssemblyQualifiedName;
+            var part = name.Substring( name.IndexOf(", Version", StringComparison.Ordinal));
+            return part;
         }
 
-        public static Type GetTypeFromShortName(string shortName)
+        public static string GetShortAssemblyQualifiedName(this Type self)
         {
-            return Type.GetType(shortName, ShortNameAssemblyResolver, null, true);
+            var name = self.AssemblyQualifiedName;
+            name = name.Replace(CoreAssemblyName, ",%core%");
+            name = name.Replace(", Culture=neutral", "");
+            name = name.Replace(", PublicKeyToken=null", "");
+            name = name.Replace(", Version=1.0.0.0", ""); //TODO: regex or whatever...
+            return name;
         }
 
-        private static Assembly ShortNameAssemblyResolver(AssemblyName name)
+        public static string ToQualifiedAssemblyName(string shortName)
         {
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => String.Equals(a.GetName().Name, name.Name, StringComparison.OrdinalIgnoreCase));
-            return assembly ?? Assembly.Load(name);
+            var res = shortName.Replace(",%core%", CoreAssemblyName);
+            return res;
         }
     }
 }
