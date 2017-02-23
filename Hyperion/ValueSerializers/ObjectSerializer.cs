@@ -35,6 +35,7 @@ namespace Hyperion.ValueSerializers
                 throw new ArgumentNullException(nameof(type));
 
             Type = type;
+            //TODO: remove version info
             var typeName = type.GetShortAssemblyQualifiedName();
             // ReSharper disable once PossibleNullReferenceException
             // ReSharper disable once AssignNullToNotNullAttribute
