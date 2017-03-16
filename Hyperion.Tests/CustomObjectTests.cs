@@ -19,6 +19,20 @@ namespace Hyperion.Tests
         {
             public int IntProp { get; set; }
         }
+
+        private class DefaultArgumentCtorType
+        {
+            public DefaultArgumentCtorType(bool val1 = false, bool val2 = false)
+            {
+                Val1 = val1;
+                Val2 = val2;
+            }
+
+            public bool Val1 { get; }
+
+            public bool Val2 { get; }
+        }
+
         [Fact]
         public void CanSerializePrivateType()
         {
@@ -56,6 +70,21 @@ namespace Hyperion.Tests
             Assert.Equal(expected, actual);
         }
 
+        [InlineData(true, false)]
+        [InlineData(false, false)]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        [Theory]
+        public void CanSerializeDefaultCtorArguments(bool val1, bool val2)
+        {
+            // need at least 1 value to be non-default
+            var expected = new DefaultArgumentCtorType(val1, val2);
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<DefaultArgumentCtorType>();
+            Assert.Equal(expected.Val1, actual.Val1);
+            Assert.Equal(expected.Val2, actual.Val1);
+        }
 
         //this uses a lightweight serialization of exceptions to conform to .NET core's lack of ISerializable
         //all custom exception information will be lost.
