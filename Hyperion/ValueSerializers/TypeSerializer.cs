@@ -66,7 +66,8 @@ namespace Hyperion.ValueSerializers
             if (shortname == null)
                 return null;
 
-            var type = TypeEx.GetTypeFromShortName(shortname);
+            var name = TypeEx.ToQualifiedAssemblyName(shortname);
+            var type = Type.GetType(name,true);
 
             //add the deserialized type to lookup
             if (session.Serializer.Options.PreserveObjectReferences)

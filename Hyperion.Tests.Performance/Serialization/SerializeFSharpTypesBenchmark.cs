@@ -11,20 +11,11 @@ using Hyperion.FSharpTestTypes;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Serialization
 {
     public class SerializeFSharpTypesBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public SerializeFSharpTypesBenchmark(ITestOutputHelper output) : base(output)
-        {
-        }
-#endif
-
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark discriminated union serialization",
             NumberOfIterations = StandardIterationCount,
@@ -37,7 +28,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(DU2.NewC(DU1.NewB("test", 123)));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark F# record serialization",
             NumberOfIterations = StandardIterationCount,
@@ -54,7 +44,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(record);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark F# record with map serialization",
             NumberOfIterations = StandardIterationCount,
@@ -68,7 +57,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(record);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark F# list serialization",
             NumberOfIterations = StandardIterationCount,
@@ -81,8 +69,7 @@ namespace Hyperion.Tests.Performance.Serialization
             var list = ListModule.OfArray(new[] { 123, 2342355, 456456467578, 234234, -234281 });
             SerializeAndCount(list);
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark F# set serialization",
             NumberOfIterations = StandardIterationCount,

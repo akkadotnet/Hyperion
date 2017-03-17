@@ -9,20 +9,11 @@
 
 using System;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Serialization
 {
     public class SerializePrimitivesBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public SerializePrimitivesBenchmark(ITestOutputHelper output) : base(output)
-        {
-        }
-#endif
-
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Byte serialization",
             NumberOfIterations = StandardIterationCount,
@@ -35,7 +26,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((byte)123);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Int16 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -48,7 +38,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((short)123);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Int32 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -61,7 +50,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((int)123);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Int64 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -73,8 +61,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount((long)123);
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.SByte serialization",
             NumberOfIterations = StandardIterationCount,
@@ -87,7 +74,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((sbyte)123);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.UInt16 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -99,8 +85,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount((ushort)123);
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.UInt32 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -113,7 +98,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((uint)123);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.UInt64 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -126,7 +110,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((ulong)123);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Boolean serialization",
             NumberOfIterations = StandardIterationCount,
@@ -139,7 +122,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(true);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Single serialization",
             NumberOfIterations = StandardIterationCount,
@@ -152,7 +134,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((float)123.56);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Double serialization",
             NumberOfIterations = StandardIterationCount,
@@ -165,7 +146,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount((double)123.56);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Decimal serialization",
             NumberOfIterations = StandardIterationCount,
@@ -177,8 +157,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount((decimal)123.56);
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.String serialization",
             NumberOfIterations = StandardIterationCount,
@@ -192,7 +171,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(x);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Guid serialization",
             NumberOfIterations = StandardIterationCount,
@@ -205,7 +183,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(Guid.NewGuid());
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.DateTime serialization",
             NumberOfIterations = StandardIterationCount,
@@ -218,7 +195,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(DateTime.UtcNow);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.TimeSpan serialization",
             NumberOfIterations = StandardIterationCount,
@@ -230,8 +206,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount(DateTime.UtcNow.TimeOfDay);
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`1 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -244,7 +219,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(Tuple.Create(123));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`2 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -256,8 +230,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount(Tuple.Create(123, true));
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`3 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -270,7 +243,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(Tuple.Create(123, true, "x"));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`4 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -282,8 +254,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount(Tuple.Create(123, true, "x", 123.3f));
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`5 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -296,7 +267,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(Tuple.Create(123, true, "x", 123.3f, "asdasdac"));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`6 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -308,8 +278,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount(Tuple.Create(123, true, "x", 123.3f, "asdasdac", false));
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`7 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -321,8 +290,7 @@ namespace Hyperion.Tests.Performance.Serialization
         {
             SerializeAndCount(Tuple.Create(123, true, "x", 123.3f, "asdasdac", false, (byte)0xf));
         }
-
-        [NBenchFact]
+        
         [PerfBenchmark(
             Description = "Benchmark System.Tuple`8 serialization",
             NumberOfIterations = StandardIterationCount,
@@ -335,7 +303,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(Tuple.Create(123, true, "x", 123.3f, "asdasdac", false, (byte)0xf, 1234));
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark System.Type serialization",
             NumberOfIterations = StandardIterationCount,

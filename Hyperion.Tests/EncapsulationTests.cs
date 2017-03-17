@@ -37,8 +37,10 @@ namespace Hyperion.Tests
             Value = value;
         }
     }
-    
+
+#if SERIALIZATION
     [Serializable]
+#endif
     public struct StructWithReadonlyFields
     {
         public readonly int Value;
