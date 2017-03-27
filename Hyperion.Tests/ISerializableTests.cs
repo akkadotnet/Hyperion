@@ -16,7 +16,17 @@ namespace Hyperion.Tests
 {
     public class ISerializableTests : TestBase
     {
+        #region Contracts
+        [Serializable]
         public class NonSerializedTest
+        {
+            public int Field1;
+
+            [NonSerialized]
+            public string Field2;
+        }
+
+        public class NonSerializedWithoutSerializableTest
         {
             public int Field1;
 
@@ -34,7 +44,7 @@ namespace Hyperion.Tests
             }
         }
 
-        public class Person : ISerializable
+        public sealed class Person : ISerializable
         {
             public Person(string firstName, string lastName)
             {
@@ -42,9 +52,15 @@ namespace Hyperion.Tests
                 LastName = lastName;
             }
 
-            public string FirstName { get; set; }
+            public Person(SerializationInfo info, StreamingContext context)
+            {
+                FirstName = (string)info.GetValue("FirstName", typeof(string));
+                LastName = (string)info.GetValue("LastName", typeof(string));
+            }
 
-            public string LastName { get; set; }
+            public string FirstName { get; }
+
+            public string LastName { get; }
 
             public void GetObjectData(SerializationInfo info, StreamingContext streamingContext)
             {
@@ -52,6 +68,44 @@ namespace Hyperion.Tests
                 info.AddValue("LastName", LastName);
             }
         }
+
+        public sealed class PersonWithoutConstructor : ISerializable
+        {
+            public PersonWithoutConstructor(string firstName)
+            {
+                FirstName = firstName;
+            }
+
+            public string FirstName { get; }
+
+            public void GetObjectData(SerializationInfo info, StreamingContext streamingContext)
+            {
+                info.AddValue("FirstName", FirstName);
+            }
+        }
+
+        public sealed class PersonWithIDeserializationCallback : ISerializable, IDeserializationCallback
+        {
+            public PersonWithIDeserializationCallback() {}
+
+            public PersonWithIDeserializationCallback(SerializationInfo info, StreamingContext context)
+            {
+                FirstName = (string)info.GetValue("FirstName", typeof(string));
+            }
+
+            public string FirstName { get; set; }
+
+            public void GetObjectData(SerializationInfo info, StreamingContext streamingContext)
+            {
+                info.AddValue("FirstName", FirstName);
+            }
+
+            public void OnDeserialization(object sender)
+            {
+                throw new Exception("OnDeserialization");
+            }
+        }
+        #endregion
 
         [Fact]
         public void CanIgnoreFieldsWithNonSerializedAttribute()
@@ -69,6 +123,21 @@ namespace Hyperion.Tests
         }
 
         [Fact(Skip="Not implemented yet")]
+        public void SkipNonSerializedAttributeIfNoSerilizedAttribute()
+        {
+            var expected = new NonSerializedWithoutSerializableTest() {
+                Field1 = 235,
+                Field2 = "non serialized text"
+            };
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<NonSerializedWithoutSerializableTest>();
+            Assert.Equal(expected.Field1, actual.Field1);
+            Assert.Equal(expected.Field2, actual.Field2);
+        }
+
+        [Fact]
         public void CanSerializeClassesWithISerializable()
         {
             var expected = new Person("Scott", "Hanselman");
@@ -80,12 +149,34 @@ namespace Hyperion.Tests
             Assert.Equal(expected.LastName, actual.LastName);
         }
 
+        [Fact(Skip="Not implemented yet")]
+        public void ShouldNotThrowIfNoConstructorWithSerializationInfo()
+        {
+            var expected = new PersonWithoutConstructor("Scott");
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<PersonWithoutConstructor>();
+            Assert.Equal(expected.FirstName, actual.FirstName);
+        }
+
         [Fact]
         public void ShouldThrowOnNonSerializableEvent()
         {
             var expected = new NotSerializableEvent(true);
 
             Assert.Throws<NotImplementedException>(() => Serialize(expected));
+        }
+
+        [Fact]
+        public void SupportsIDeserializationCallback()
+        {
+            var expected = new PersonWithIDeserializationCallback { FirstName = "Scott" };
+
+            Serialize(expected);
+            Reset();
+            var exception = Assert.Throws<Exception>(() => Deserialize<PersonWithIDeserializationCallback>());
+            Assert.Equal("OnDeserialization", exception.Message);
         }
     }
 }
