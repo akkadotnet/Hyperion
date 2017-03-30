@@ -122,15 +122,22 @@ namespace Hyperion.Tests
             Assert.Null(actual.Field2);
         }
 
-        [Fact(Skip="Not implemented yet")]
+        [Fact]
         public void SkipNonSerializedAttributeIfNoSerilizedAttribute()
         {
-            var expected = new NonSerializedWithoutSerializableTest() {
+            var input = new NonSerializedWithoutSerializableTest()
+            {
                 Field1 = 235,
                 Field2 = "non serialized text"
             };
 
-            Serialize(expected);
+            var expected = new NonSerializedWithoutSerializableTest()
+            {
+                Field1 = 235,
+                Field2 = null
+            };
+
+            Serialize(input);
             Reset();
             var actual = Deserialize<NonSerializedWithoutSerializableTest>();
             Assert.Equal(expected.Field1, actual.Field1);
