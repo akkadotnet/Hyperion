@@ -47,6 +47,7 @@ namespace Hyperion
             
         };
 
+        internal readonly bool IgnoreISerializable;
         internal readonly bool PreserveObjectReferences;
         internal readonly Surrogate[] Surrogates;
         internal readonly ValueSerializerFactory[] ValueSerializerFactories;
@@ -54,7 +55,7 @@ namespace Hyperion
         internal readonly Type[] KnownTypes;
         internal readonly Dictionary<Type, ushort> KnownTypesDict = new Dictionary<Type, ushort>();
 
-        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null)
+        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null, bool ignoreISerializable = false)
         {
             VersionTolerance = versionTolerance;
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
@@ -71,6 +72,7 @@ namespace Hyperion
             }
 
             PreserveObjectReferences = preserveObjectReferences;
+            IgnoreISerializable = ignoreISerializable;
         }
     }
 }
