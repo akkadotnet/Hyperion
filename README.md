@@ -61,7 +61,7 @@ This allows systems to have slightly different versions of the contract types wh
 
 Hyperion has been designed as a wire format, point to point for soft realtime scenarios.
 If you need a format that is durable for persistence over time.
-e.g. EventSourcing or for message queues, then Protobuf or MS Bond is probably a better choise as those formats have been designed for true versiom tolerance.
+e.g. EventSourcing or for message queues, then Protobuf or MS Bond is probably a better choise as those formats have been designed for true version tolerance.
 
 ## Performance
 
