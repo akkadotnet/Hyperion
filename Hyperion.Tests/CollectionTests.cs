@@ -9,12 +9,16 @@
 
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
 using Xunit;
+using Hyperion.SerializerFactories;
+using Hyperion.ValueSerializers;
+using Hyperion.Extensions;
 
 namespace Hyperion.Tests
 {
@@ -381,5 +385,145 @@ namespace Hyperion.Tests
             var actual = Deserialize<CustomAddRange>();
             Assert.True(expected.SequenceEqual(actual));
         }
-    }
+
+		// things get trickier when unknown types come to scene
+		public class NotKnown { }
+
+		public abstract class BaseContainer : IList<NotKnown>, ICollection<NotKnown>, IEnumerable<NotKnown>, IEnumerable, IList, ICollection
+		{
+			private List<NotKnown> _inner;
+
+			#region interfaces methods
+
+			public IEnumerator<NotKnown> GetEnumerator()
+				=> _inner.GetEnumerator();
+
+			IEnumerator IEnumerable.GetEnumerator()
+				=> _inner.GetEnumerator();
+
+			// Ambiguous Add method
+			public virtual void Add(object content)
+				=> _inner.Add((NotKnown)content);
+
+			// Ambiguous Add method
+			void ICollection<NotKnown>.Add(NotKnown item)
+				=> _inner.Add(item);
+
+			int IList.Add(object value)
+				=> ((IList)_inner).Add((NotKnown)value);
+
+			public bool Contains(object value)
+				=> _inner.Contains((NotKnown)value);
+
+			void IList.Clear()
+				=> _inner.Clear();
+
+			public int IndexOf(object value)
+				=> _inner.IndexOf((NotKnown)value);
+
+			public void Insert(int index, object value)
+				=> _inner.Insert(index, (NotKnown)value);
+
+			public void Remove(object value)
+				=> _inner.Remove((NotKnown)value);
+
+			void IList.RemoveAt(int index)
+				=> _inner.RemoveAt(index);
+
+			object IList.this[int index]
+			{
+				get { return _inner[index]; }
+				set { _inner[index] = (NotKnown)value; }
+			}
+
+			bool IList.IsReadOnly => false;
+			public bool IsFixedSize => false;
+			void ICollection<NotKnown>.Clear()
+				=> _inner.Clear();
+
+			public bool Contains(NotKnown item)
+				=> _inner.Contains(item);
+
+			public void CopyTo(NotKnown[] array, int arrayIndex)
+				=> _inner.CopyTo(array, arrayIndex);
+
+			public bool Remove(NotKnown item)
+				=> _inner.Remove(item);
+
+			public void CopyTo(Array array, int index)
+				=> ((ICollection)_inner).CopyTo(array, index);
+
+			// nb: not a direct implementation!
+			public int Count => _inner.Count;
+
+			public object SyncRoot => ((ICollection)_inner).SyncRoot;
+			public bool IsSynchronized => ((ICollection)_inner).IsSynchronized;
+
+			int ICollection<NotKnown>.Count => _inner.Count;
+
+			bool ICollection<NotKnown>.IsReadOnly => ((ICollection<NotKnown>)_inner).IsReadOnly;
+
+			public int IndexOf(NotKnown item)
+				=> _inner.IndexOf(item);
+
+			public void Insert(int index, NotKnown item)
+				=> _inner.Add(item);
+
+			void IList<NotKnown>.RemoveAt(int index)
+				=> _inner.RemoveAt(index);
+
+			public NotKnown this[int index]
+			{
+				get { return _inner[index]; }
+				set { _inner[index] = value; }
+			}
+			#endregion
+		}
+
+		public class DerivedContainer : BaseContainer, IList<NotKnown>, ICollection<NotKnown>, IEnumerable<NotKnown>, IEnumerable
+		{
+			// Ambiguous Add method
+			public void Add(NotKnown item)
+			{
+				this.Add((object)item);
+			}
+		}
+
+	    [Fact]
+	    public void CanInstantiateSerializerForCollectionWithAmbiguousAddMethod()
+	    {
+		    var serializer = new Serializer(
+			    new SerializerOptions(knownTypes: new List<Type> {typeof(DerivedContainer)},
+				    serializerFactories: new List<ValueSerializerFactory> {new DerivedContainerSerializerFactory()}));
+		    var init = new DerivedContainer();
+		    serializer.Serialize(init, new MemoryStream());
+		    // we're done if AmbiguousMatchException wasn't fired
+	    }
+
+	    public class DerivedContainerSerializerFactory : ValueSerializerFactory
+		{
+			public override bool CanSerialize(Serializer serializer, Type type)
+				=> typeof(DerivedContainer) == type;
+
+			public override bool CanDeserialize(Serializer serializer, Type type)
+				=> typeof(DerivedContainer) == type;
+
+			public override ValueSerializer BuildSerializer(Serializer serializer, Type type, ConcurrentDictionary<Type, ValueSerializer> typeMapping)
+			{
+				var os = new ObjectSerializer(type);
+				typeMapping.TryAdd(type, os);
+				ObjectReader reader = (stream, session) =>
+				{
+					var raw = stream.ReadString(session);
+					return new DerivedContainer();
+				};
+				ObjectWriter writer = (stream, value, session) =>
+				{
+					StringSerializer.WriteValueImpl(stream, "test", session);
+				};
+				os.Initialize(reader, writer);
+				return os;
+			}
+		}
+	}
 }
