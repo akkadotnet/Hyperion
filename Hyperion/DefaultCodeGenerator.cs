@@ -144,7 +144,8 @@ namespace Hyperion
             }
 
             var fieldsArray = fields.ToArray();
-            var serializers = fieldsArray.Select(field => serializer.GetSerializerByType(field.FieldType)).ToArray();
+            var serializers = fieldsArray.Select(field => 
+                serializer.GetSerializerByType(field.FieldType)).ToArray();
 
             preallocatedBufferSize = serializers.Length != 0 ? serializers.Max(s => s.PreallocatedByteBufferSize) : 0;
 

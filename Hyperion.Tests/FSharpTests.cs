@@ -54,6 +54,16 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void CanSerializeStructBasedDU()
+        {
+            var expected = SDU1.NewB("hello", 1);
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<object>();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void CanSerializeNestedDU()
         {
             var expected = DU2.NewC(DU1.NewA(1));
@@ -93,16 +103,30 @@ namespace Hyperion.Tests
 #endif
 
         [Fact]
-        public void CanSerializeUser()
+        public void CanSerializeRecord()
         {
-                var expected = new User("foo", new FSharpOption<string>(null), "hello");
+                var expected = new TestRecord("foo", new FSharpOption<string>(null), "hello");
                 Serialize(expected);
                 Reset();
-                var actual = Deserialize<User>();
+                var actual = Deserialize<TestRecord>();
                // Assert.Equal(expected, actual);
                 Assert.Equal(expected.aref, actual.aref);
                 Assert.Equal(expected.name, actual.name);
                 Assert.Equal(expected.connections, actual.connections);
+
+        }
+
+        [Fact]
+        public void CanSerializeStructRecord()
+        {
+            var expected = new TestStructRecord("foo", new FSharpOption<string>(null), "hello");
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<TestStructRecord>();
+            // Assert.Equal(expected, actual);
+            Assert.Equal(expected.aref, actual.aref);
+            Assert.Equal(expected.name, actual.name);
+            Assert.Equal(expected.connections, actual.connections);
 
         }
 

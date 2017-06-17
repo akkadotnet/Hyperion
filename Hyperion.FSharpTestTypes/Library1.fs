@@ -12,6 +12,11 @@ and DU2 =
 | D of string
 | E of option<DU1>
 
+[<Struct>]
+type SDU1 =
+| A of a:int
+| B of bString:string * bInt:int
+
 type HubType =
     | Task of unit 
     | Chat of unit 
@@ -25,21 +30,38 @@ type Connection =
 #endif
 
 [<CustomEquality;CustomComparison>]
-type User = 
+type TestRecord = 
   { name : string
     aref : string option
     connections : string}
 
     override x.Equals(yobj) = 
         match yobj with
-        | :? User as y -> (x.name = y.name)
+        | :? TestRecord as y -> (x.name = y.name)
         | _ -> false
 
     override x.GetHashCode() = hash x.name
     interface System.IComparable with
         member x.CompareTo yobj =
             match yobj with
-            | :? User as y -> compare x.name y.name
+            | :? TestRecord as y -> compare x.name y.name
+            | _ -> invalidArg "yobj" "cannot compare values of different types"
+            
+[<Struct;CustomEquality;CustomComparison>]
+type TestStructRecord = 
+  { name : string
+    aref : string option
+    connections : string}
+    override x.Equals(yobj) = 
+        match yobj with
+        | :? TestStructRecord as y -> (x.name = y.name)
+        | _ -> false
+
+    override x.GetHashCode() = hash x.name
+    interface System.IComparable with
+        member x.CompareTo yobj =
+            match yobj with
+            | :? TestStructRecord as y -> compare x.name y.name
             | _ -> invalidArg "yobj" "cannot compare values of different types"
 
 module TestQuotations = 
