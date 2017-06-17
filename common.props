@@ -12,5 +12,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <XunitVersion>2.3.0-beta4-*</XunitVersion>
+    <TestSdkVersion>15.3.0</TestSdkVersion>
   </PropertyGroup>
 </Project>

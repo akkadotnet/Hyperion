@@ -17,7 +17,7 @@ using Hyperion.ValueSerializers;
 namespace Hyperion.SerializerFactories
 {
     // ReSharper disable once InconsistentNaming
-    public class ISerializableSerializerFactory : ValueSerializerFactory
+    internal sealed class ISerializableSerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type)
         {

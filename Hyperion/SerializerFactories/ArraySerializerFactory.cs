@@ -9,16 +9,13 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Runtime.ExceptionServices;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class ArraySerializerFactory : ValueSerializerFactory
+    internal sealed class ArraySerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type) => type.IsOneDimensionalArray();
 

@@ -1,8 +1,5 @@
-﻿namespace Hyperion.FSharpTestTypes
+namespace Hyperion.Tests.FSharpData
 
-#if AKKA
-open Akka.Actor
-#endif
 
 type DU1 = 
 | A of int
@@ -15,15 +12,7 @@ and DU2 =
 type HubType =
     | Task of unit 
     | Chat of unit 
-
-#if AKKA
-type Connection =
-  { username : string
-    id : string
-    hubType : HubType
-    signalrAref : IActorRef }
-#endif
-
+        
 [<CustomEquality;CustomComparison>]
 type User = 
   { name : string
@@ -55,5 +44,3 @@ module TestMap =
     type RecordWithString = {Name:string}
     type RecordWithMap = {SomeMap: Map<int,string>}
     let createRecordWithMap = {SomeMap = Map.ofSeq [ (1, "one"); (2, "two") ] }
-    
-

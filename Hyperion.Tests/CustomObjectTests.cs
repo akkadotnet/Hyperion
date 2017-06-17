@@ -8,17 +8,31 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using Xunit;
 
 namespace Hyperion.Tests
 {
-    
+
     public class CustomObjectTests : TestBase
     {
         private class PrivateType
         {
             public int IntProp { get; set; }
         }
+
+        private class Bucket
+        {
+            public Bucket(IImmutableDictionary<string, int> values)
+            {
+                Values = values;
+            }
+
+            public IImmutableDictionary<string, int> Values { get; }
+        }
+
         [Fact]
         public void CanSerializePrivateType()
         {
@@ -170,7 +184,7 @@ namespace Hyperion.Tests
         [Fact]
         public void CanSerializeObjectsKnownTypes()
         {
-            CustomInit(new Serializer(new SerializerOptions(knownTypes:new[] {typeof(Something)})));
+            CustomInit(new Serializer(new SerializerOptions(knownTypes: new[] { typeof(Something) })));
             var expected1 = new Something
             {
                 StringProp = "First"
@@ -190,6 +204,21 @@ namespace Hyperion.Tests
             Assert.Equal(expected1, Deserialize<Something>());
             Assert.Equal(expected2, Deserialize<Something>());
             Assert.Equal(expected3, Deserialize<Something>());
+        }
+
+        [Fact]
+        public void CanSerializeObjectWithInterfaceReferencedCollections()
+        {
+            var expected = new Bucket(new Dictionary<string, int>
+            { 
+                { "a", 1 },
+                { "b", 2 },
+                { "c", 3 }
+            }.ToImmutableDictionary());
+
+            Serialize(expected);
+            Reset();
+            Assert.Equal(expected.Values.ToArray(), Deserialize<Bucket>().Values.ToArray());
         }
     }
 }

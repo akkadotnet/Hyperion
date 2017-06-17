@@ -13,7 +13,7 @@ using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
-    public class StringSerializer : ValueSerializer
+    internal sealed class StringSerializer : ValueSerializer
     {
         public const byte Manifest = 7;
         public static readonly StringSerializer Instance = new StringSerializer();

@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class SystemObjectSerializer : ValueSerializer
+    internal sealed class SystemObjectSerializer : ValueSerializer
     {
         public const byte Manifest = 1;
         public static SystemObjectSerializer Instance = new SystemObjectSerializer();

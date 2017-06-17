@@ -16,7 +16,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class MethodInfoSerializerFactory : ValueSerializerFactory
+    internal sealed class MethodInfoSerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type)
         {

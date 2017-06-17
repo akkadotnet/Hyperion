@@ -9,13 +9,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Hyperion.Compilation
 {
-    public class Compiler<TDel> : ICompiler<TDel>
+    internal sealed class Compiler<TDel> : ICompiler<TDel>
     {
         private readonly List<Expression> _content = new List<Expression>();
         private readonly List<Expression> _expressions = new List<Expression>();
@@ -55,13 +55,16 @@ namespace Hyperion.Compilation
 
         public int GetVariable<T>(string name)
         {
-            var existing = _expressions.OfType<ParameterExpression>().First(v => v.Name == name && v.Type == typeof(T));
-            if (existing == null)
+            var t = typeof(T);
+            for (int i = 0; i < _expressions.Count; i++)
             {
-                throw new Exception("Variable not found.");
+                if (_expressions[i] is ParameterExpression parameter && parameter.Name == name && parameter.Type == t)
+                {
+                    return i;
+                }
             }
 
-            return _expressions.IndexOf(existing);
+            throw new Exception("Variable not found.");
         }
 
         public int Constant(object value)
@@ -87,14 +90,14 @@ namespace Hyperion.Compilation
         public void EmitCall(MethodInfo method, int target, params int[] arguments)
         {
             var targetExp = _expressions[target];
-            var argumentsExp = arguments.Select(n => _expressions[n]).ToArray();
+            var argumentsExp = ArgsToExpr(arguments);
             var call = Expression.Call(targetExp, method, argumentsExp);
             _content.Add(call);
         }
 
         public void EmitStaticCall(MethodInfo method, params int[] arguments)
         {
-            var argumentsExp = arguments.Select(n => _expressions[n]).ToArray();
+            var argumentsExp = ArgsToExpr(arguments);
             var call = Expression.Call(null, method, argumentsExp);
             _content.Add(call);
         }
@@ -102,7 +105,7 @@ namespace Hyperion.Compilation
         public int Call(MethodInfo method, int target, params int[] arguments)
         {
             var targetExp = _expressions[target];
-            var argumentsExp = arguments.Select(n => _expressions[n]).ToArray();
+            var argumentsExp = ArgsToExpr(arguments);
             var call = Expression.Call(targetExp, method, argumentsExp);
             _expressions.Add(call);
             return _expressions.Count - 1;
@@ -110,7 +113,7 @@ namespace Hyperion.Compilation
 
         public int StaticCall(MethodInfo method, params int[] arguments)
         {
-            var argumentsExp = arguments.Select(n => _expressions[n]).ToArray();
+            var argumentsExp = ArgsToExpr(arguments);
             var call = Expression.Call(null, method, argumentsExp);
             _expressions.Add(call);
             return _expressions.Count - 1;
@@ -145,7 +148,7 @@ namespace Hyperion.Compilation
 
         public Expression ToBlock()
         {
-            if (!_content.Any())
+            if (_content.Count == 0)
             {
                 _content.Add(Expression.Empty());
             }
@@ -190,6 +193,19 @@ namespace Hyperion.Compilation
             var conv = (Expression) Expression.Convert(valueExp, type);
             _expressions.Add(conv);
             return _expressions.Count - 1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Expression[] ArgsToExpr(int[] arguments)
+        {
+            var result = new Expression[arguments.Length];
+            var i = 0;
+            foreach (var n in arguments)
+            {
+                result[i] = _expressions[n];
+                i++;
+            }
+            return result;
         }
     }
 }

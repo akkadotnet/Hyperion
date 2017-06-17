@@ -8,6 +8,7 @@
 #endregion
 
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security;
 
@@ -24,6 +25,7 @@ using System.Security;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
 [assembly: Guid("7af8d2b6-9f1f-4a1c-8673-48e533108385")]
+[assembly: InternalsVisibleTo("Hyperion.Tests")]
 
 #if UNSAFE
 [assembly: AllowPartiallyTrustedCallers]

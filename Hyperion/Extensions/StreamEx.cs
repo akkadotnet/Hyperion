@@ -13,7 +13,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.Extensions
 {
-    public static class StreamEx
+    internal static class StreamEx
     {
 
         public static uint ReadVarint32(this Stream stream)

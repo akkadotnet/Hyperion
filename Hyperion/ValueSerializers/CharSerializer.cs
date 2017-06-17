@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class CharSerializer : SessionAwareByteArrayRequiringValueSerializer<char>
+    internal sealed class CharSerializer : SessionAwareByteArrayRequiringValueSerializer<char>
     {
         public const byte Manifest = 15;
         public const int Size = sizeof(char);

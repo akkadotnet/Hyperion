@@ -19,7 +19,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class EnumerableSerializerFactory : ValueSerializerFactory
+    internal sealed class EnumerableSerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type)
         {

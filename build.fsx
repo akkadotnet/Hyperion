@@ -54,7 +54,7 @@ Target "Build" (fun _ ->
     let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
 
     if (isWindows) then
-        let projects = !! "./**/*.csproj"
+        let projects = !! "./**/*.csproj" ++ "./**/*.fsproj"
 
         let runSingleProject project =
             DotNetCli.Build
@@ -78,7 +78,7 @@ Target "Build" (fun _ ->
             (fun p -> 
                 { p with
                     Project = "./Hyperion.Tests/Hyperion.Tests.csproj"
-                    Framework = "netcoreapp1.0"
+                    Framework = "netcoreapp1.1"
                     Configuration = configuration 
                     AdditionalArgs = additionalArgs })
 )
@@ -100,7 +100,7 @@ Target "RunTests" (fun _ ->
             (fun p -> 
                 { p with
                     Project = "./Hyperion.Tests/Hyperion.Tests.csproj"
-                    Framework = "netcoreapp1.0"
+                    Framework = "netcoreapp1.1"
                     Configuration = configuration })
 )
 
@@ -126,28 +126,11 @@ Target "CopyOutput" (fun _ ->
 )
 
 //--------------------------------------------------------------------------------
-// NBench targets 
+// Benchmarks
 //--------------------------------------------------------------------------------
 
-Target "NBench" (fun _ ->
-    if (isWindows) then
-        let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
-        let assembly = __SOURCE_DIRECTORY__ @@ "Hyperion.Tests.Performance/bin/Release/net45/Hyperion.Tests.Performance.dll"
-        
-        let spec = getBuildParam "spec"
-
-        let args = new StringBuilder()
-                |> append assembly
-                |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                |> append (sprintf "concurrent=\"%b\"" true)
-                |> append (sprintf "trace=\"%b\"" true)
-                |> toText
-
-        let result = ExecProcess(fun info -> 
-            info.FileName <- nbenchTestPath
-            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
-            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
+Target "Benchmarks" (fun _ ->
+    () //TODO: complete BenchmarkDotNet setup
 )
 
 //--------------------------------------------------------------------------------
@@ -205,6 +188,7 @@ Target "Help" <| fun _ ->
       " * Build      Builds"
       " * Nuget      Create and optionally publish nugets packages"
       " * RunTests   Runs tests"
+      " * Benchmarks Run BenchmarkDotNet performance tests"
       " * All        Builds, run tests, creates and optionally publish nuget packages"
       ""
       " Other Targets"
@@ -254,7 +238,10 @@ Target "Nuget" DoNothing
 
 // tests dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
-"Clean" ==> "RestorePackages" ==> "Build" ==> "NBench"
+"Clean" ==> "RestorePackages" ==> "Build"
+
+// benchmark dependencies
+"BuildRelease" ==> "Benchmarks"
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
@@ -264,6 +251,7 @@ Target "Nuget" DoNothing
 // all
 "BuildRelease" ==> "All"
 "RunTests" ==> "All"
+"Benchmarks" ==> "All"
 "Nuget" ==> "All"
 
 RunTargetOrDefault "Help"

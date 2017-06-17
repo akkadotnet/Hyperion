@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class FromSurrogateSerializer : ValueSerializer
+    internal sealed class FromSurrogateSerializer : ValueSerializer
     {
         private readonly ValueSerializer _surrogateSerializer;
         private readonly Func<object, object> _translator;
