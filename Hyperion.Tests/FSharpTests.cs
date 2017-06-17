@@ -10,6 +10,8 @@
 #if AKKA
 using Akka.Actor;
 #endif
+using System.Threading;
+using FSharp.Quotations.Evaluator;
 using Hyperion.FSharpTestTypes;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Control;
@@ -131,15 +133,21 @@ namespace Hyperion.Tests
         }
 
         //FIXME: make F# quotations and Async serializable
-        //[Fact]
+        [Fact(Skip = "FIXME: problem with System.Core version=4.0")]
         public void CanSerializeQuotation()
         {
             var expected = TestQuotations.Quotation;
             Serialize(expected);
             Reset();
             var actual = Deserialize<FSharpExpr<FSharpFunc<int, FSharpAsync<int>>>>();
-            // Assert.Equal(expected, actual);
-            Assert.Equal(expected, actual);
+
+            var expectedFn = QuotationEvaluator.Compile(expected);
+            var actualFn = QuotationEvaluator.Compile(actual);
+
+            var a = FSharpAsync.RunSynchronously(expectedFn.Invoke(5), FSharpOption<int>.None, FSharpOption<CancellationToken>.None);
+            var b = FSharpAsync.RunSynchronously(actualFn.Invoke(5), FSharpOption<int>.None, FSharpOption<CancellationToken>.None);
+            
+            Assert.Equal(a, b);
         }
     }
 }
