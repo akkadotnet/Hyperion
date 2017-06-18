@@ -16,7 +16,7 @@ using Hyperion.Extensions;
 namespace Hyperion.Compilation
 {
 #if NET45
-    public class IlBuilder
+    internal class IlBuilder
     {
         private readonly List<IlExpression> _expressions = new List<IlExpression>();
         protected List<IlParameter> Parameters { get; } = new List<IlParameter>();

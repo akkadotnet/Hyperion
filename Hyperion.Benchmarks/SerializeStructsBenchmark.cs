@@ -7,7 +7,6 @@
 // -----------------------------------------------------------------------
 #endregion
 
-using System.IO;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 

@@ -9,7 +9,6 @@
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using BenchmarkDotNet.Attributes;
 
 namespace Hyperion.Benchmarks

@@ -15,7 +15,7 @@ using System.Reflection;
 
 namespace Hyperion.Compilation
 {
-    public class Compiler<TDel> : ICompiler<TDel>
+    internal sealed class Compiler<TDel> : ICompiler<TDel>
     {
         private readonly List<Expression> _content = new List<Expression>();
         private readonly List<Expression> _expressions = new List<Expression>();

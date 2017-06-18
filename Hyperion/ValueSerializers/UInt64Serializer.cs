@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class UInt64Serializer : SessionAwareByteArrayRequiringValueSerializer<ulong>
+    internal sealed class UInt64Serializer : SessionAwareByteArrayRequiringValueSerializer<ulong>
     {
         public const byte Manifest = 19;
         public const int Size = sizeof(ulong);

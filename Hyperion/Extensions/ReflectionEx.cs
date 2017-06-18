@@ -18,12 +18,12 @@ using System.Reflection;
 
 namespace Hyperion.Extensions
 {
-    public static class BindingFlagsEx
+    internal static class BindingFlagsEx
     {
         public const BindingFlags All = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
     }
 
-    public static class ReflectionEx
+    internal static class ReflectionEx
     {
         public static readonly Assembly CoreAssembly = typeof(int).GetTypeInfo().Assembly;
 

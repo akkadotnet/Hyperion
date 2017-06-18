@@ -15,7 +15,7 @@ using System.Text;
 namespace Hyperion.Compilation
 {
 #if NET45
-    public class IlCompilerContext
+    internal sealed class IlCompilerContext
     {
         private int _stackDepth;
 
@@ -44,7 +44,7 @@ namespace Hyperion.Compilation
         public Type SelfType { get; }
     }
 
-    public class IlEmitter
+    internal sealed class IlEmitter
     {
         private readonly ILGenerator _il;
         private readonly StringBuilder _sb = new StringBuilder();

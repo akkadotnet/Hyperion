@@ -54,7 +54,7 @@ Target "Build" (fun _ ->
     let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
 
     if (isWindows) then
-        let projects = !! "./**/*.csproj"
+        let projects = !! "./**/*.csproj" ++ "./**/*.fsproj"
 
         let runSingleProject project =
             DotNetCli.Build
@@ -123,31 +123,6 @@ Target "CopyOutput" (fun _ ->
                 Framework = "netstandard1.6"
                 Output = outputBinariesNetStandard
                 Configuration = configuration })
-)
-
-//--------------------------------------------------------------------------------
-// NBench targets 
-//--------------------------------------------------------------------------------
-
-Target "NBench" (fun _ ->
-    if (isWindows) then
-        let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" "tools/NBench.Runner/lib/net45"
-        let assembly = __SOURCE_DIRECTORY__ @@ "Hyperion.Tests.Performance/bin/Release/net45/Hyperion.Tests.Performance.dll"
-        
-        let spec = getBuildParam "spec"
-
-        let args = new StringBuilder()
-                |> append assembly
-                |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
-                |> append (sprintf "concurrent=\"%b\"" true)
-                |> append (sprintf "trace=\"%b\"" true)
-                |> toText
-
-        let result = ExecProcess(fun info -> 
-            info.FileName <- nbenchTestPath
-            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
-            info.Arguments <- args) (System.TimeSpan.FromMinutes 15.0) (* Reasonably long-running task. *)
-        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
 )
 
 //--------------------------------------------------------------------------------
@@ -254,7 +229,7 @@ Target "Nuget" DoNothing
 
 // tests dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
-"Clean" ==> "RestorePackages" ==> "Build" ==> "NBench"
+"Clean" ==> "RestorePackages" ==> "Build"
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"

@@ -15,13 +15,13 @@ using Hyperion.Extensions;
 namespace Hyperion.Compilation
 {
 #if NET45
-    public abstract class IlExpression
+    internal abstract class IlExpression
     {
         public abstract void Emit(IlCompilerContext ctx);
         public abstract Type Type();
     }
 
-    public class IlBool : IlExpression
+    internal sealed class IlBool : IlExpression
     {
         private readonly bool _value;
 
@@ -39,7 +39,7 @@ namespace Hyperion.Compilation
         public override Type Type() => typeof(bool);
     }
 
-    public class IlRuntimeConstant : IlExpression
+    internal sealed class IlRuntimeConstant : IlExpression
     {
         private readonly object _object;
         public int Index { get; }
@@ -61,7 +61,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _object.GetType();
     }
 
-    public class IlReadField : IlExpression
+    internal sealed class IlReadField : IlExpression
     {
         private readonly FieldInfo _field;
         private readonly IlExpression _target;
@@ -82,7 +82,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _field.FieldType;
     }
 
-    public class IlWriteVariable : IlExpression
+    internal sealed class IlWriteVariable : IlExpression
     {
         private readonly IlVariable _variable;
         private readonly IlExpression _value;
@@ -106,7 +106,7 @@ namespace Hyperion.Compilation
         }
     }
 
-    public class IlWriteField : IlExpression
+    internal sealed class IlWriteField : IlExpression
     {
         private readonly FieldInfo _field;
         private readonly IlExpression _target;
@@ -133,7 +133,7 @@ namespace Hyperion.Compilation
         }
     }
 
-    public class IlNew : IlExpression
+    internal sealed class IlNew : IlExpression
     {
         private readonly Type _type;
 
@@ -153,7 +153,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _type;
     }
 
-    public class IlParameter : IlExpression
+    internal sealed class IlParameter : IlExpression
     {
         public string Name { get; }
         public int ParameterIndex { get; }
@@ -175,7 +175,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _type;
     }
 
-    public class IlVariable : IlExpression
+    internal sealed class IlVariable : IlExpression
     {
         public int VariableIndex { get; }
         public string Name { get; }
@@ -197,7 +197,7 @@ namespace Hyperion.Compilation
         public override Type Type() => VarType;
     }
 
-    public class IlCastClass : IlExpression
+    internal sealed class IlCastClass : IlExpression
     {
         private readonly Type _type;
         private readonly IlExpression _expression;
@@ -219,7 +219,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _type;
     }
 
-    public class IlBox : IlExpression
+    internal sealed class IlBox : IlExpression
     {
         private readonly Type _type;
         private readonly IlExpression _expression;
@@ -239,7 +239,7 @@ namespace Hyperion.Compilation
         public override Type Type() => typeof(object);
     }
 
-    public class IlUnbox : IlExpression
+    internal sealed class IlUnbox : IlExpression
     {
         private readonly Type _type;
         private readonly IlExpression _expression;
@@ -259,7 +259,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _type;
     }
 
-    public class IlCall : IlExpression
+    internal sealed class IlCall : IlExpression
     {
         private readonly IlExpression _target;
         private readonly MethodInfo _method;
@@ -295,7 +295,7 @@ namespace Hyperion.Compilation
         public override Type Type() => _method.ReturnType;
     }
 
-    public class IlCallStatic : IlExpression
+    internal sealed class IlCallStatic : IlExpression
     {
         private readonly MethodInfo _method;
         private readonly IlExpression[] _args;

@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class FloatSerializer : SessionAwareByteArrayRequiringValueSerializer<float>
+    internal sealed class FloatSerializer : SessionAwareByteArrayRequiringValueSerializer<float>
     {
         public const byte Manifest = 12;
         public const int Size = sizeof(float);

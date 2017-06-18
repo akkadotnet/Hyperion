@@ -18,7 +18,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class DictionarySerializerFactory : ValueSerializerFactory
+    internal sealed class DictionarySerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type) => IsInterface(type);
 

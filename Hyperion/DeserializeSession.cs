@@ -18,8 +18,7 @@ namespace Hyperion
     {
 
     }
-    public class 
-        DeserializerSession
+    public class DeserializerSession
     {
         public const int MinBufferSize = 9;
         private byte[] _buffer;

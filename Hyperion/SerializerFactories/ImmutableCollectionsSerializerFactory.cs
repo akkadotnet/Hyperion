@@ -18,7 +18,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class ImmutableCollectionsSerializerFactory : ValueSerializerFactory
+    internal sealed class ImmutableCollectionsSerializerFactory : ValueSerializerFactory
     {
         private const string ImmutableCollectionsNamespace = "System.Collections.Immutable";
         private const string ImmutableCollectionsAssembly = "System.Collections.Immutable";

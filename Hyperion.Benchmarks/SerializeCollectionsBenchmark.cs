@@ -8,7 +8,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.IO;
 using BenchmarkDotNet.Attributes;
 
 namespace Hyperion.Benchmarks

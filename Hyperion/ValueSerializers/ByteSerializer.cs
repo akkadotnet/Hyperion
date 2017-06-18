@@ -11,7 +11,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class ByteSerializer : SessionIgnorantValueSerializer<byte>
+    internal sealed class ByteSerializer : SessionIgnorantValueSerializer<byte>
     {
         public const byte Manifest = 4;
         public static readonly ByteSerializer Instance = new ByteSerializer();

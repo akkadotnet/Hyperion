@@ -15,7 +15,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class ExceptionSerializerFactory : ValueSerializerFactory
+    internal sealed class ExceptionSerializerFactory : ValueSerializerFactory
     {
         private static readonly TypeInfo ExceptionTypeInfo = typeof(Exception).GetTypeInfo();
         private readonly FieldInfo _className;

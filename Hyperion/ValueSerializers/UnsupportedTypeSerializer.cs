@@ -23,7 +23,8 @@ namespace Hyperion.ValueSerializers
         public UnsupportedTypeException(Type t, string msg):base(msg)
         { }
     }
-    public class UnsupportedTypeSerializer:ValueSerializer
+
+    internal sealed class UnsupportedTypeSerializer :ValueSerializer
     {
         private readonly string _errorMessage;
         private readonly Type _invalidType;

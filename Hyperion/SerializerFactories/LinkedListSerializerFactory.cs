@@ -12,13 +12,12 @@ using System.Reflection;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public sealed class LinkedListSerializerFactory : ValueSerializerFactory
+    internal sealed class LinkedListSerializerFactory : ValueSerializerFactory
     {
         private static readonly Type LinkedListType = typeof(LinkedList<>);
 

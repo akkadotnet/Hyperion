@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class DecimalSerializer : ValueSerializer
+    internal sealed class DecimalSerializer : ValueSerializer
     {
         public const byte Manifest = 14;
         public static readonly DecimalSerializer Instance = new DecimalSerializer();

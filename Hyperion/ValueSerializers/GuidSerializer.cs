@@ -13,7 +13,7 @@ using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
-    public class GuidSerializer : SessionIgnorantValueSerializer<Guid>
+    internal sealed class GuidSerializer : SessionIgnorantValueSerializer<Guid>
     {
         public const byte Manifest = 11;
         public static readonly GuidSerializer Instance = new GuidSerializer();

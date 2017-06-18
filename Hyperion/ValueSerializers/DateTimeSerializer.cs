@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class DateTimeSerializer : SessionAwareByteArrayRequiringValueSerializer<DateTime>
+    internal sealed class DateTimeSerializer : SessionAwareByteArrayRequiringValueSerializer<DateTime>
     {
         public const byte Manifest = 5;
         public const int Size = sizeof(long) + sizeof(byte);

@@ -7,7 +7,6 @@
 // -----------------------------------------------------------------------
 #endregion
 
-using System.IO;
 using BenchmarkDotNet.Attributes;
 using Hyperion.FSharpTestTypes;
 using Microsoft.FSharp.Collections;
