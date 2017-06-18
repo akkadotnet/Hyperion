@@ -86,10 +86,10 @@ namespace Hyperion.Compilation
 
         public int Constant(object value)
         {
-            if (value is bool)
+            if (value is bool b)
             {
                 //doing this is faster than storing this as state
-                _expressions.Add(new IlBool((bool) value));
+                _expressions.Add(new IlBool(b));
                 return _expressions.Count - 1;
             }
 

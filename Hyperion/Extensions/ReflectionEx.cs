@@ -43,6 +43,7 @@ namespace Hyperion.Extensions
 #if SERIALIZATION
                         .Where(f => !f.IsDefined(typeof(NonSerializedAttribute)))
 #endif
+                        .Where(f => !f.IsDefined(typeof(IgnoreAttribute)))
                         .Where(f => !f.IsStatic)
                         .Where(f => f.FieldType != typeof(IntPtr))
                         .Where(f => f.FieldType != typeof(UIntPtr))

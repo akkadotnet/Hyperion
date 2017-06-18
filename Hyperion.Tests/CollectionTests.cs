@@ -51,8 +51,7 @@ namespace Hyperion.Tests
             var actual = Deserialize<byte[]>();
             Assert.Equal(expected, actual);
         }
-
-
+        
         [Fact]
         public void CanSerializeDictionary()
         {
@@ -65,6 +64,21 @@ namespace Hyperion.Tests
             Serialize(expected);
             Reset();
             var actual = Deserialize<Dictionary<string, string>>();
+            Assert.Equal(expected.ToList(), actual.ToList());
+        }
+
+        [Fact]
+        public void CanSerializeIDictionaryInterface()
+        {
+            var expected = new Dictionary<string, string>
+            {
+                ["abc"] = "def",
+                ["ghi"] = "jkl,"
+            };
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<IDictionary<string, string>>();
             Assert.Equal(expected.ToList(), actual.ToList());
         }
 
