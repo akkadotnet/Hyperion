@@ -13,38 +13,25 @@ using BenchmarkDotNet.Attributes;
 
 namespace Hyperion.Benchmarks
 {
-    [Config(typeof(HyperionConfig))]
-    public class SerializeStructsBenchmark
+    public class SerializeStructsBenchmark : HyperionBenchmark
     {
         #region init
-        private Serializer serializer;
-        private MemoryStream stream;
-
         private StandardStruct standardValue;
         private BlittableStruct blittableValue;
         private TestEnum testEnum;
-
-        [Setup]
-        public void Setup()
+        
+        protected override void Init()
         {
-            serializer = new Serializer();
-            stream = new MemoryStream();
-
             standardValue = new StandardStruct(1, "John", "Doe", isLoggedIn: false);
             blittableValue = new BlittableStruct(59, 92);
             testEnum = TestEnum.HatesAll;
         }
 
-        [Cleanup]
-        public void Cleanup()
-        {
-            stream.Dispose();
-        }
         #endregion
 
-        [Benchmark] public void Serialize_Enums() => serializer.Serialize(testEnum, stream);
-        [Benchmark] public void Serialize_StandardValueTypes() => serializer.Serialize(standardValue, stream);
-        [Benchmark] public void Serialize_BlittableValueTypes() => serializer.Serialize(blittableValue, stream);
+        [Benchmark] public void Serialize_Enums() => Serialize(testEnum);
+        [Benchmark] public void Serialize_StandardValueTypes() => Serialize(standardValue);
+        [Benchmark] public void Serialize_BlittableValueTypes() => Serialize(blittableValue);
     }
 
     #region test data types

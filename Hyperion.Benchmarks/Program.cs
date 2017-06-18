@@ -16,7 +16,8 @@ namespace Hyperion.Benchmarks
     {
         static void Main(string[] args)
         {
-            BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly()).RunAll();
+            var benchmark = BenchmarkSwitcher.FromAssembly(Assembly.GetExecutingAssembly());
+            benchmark.RunAll();
         }
     }
 }

@@ -9,28 +9,22 @@
 
 using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 
 namespace Hyperion.Benchmarks
 {
-    [Config(typeof(HyperionConfig))]
-    public class SerializeClassesBenchmark
+    public class SerializeClassesBenchmark : HyperionBenchmark
     {
         #region init
-        private Serializer serializer;
-        private MemoryStream stream;
-
         private CyclicClassA cyclic;
         private VirtualTestClass virtualObject;
         private LargeSealedClass sealedObject;
         private GenericClass<int, string, bool, DateTime, Guid> genericObject;
 
-        [Setup]
-        public void Setup()
+        protected override void Init()
         {
-            serializer = new Serializer(new SerializerOptions(preserveObjectReferences:true));
-            stream = new MemoryStream();
-
+            Serializer = new Serializer(new SerializerOptions(preserveObjectReferences:true));
             var a = new CyclicClassA();
             var b = new CyclicClassB();
             a.B = b;
@@ -50,17 +44,12 @@ namespace Hyperion.Benchmarks
             genericObject = new GenericClass<int, string, bool, DateTime, Guid>(123, "hello-world", true, DateTime.Now, Guid.NewGuid());
         }
 
-        [Cleanup]
-        public void Cleanup()
-        {
-            stream.Dispose();
-        }
         #endregion
 
-        [Benchmark] public void Serialize_CyclicReferences() => serializer.Serialize(cyclic, stream);
-        [Benchmark] public void Serialize_VirtualClasses() => serializer.Serialize(virtualObject, stream);
-        [Benchmark] public void Serialize_LargeSealedClasses() => serializer.Serialize(sealedObject, stream);
-        [Benchmark] public void Serialize_GenericClasses() => serializer.Serialize(genericObject, stream);
+        [Benchmark] public void Serialize_CyclicReferences() => Serialize(cyclic);
+        [Benchmark] public void Serialize_VirtualClasses() => Serialize(virtualObject);
+        [Benchmark] public void Serialize_LargeSealedClasses() => Serialize(sealedObject);
+        [Benchmark] public void Serialize_GenericClasses() => Serialize(genericObject);
     }
 
     #region test data types

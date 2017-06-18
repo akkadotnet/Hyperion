@@ -15,7 +15,7 @@ namespace Hyperion
     /// By default ByteArrayKey overrides "public bool Equals(object obj)" to do comparisons.
     /// But this causes boxing/allocations, so by having a custom comparer we can prevent that.
     /// </summary>
-    public class ByteArrayKeyComparer : IEqualityComparer<ByteArrayKey>
+    internal struct ByteArrayKeyComparer : IEqualityComparer<ByteArrayKey>
     {
         public static readonly ByteArrayKeyComparer Instance = new ByteArrayKeyComparer();
 

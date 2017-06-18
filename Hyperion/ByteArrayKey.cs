@@ -11,7 +11,7 @@ using Hyperion.Internal;
 
 namespace Hyperion
 {
-    public struct ByteArrayKey
+    internal struct ByteArrayKey
     {       
         public readonly byte[] Bytes;
         private readonly int _hashCode;
