@@ -17,7 +17,6 @@ namespace Hyperion
     public class SerializerOptions
     {
         internal static readonly Surrogate[] EmptySurrogates = new Surrogate[0];
-        internal static readonly ValueSerializerFactory[] EmptyValueSerializerFactories = new ValueSerializerFactory[0];
         
 
         private static readonly ValueSerializerFactory[] DefaultValueSerializerFactories =
@@ -61,9 +60,9 @@ namespace Hyperion
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
 
             //use the default factories + any user defined
-            ValueSerializerFactories =
-                DefaultValueSerializerFactories.Concat(serializerFactories?.ToArray() ?? EmptyValueSerializerFactories)
-                    .ToArray();
+	        ValueSerializerFactories = serializerFactories == null
+		        ? DefaultValueSerializerFactories
+		        : serializerFactories.Concat(DefaultValueSerializerFactories).ToArray();
 
             KnownTypes = knownTypes?.ToArray() ?? new Type[] {};
             for (var i = 0; i < KnownTypes.Length; i++)
