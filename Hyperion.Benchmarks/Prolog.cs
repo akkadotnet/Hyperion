@@ -46,12 +46,15 @@ namespace Hyperion.Benchmarks
         public void Cleanup()
         {
             Stream.Dispose();
+            Clean();
         }
 
         protected virtual void Init()
         {
             Serializer = new Serializer();
         }
+
+        protected virtual void Clean() { }
 
         #endregion
 
@@ -66,6 +69,7 @@ namespace Hyperion.Benchmarks
         protected void Deserialize<T>()
         {
             Serializer.Deserialize<T>(Stream);
+            Stream.Position = 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

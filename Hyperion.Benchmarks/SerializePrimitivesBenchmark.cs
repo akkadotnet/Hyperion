@@ -32,40 +32,40 @@ namespace Hyperion.Benchmarks
 
         #endregion
 
-        [Benchmark] public void Serialize_Boolean() => Serialize(true);
-        [Benchmark] public void Serialize_Byte() => Serialize((byte)123);
-        [Benchmark] public void Serialize_SByte() => Serialize((sbyte)123);
-        [Benchmark] public void Serialize_Int16() => Serialize((short)1234);
-        [Benchmark] public void Serialize_UInt16() => Serialize((ushort)1234);
-        [Benchmark] public void Serialize_Int32() => Serialize(12345);
-        [Benchmark] public void Serialize_UInt32() => Serialize(12345U);
-        [Benchmark] public void Serialize_Int64() => Serialize(123456L);
-        [Benchmark] public void Serialize_UInt64() => Serialize(123456UL);
-        [Benchmark] public void Serialize_Single() => Serialize(123456.34F);
-        [Benchmark] public void Serialize_Double() => Serialize(123456.34D);
-        [Benchmark] public void Serialize_Decimal() => Serialize(123456.34M);
-        [Benchmark] public void Serialize_Guid() => Serialize(guid);
-        [Benchmark] public void Serialize_DateTime() => Serialize(dateTime);
-        [Benchmark] public void Serialize_TimeSpan() => Serialize(time);
-        [Benchmark] public void Serialize_String() => Serialize(str);
-        [Benchmark] public void Serialize_Type() => Serialize(typeof(int));
+        [Benchmark] public void Boolean() => SerializeAndDeserialize(true);
+        [Benchmark] public void Byte() => SerializeAndDeserialize((byte)123);
+        [Benchmark] public void SByte() => SerializeAndDeserialize((sbyte)123);
+        [Benchmark] public void Int16() => SerializeAndDeserialize((short)1234);
+        [Benchmark] public void UInt16() => SerializeAndDeserialize((ushort)1234);
+        [Benchmark] public void Int32() => SerializeAndDeserialize(12345);
+        [Benchmark] public void UInt32() => SerializeAndDeserialize(12345U);
+        [Benchmark] public void Int64() => SerializeAndDeserialize(123456L);
+        [Benchmark] public void UInt64() => SerializeAndDeserialize(123456UL);
+        [Benchmark] public void Single() => SerializeAndDeserialize(123456.34F);
+        [Benchmark] public void Double() => SerializeAndDeserialize(123456.34D);
+        [Benchmark] public void Decimal() => SerializeAndDeserialize(123456.34M);
+        [Benchmark] public void Guids() => SerializeAndDeserialize(guid);
+        [Benchmark] public void DateTimes() => SerializeAndDeserialize(dateTime);
+        [Benchmark] public void TimeSpan() => SerializeAndDeserialize(time);
+        [Benchmark] public void String() => SerializeAndDeserialize(str);
+        [Benchmark] public void Type() => SerializeAndDeserialize(typeof(int));
 
-        [Benchmark] public void Serialize_Tuple1() => Serialize(Tuple.Create(1234));
-        [Benchmark] public void Serialize_Tuple2() => Serialize(Tuple.Create(1234, "hello world"));
-        [Benchmark] public void Serialize_Tuple3() => Serialize(Tuple.Create(1234, "hello world", true));
-        [Benchmark] public void Serialize_Tuple4() => Serialize(Tuple.Create(1234, "hello world", true, typeof(int)));
-        [Benchmark] public void Serialize_Tuple5() => Serialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL));
-        [Benchmark] public void Serialize_Tuple6() => Serialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime));
-        [Benchmark] public void Serialize_Tuple7() => Serialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time));
-        [Benchmark] public void Serialize_Tuple8() => Serialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time, guid));
+        [Benchmark] public void Tuple1() => SerializeAndDeserialize(Tuple.Create(1234));
+        [Benchmark] public void Tuple2() => SerializeAndDeserialize(Tuple.Create(1234, "hello world"));
+        [Benchmark] public void Tuple3() => SerializeAndDeserialize(Tuple.Create(1234, "hello world", true));
+        [Benchmark] public void Tuple4() => SerializeAndDeserialize(Tuple.Create(1234, "hello world", true, typeof(int)));
+        [Benchmark] public void Tuple5() => SerializeAndDeserialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL));
+        [Benchmark] public void Tuple6() => SerializeAndDeserialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime));
+        [Benchmark] public void Tuple7() => SerializeAndDeserialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time));
+        [Benchmark] public void Tuple8() => SerializeAndDeserialize(Tuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time, guid));
 
-        [Benchmark] public void Serialize_ValueTuple1() => Serialize(ValueTuple.Create(1234));
-        [Benchmark] public void Serialize_ValueTuple2() => Serialize(ValueTuple.Create(1234, "hello world"));
-        [Benchmark] public void Serialize_ValueTuple3() => Serialize(ValueTuple.Create(1234, "hello world", true));
-        [Benchmark] public void Serialize_ValueTuple4() => Serialize(ValueTuple.Create(1234, "hello world", true, typeof(int)));
-        [Benchmark] public void Serialize_ValueTuple5() => Serialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL));
-        [Benchmark] public void Serialize_ValueTuple6() => Serialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime));
-        [Benchmark] public void Serialize_ValueTuple7() => Serialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time));
-        [Benchmark] public void Serialize_ValueTuple8() => Serialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time, guid));
+        [Benchmark] public void ValueTuple1() => SerializeAndDeserialize(ValueTuple.Create(1234));
+        [Benchmark] public void ValueTuple2() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world"));
+        [Benchmark] public void ValueTuple3() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world", true));
+        [Benchmark] public void ValueTuple4() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world", true, typeof(int)));
+        [Benchmark] public void ValueTuple5() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL));
+        [Benchmark] public void ValueTuple6() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime));
+        [Benchmark] public void ValueTuple7() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time));
+        [Benchmark] public void ValueTuple8() => SerializeAndDeserialize(ValueTuple.Create(1234, "hello world", true, typeof(int), 345666UL, dateTime, time, guid));
     }
 }

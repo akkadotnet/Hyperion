@@ -14,17 +14,17 @@ namespace Hyperion.Benchmarks
 {
     public class SerializeCollectionsBenchmark : HyperionBenchmark
     {
-        [Benchmark] public void Serialize_ByteArray() => Serialize(new byte[] { 123, 134, 11, 122, 1 });
-        [Benchmark] public void Serialize_StringArray() => Serialize(new[] { "abc", "cbd0", "sdsd4", "4dfg", "sfsdf44g" });
-        [Benchmark] public void Serialize_Dictionary() => Serialize(new Dictionary<string, string>
+        [Benchmark] public void Byte_Array() => SerializeAndDeserialize(new byte[] { 123, 134, 11, 122, 1 });
+        [Benchmark] public void String_Array() => SerializeAndDeserialize(new[] { "abc", "cbd0", "sdsd4", "4dfg", "sfsdf44g" });
+        [Benchmark] public void Dictionary() => SerializeAndDeserialize(new Dictionary<string, string>
             {
                 ["abc"] = "aaa",
                 ["dsdf"] = "asdab",
                 ["fms0"] = "sdftu"
             });
-        [Benchmark] public void Serialize_ArrayList() => Serialize(new List<string> { "asdad", "asdabs3", "sfsdf44g", "asdf4r", "sfsdf44g" });
-        [Benchmark] public void Serialize_LinkedList() => Serialize(new LinkedList<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
-        [Benchmark] public void Serialize_HashSet() => Serialize(new HashSet<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
-        [Benchmark] public void Serialize_SortedSet() => Serialize(new SortedSet<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
+        [Benchmark] public void Array_List() => SerializeAndDeserialize(new List<string> { "asdad", "asdabs3", "sfsdf44g", "asdf4r", "sfsdf44g" });
+        [Benchmark] public void Linked_List() => SerializeAndDeserialize(new LinkedList<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
+        [Benchmark] public void Hash_Set() => SerializeAndDeserialize(new HashSet<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
+        [Benchmark] public void Sorted_Set() => SerializeAndDeserialize(new SortedSet<string>(new[] { "asdad", "asdabs3", "dfsdf9", "asdf4r", "sfsdf44g" }));
     }
 }

@@ -15,11 +15,11 @@ namespace Hyperion.Benchmarks
 {
     public class SerializeImmutableCollectionsBenchmark : HyperionBenchmark
     {
-        [Benchmark] public void Serialize_ImmutableArray() => Serialize(ImmutableArray.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
-        [Benchmark] public void Serialize_ImmutableList() => Serialize(ImmutableList.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
-        [Benchmark] public void Serialize_ImmutableHashSet() => Serialize(ImmutableHashSet.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
-        [Benchmark] public void Serialize_ImmutableSortedSet() => Serialize(ImmutableSortedSet.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
-        [Benchmark] public void Serialize_ImmutableDictionary() => Serialize(ImmutableDictionary.CreateRange(new[]
+        [Benchmark] public void Immutable_Array() => SerializeAndDeserialize(ImmutableArray.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
+        [Benchmark] public void Immutable_List() => SerializeAndDeserialize(ImmutableList.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
+        [Benchmark] public void Immutable_Hash_Set() => SerializeAndDeserialize(ImmutableHashSet.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
+        [Benchmark] public void Immutable_Sorted_Set() => SerializeAndDeserialize(ImmutableSortedSet.CreateRange(new[] { "abc", "cbd0", "sdsd4", "4dfg", "adafd0xd" }));
+        [Benchmark] public void Immutable_Dictionary() => SerializeAndDeserialize(ImmutableDictionary.CreateRange(new[]
         {
             new KeyValuePair<string, string>("key1", "value1"),
             new KeyValuePair<string, string>("key2", "value2"),

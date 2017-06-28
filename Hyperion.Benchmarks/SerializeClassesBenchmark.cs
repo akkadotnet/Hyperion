@@ -44,10 +44,10 @@ namespace Hyperion.Benchmarks
 
         #endregion
 
-        [Benchmark] public void Serialize_CyclicReferences() => Serialize(cyclic);
-        [Benchmark] public void Serialize_VirtualClasses() => Serialize(virtualObject);
-        [Benchmark] public void Serialize_LargeSealedClasses() => Serialize(sealedObject);
-        [Benchmark] public void Serialize_GenericClasses() => Serialize(genericObject);
+        [Benchmark] public void Cyclic_References() => SerializeAndDeserialize(cyclic);
+        [Benchmark] public void Virtual_Classes() => SerializeAndDeserialize(virtualObject);
+        [Benchmark] public void Large_Sealed_Classes() => SerializeAndDeserialize(sealedObject);
+        [Benchmark] public void Generic_Classes() => SerializeAndDeserialize(genericObject);
     }
 
     #region test data types

@@ -40,11 +40,11 @@ namespace Hyperion.Benchmarks
         
         #endregion
 
-        [Benchmark] public void Serialize_DiscriminatedUnion() => Serialize(du);
-        [Benchmark] public void Serialize_Struct_DiscriminatedUnion() => Serialize(sdu);
-        [Benchmark] public void Serialize_Record() => Serialize(record);
-        [Benchmark] public void Serialize_RecordWithMap() => Serialize(TestMap.createRecordWithMap);
-        [Benchmark] public void Serialize_FSharpList() => Serialize(list);
-        [Benchmark] public void Serialize_FSharpSet() => Serialize(set);
+        [Benchmark] public void Discriminated_Union() => SerializeAndDeserialize(du);
+        [Benchmark] public void Struct_Discriminated_Union() => SerializeAndDeserialize(sdu);
+        [Benchmark] public void Record() => SerializeAndDeserialize(record);
+        [Benchmark] public void Record_With_Map() => SerializeAndDeserialize(TestMap.createRecordWithMap);
+        [Benchmark] public void FSharp_List() => SerializeAndDeserialize(list);
+        [Benchmark] public void FSharp_Set() => SerializeAndDeserialize(set);
     }
 }

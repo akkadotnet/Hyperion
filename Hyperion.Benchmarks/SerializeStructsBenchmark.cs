@@ -28,9 +28,9 @@ namespace Hyperion.Benchmarks
 
         #endregion
 
-        [Benchmark] public void Serialize_Enums() => Serialize(testEnum);
-        [Benchmark] public void Serialize_StandardValueTypes() => Serialize(standardValue);
-        [Benchmark] public void Serialize_BlittableValueTypes() => Serialize(blittableValue);
+        [Benchmark] public void Enums() => SerializeAndDeserialize(testEnum);
+        [Benchmark] public void Standard_Value_Types() => SerializeAndDeserialize(standardValue);
+        [Benchmark] public void Blittable_Value_Types() => SerializeAndDeserialize(blittableValue);
     }
 
     #region test data types
