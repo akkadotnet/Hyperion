@@ -8,6 +8,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using Xunit;
 
@@ -16,6 +18,49 @@ namespace Hyperion.Tests
     
     public class Bugs
     {
+        #region issue 58
+
+        public enum TrustLevel { Unknown, Suspicious, Partial, Fully }
+        public interface IContainer<out T>
+        {
+            T Value { get; }
+            TrustLevel TrustLevel { get; }
+        }
+        public class Container<T> : IContainer<T>
+        {
+            public T Value { get; }
+            public TrustLevel TrustLevel { get; }
+
+            public Container(T value, TrustLevel trustLevel)
+            {
+                Value = value;
+                TrustLevel = trustLevel;
+            }
+        }
+        public class Name
+        {
+            public IContainer<string> Title { get; }
+            public IContainer<string> GivenName { get; }
+            public IContainer<string> FamilyName { get; }
+
+            public Name(IContainer<string> title, IContainer<string> givenName, IContainer<string> familyName)
+            {
+                Title = title;
+                GivenName = givenName;
+                FamilyName = familyName;
+            }
+        }
+        public class ProvisioningResultMessage<T>
+        {
+            private T Result { get; }
+
+            public ProvisioningResultMessage(T result)
+            {
+                Result = result;
+            }
+        }
+
+        #endregion
 
         public class ByteMessage
         {
@@ -63,6 +108,34 @@ namespace Hyperion.Tests
             serializer.Serialize(root, stream);
             stream.Position = 0;
             var actual = serializer.Deserialize<Recover>(stream);
+        }
+
+        [Fact]
+        public void CanSerializeImmutableGenericInterfaces()
+        {
+            var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
+            var names = new List<Name>
+            {
+                new Name(new Container<string>("Mr", TrustLevel.Partial),
+                    new Container<string>("Bob", TrustLevel.Partial),
+                    new Container<string>("Smith", TrustLevel.Suspicious)),
+                new Name(new Container<string>("Mrs", TrustLevel.Suspicious),
+                    new Container<string>("Jane", TrustLevel.Suspicious),
+                    new Container<string>("Smith", TrustLevel.Suspicious)),
+                new Name(new Container<string>("Master", TrustLevel.Fully),
+                    new Container<string>("Fred", TrustLevel.Fully), new Container<string>("Smith", TrustLevel.Fully)),
+                new Name(new Container<string>("Miss", TrustLevel.Partial),
+                    new Container<string>("Sandra", TrustLevel.Partial),
+                    new Container<string>("Smith", TrustLevel.Suspicious))
+            };
+            var message = new ProvisioningResultMessage<IEnumerable<Name>>(names.ToImmutableArray());
+
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(message, stream);
+                stream.Position = 0;
+                var actual = serializer.Deserialize(stream);
+            }
         }
 
         public class SnapshotSelectionCriteria
