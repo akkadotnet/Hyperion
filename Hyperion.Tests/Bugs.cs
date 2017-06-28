@@ -15,7 +15,7 @@ using Xunit;
 
 namespace Hyperion.Tests
 {
-    
+
     public class Bugs
     {
         #region issue 58
@@ -35,19 +35,6 @@ namespace Hyperion.Tests
             {
                 Value = value;
                 TrustLevel = trustLevel;
-            }
-        }
-        public class Name
-        {
-            public IContainer<string> Title { get; }
-            public IContainer<string> GivenName { get; }
-            public IContainer<string> FamilyName { get; }
-
-            public Name(IContainer<string> title, IContainer<string> givenName, IContainer<string> familyName)
-            {
-                Title = title;
-                GivenName = givenName;
-                FamilyName = familyName;
             }
         }
         public class ProvisioningResultMessage<T>
@@ -91,7 +78,7 @@ namespace Hyperion.Tests
         public void CanSerializeMessageWithByte()
         {
             var stream = new MemoryStream();
-            var msg = new ByteMessage(DateTime.UtcNow,1,2);
+            var msg = new ByteMessage(DateTime.UtcNow, 1, 2);
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
             serializer.Serialize(msg, stream);
             stream.Position = 0;
@@ -114,21 +101,22 @@ namespace Hyperion.Tests
         public void CanSerializeImmutableGenericInterfaces()
         {
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
-            var names = new List<Name>
+            var names = new List<Container<string>>
             {
-                new Name(new Container<string>("Mr", TrustLevel.Partial),
-                    new Container<string>("Bob", TrustLevel.Partial),
-                    new Container<string>("Smith", TrustLevel.Suspicious)),
-                new Name(new Container<string>("Mrs", TrustLevel.Suspicious),
-                    new Container<string>("Jane", TrustLevel.Suspicious),
-                    new Container<string>("Smith", TrustLevel.Suspicious)),
-                new Name(new Container<string>("Master", TrustLevel.Fully),
-                    new Container<string>("Fred", TrustLevel.Fully), new Container<string>("Smith", TrustLevel.Fully)),
-                new Name(new Container<string>("Miss", TrustLevel.Partial),
-                    new Container<string>("Sandra", TrustLevel.Partial),
-                    new Container<string>("Smith", TrustLevel.Suspicious))
+                new Container<string>("Mr", TrustLevel.Partial),
+                new Container<string>("Bob", TrustLevel.Partial),
+                new Container<string>("Smith", TrustLevel.Suspicious),
+                new Container<string>("Mrs", TrustLevel.Suspicious),
+                new Container<string>("Jane", TrustLevel.Suspicious),
+                new Container<string>("Smith", TrustLevel.Suspicious),
+                new Container<string>("Master", TrustLevel.Fully),
+                new Container<string>("Fred", TrustLevel.Fully),
+                new Container<string>("Smith", TrustLevel.Fully),
+                new Container<string>("Miss", TrustLevel.Partial),
+                new Container<string>("Sandra", TrustLevel.Partial),
+                new Container<string>("Smith", TrustLevel.Suspicious)
             };
-            var message = new ProvisioningResultMessage<IEnumerable<Name>>(names.ToImmutableArray());
+            var message = new ProvisioningResultMessage<IEnumerable<Container<string>>>(names.ToImmutableArray());
 
             using (var stream = new MemoryStream())
             {
