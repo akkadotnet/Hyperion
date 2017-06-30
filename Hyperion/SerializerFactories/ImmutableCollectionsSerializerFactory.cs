@@ -61,22 +61,28 @@ namespace Hyperion.SerializerFactories
             var creatorType =
                 Type.GetType(ImmutableCollectionsNamespace + "." + typeName + ", " + ImmutableCollectionsAssembly);
 
-            var genericTypes = elementType.GetTypeInfo().IsGenericType
-                   ? elementType.GetTypeInfo().GetGenericArguments()
-                   : new[] { elementType };
+
+            var createRangeMethodInfo = creatorType != null
+                ? creatorType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(methodInfo => methodInfo.Name == "CreateRange" && methodInfo.GetParameters().Length == 1)
+                : null;
+
+            // If the element type is a generic type and the method located to create the collection instance requires more than one generic type parameter
+            // we need to obtain the generic arguments of the element type.
+            var genericTypes = elementType.GetTypeInfo().IsGenericType && createRangeMethodInfo != null && createRangeMethodInfo.GetGenericArguments().Length > 1
+                ? elementType.GetTypeInfo().GetGenericArguments()
+                : new[] { elementType };
 
             // if creatorType == null it means that type is probably an interface
             // we propagate null to create mock serializer - it won't be used anyway
-            
+
             var stackTypeDef = Type.GetType(ImmutableCollectionsNamespace + ".IImmutableStack`1, " + ImmutableCollectionsAssembly, true);
             var stackInterface = stackTypeDef.MakeGenericType(genericTypes[0]);
 
             var isStack = stackInterface.IsAssignableFrom(type);
 
-            var createRange = creatorType != null
-                ? creatorType.GetTypeInfo().GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(methodInfo => methodInfo.Name == "CreateRange" && methodInfo.GetParameters().Length == 1)
-                .MakeGenericMethod(genericTypes)
+            var createRange = createRangeMethodInfo != null
+                ? createRangeMethodInfo.MakeGenericMethod(genericTypes)
                 : null;
 
             ObjectWriter writer = (stream, o, session) =>
