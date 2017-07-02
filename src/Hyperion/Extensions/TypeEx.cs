@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
+
 #if SERIALIZATION
 using System.Runtime.Serialization;
 #endif
@@ -203,6 +205,10 @@ namespace Hyperion.Extensions
 
         private static readonly string CoreAssemblyName = GetCoreAssemblyName();
 
+        private static readonly Regex cleanAssemblyVersionRegex = new Regex(
+            "(, Version=([\\d\\.]+))?(, Culture=[^,\\] \\t]+)?(, PublicKeyToken=(null|[\\da-f]+))?",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
         private static string GetCoreAssemblyName()
         {
             var name = 1.GetType().AssemblyQualifiedName;
@@ -214,9 +220,7 @@ namespace Hyperion.Extensions
         {
             var name = self.AssemblyQualifiedName;
             name = name.Replace(CoreAssemblyName, ",%core%");
-            name = name.Replace(", Culture=neutral", "");
-            name = name.Replace(", PublicKeyToken=null", "");
-            name = name.Replace(", Version=1.0.0.0", ""); //TODO: regex or whatever...
+            name = cleanAssemblyVersionRegex.Replace(name, string.Empty);
             return name;
         }
 
