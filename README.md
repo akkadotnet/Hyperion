@@ -67,7 +67,7 @@ e.g. EventSourcing or for message queues, then Protobuf or MS Bond is probably a
 
 Hyperion has been designed with a performance first mindset.
 It is not _the_ most important aspect of Hyperion, Surrogates and polymorphism is more critical for what we want to solve.
-But even with it's rich featureset, Hyperion performs extremely well.
+But even with its rich featureset, Hyperion performs extremely well.
 
 ```text
 Hyperion - preregister types
