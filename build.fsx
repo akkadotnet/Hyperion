@@ -20,6 +20,12 @@ let outputNuGet = output @@ "nuget"
 let outputBinariesNet45 = outputBinaries @@ "net45"
 let outputBinariesNetStandard = outputBinaries @@ "netstandard1.6"
 
+let buildNumber = environVarOrDefault "BUILD_NUMBER" "0"
+let versionSuffix = 
+    match (getBuildParam "nugetprerelease") with
+    | "dev" -> "beta" + (if (not (buildNumber = "0")) then ("-" + buildNumber) else "")
+    | _ -> ""
+
 Target "Clean" (fun _ ->
     CleanDir output
     CleanDir outputTests
@@ -34,14 +40,19 @@ Target "Clean" (fun _ ->
 )
 
 Target "RestorePackages" (fun _ ->
+    let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
+
     DotNetCli.Restore
         (fun p -> 
             { p with
                 Project = "./Hyperion.sln"
-                NoCache = false })
+                NoCache = false 
+                AdditionalArgs = additionalArgs })
 )
 
 Target "Build" (fun _ ->
+    let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
+
     if (isWindows) then
         let projects = !! "./**/*.csproj"
 
@@ -50,7 +61,8 @@ Target "Build" (fun _ ->
                 (fun p -> 
                     { p with
                         Project = project
-                        Configuration = configuration })
+                        Configuration = configuration 
+                        AdditionalArgs = additionalArgs })
 
         projects |> Seq.iter (runSingleProject)
     else
@@ -59,14 +71,16 @@ Target "Build" (fun _ ->
                 { p with
                     Project = "./Hyperion/Hyperion.csproj"
                     Framework = "netstandard1.6"
-                    Configuration = configuration })
+                    Configuration = configuration 
+                    AdditionalArgs = additionalArgs })
 
         DotNetCli.Build
             (fun p -> 
                 { p with
                     Project = "./Hyperion.Tests/Hyperion.Tests.csproj"
                     Framework = "netcoreapp1.0"
-                    Configuration = configuration })
+                    Configuration = configuration 
+                    AdditionalArgs = additionalArgs })
 )
 
 Target "RunTests" (fun _ ->
@@ -141,8 +155,6 @@ Target "NBench" (fun _ ->
 //--------------------------------------------------------------------------------
 
 Target "CreateNuget" (fun _ ->
-    let versionSuffix = getBuildParamOrDefault "versionsuffix" ""
-
     DotNetCli.Pack
         (fun p -> 
             { p with
