@@ -21,11 +21,17 @@ namespace Hyperion.SerializerFactories
     {
         public override bool CanSerialize(Serializer serializer, Type type)
         {
+            if (serializer.Options.IgnoreISerializable)
+                return false;
+
             return typeof (ISerializable).IsAssignableFrom(type);
         }
 
         public override bool CanDeserialize(Serializer serializer, Type type)
         {
+            if (serializer.Options.IgnoreISerializable)
+                return false;
+
             return CanSerialize(serializer, type);
         }
 

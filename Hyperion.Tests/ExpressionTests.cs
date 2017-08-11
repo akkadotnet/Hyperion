@@ -33,11 +33,13 @@ namespace Hyperion.Tests
 
         public class DummyException : Exception
         {
+#if SERIALIZATION
             protected DummyException(
                 SerializationInfo info,
                 StreamingContext context) : base(info, context)
             {
             }
+#endif
         }
 
         [Fact]

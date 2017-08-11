@@ -22,7 +22,7 @@ namespace Hyperion.SerializerFactories
     {
         private static readonly Type LinkedListType = typeof(LinkedList<>);
 
-        public override bool CanSerialize(Serializer serializer, Type type) => type.IsGenericType && type.GetGenericTypeDefinition() == LinkedListType;
+        public override bool CanSerialize(Serializer serializer, Type type) => type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == LinkedListType;
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 

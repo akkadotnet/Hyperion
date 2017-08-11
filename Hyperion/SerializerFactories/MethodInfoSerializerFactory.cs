@@ -49,7 +49,14 @@ namespace Hyperion.SerializerFactories
                     null);
                 return method;
 #else
-                return null;
+                var methods = owner.GetTypeInfo()
+                    .GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
+                                BindingFlags.NonPublic);
+                var method = methods.FirstOrDefault(m => m.Name == name &&
+                                                         m.GetParameters()
+                                                             .Select(p => p.ParameterType)
+                                                             .SequenceEqual(arguments));
+                return method;
 #endif
             };
             ObjectWriter writer = (stream, obj, session) =>

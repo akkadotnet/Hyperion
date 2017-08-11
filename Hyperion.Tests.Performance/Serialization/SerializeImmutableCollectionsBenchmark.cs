@@ -10,20 +10,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using NBench;
-using Pro.NBench.xUnit.XunitExtensions;
-using Xunit.Abstractions;
 
 namespace Hyperion.Tests.Performance.Serialization
 {
     public class SerializeImmutableCollectionsBenchmark : PerfTestBase
     {
-#if !NBENCH
-        public SerializeImmutableCollectionsBenchmark(ITestOutputHelper output) : base(output)
-        {
-        }
-#endif
-
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark immutable string array serialization",
             NumberOfIterations = StandardIterationCount,
@@ -37,7 +28,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(collection);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark immutable list serialization",
             NumberOfIterations = StandardIterationCount,
@@ -51,7 +41,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(collection);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark immutable hash set serialization",
             NumberOfIterations = StandardIterationCount,
@@ -65,7 +54,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(collection);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark immutable sorted set serialization",
             NumberOfIterations = StandardIterationCount,
@@ -79,7 +67,6 @@ namespace Hyperion.Tests.Performance.Serialization
             SerializeAndCount(collection);
         }
 
-        [NBenchFact]
         [PerfBenchmark(
             Description = "Benchmark immutable dictionary serialization",
             NumberOfIterations = StandardIterationCount,
