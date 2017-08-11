@@ -1,3 +1,9 @@
+### 0.9.5 August 11 2017
+
+Provides support for .NET Standard 1.6.
+
+See the full set of changes here: [Hyperion 0.9.5](https://github.com/akkadotnet/Hyperion/milestone/3)
+
 ### 0.9.2 January 05 2017
 Includes bug fixes for immutable data structures and lists.
 
