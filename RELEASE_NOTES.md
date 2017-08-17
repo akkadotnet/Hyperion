@@ -1,3 +1,7 @@
+### 0.9.6 August 17 2017
+
+Resolving issues with conflicting binary being downloaded via NuGet with version bump.
+
 ### 0.9.5 August 11 2017
 
 Provides support for .NET Standard 1.6.

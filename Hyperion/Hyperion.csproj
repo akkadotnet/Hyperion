@@ -1,16 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\common.props" />
 
   <PropertyGroup>
     <AssemblyTitle>Hyperion</AssemblyTitle>
     <Description>Hyperion, fast binary POCO serializer</Description>
-    <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
-    <VersionPrefix>0.9.5</VersionPrefix>
-    <Authors>akkadotnet</Authors>
     <TargetFrameworks>netstandard1.6;net45</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PackageTags>serialization;poco</PackageTags>
-    <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
     <NetStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard1.6' ">1.6.1</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
