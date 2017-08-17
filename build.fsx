@@ -264,5 +264,6 @@ Target "Nuget" DoNothing
 // all
 "BuildRelease" ==> "All"
 "RunTests" ==> "All"
+"Nuget" ==> "All"
 
 RunTargetOrDefault "Help"
