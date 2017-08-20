@@ -1,4 +1,4 @@
-﻿namespace Hyperion.FSharpTestTypes.AssemblyInfo
+﻿namespace Hyperion.Tests.FSharpData.AssemblyInfo
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -7,11 +7,11 @@ open System.Runtime.InteropServices
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("Hyperion.FSharpTestTypes")>]
+[<assembly: AssemblyTitle("Hyperion.Tests.FSharpData")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("")>]
-[<assembly: AssemblyProduct("Hyperion.FSharpTestTypes")>]
+[<assembly: AssemblyProduct("Hyperion.Tests.FSharpData")>]
 [<assembly: AssemblyCopyright("Copyright ©  2017")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
@@ -22,7 +22,7 @@ open System.Runtime.InteropServices
 [<assembly: ComVisible(false)>]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[<assembly: Guid("8b53b1fa-9fb9-402a-9a51-a2dca8de62a3")>]
+[<assembly: Guid("95180489-6e07-4658-afe9-6228b304708c")>]
 
 // Version information for an assembly consists of the following four values:
 // 

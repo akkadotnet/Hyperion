@@ -8,6 +8,8 @@
 #endregion
 
 using BenchmarkDotNet.Attributes;
+#if FSHARP
+
 using Hyperion.FSharpTestTypes;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
@@ -48,3 +50,5 @@ namespace Hyperion.Benchmarks
         [Benchmark] public void FSharp_Set() => SerializeAndDeserialize(set);
     }
 }
+
+#endif
