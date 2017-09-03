@@ -126,6 +126,14 @@ Target "CopyOutput" (fun _ ->
 )
 
 //--------------------------------------------------------------------------------
+// Benchmarks
+//--------------------------------------------------------------------------------
+
+Target "Benchmarks" (fun _ ->
+    () //TODO: complete BenchmarkDotNet setup
+)
+
+//--------------------------------------------------------------------------------
 // Nuget targets 
 //--------------------------------------------------------------------------------
 
@@ -180,6 +188,7 @@ Target "Help" <| fun _ ->
       " * Build      Builds"
       " * Nuget      Create and optionally publish nugets packages"
       " * RunTests   Runs tests"
+      " * Benchmarks Run BenchmarkDotNet performance tests"
       " * All        Builds, run tests, creates and optionally publish nuget packages"
       ""
       " Other Targets"
@@ -231,6 +240,9 @@ Target "Nuget" DoNothing
 "Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
 "Clean" ==> "RestorePackages" ==> "Build"
 
+// benchmark dependencies
+"BuildRelease" ==> "Benchmarks"
+
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
 "CreateNuget" ==> "PublishNuget"
@@ -239,6 +251,7 @@ Target "Nuget" DoNothing
 // all
 "BuildRelease" ==> "All"
 "RunTests" ==> "All"
+"Benchmarks" ==> "All"
 "Nuget" ==> "All"
 
 RunTargetOrDefault "Help"
