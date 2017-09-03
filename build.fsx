@@ -54,7 +54,7 @@ Target "Build" (fun _ ->
     let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
 
     if (isWindows) then
-        let projects = !! "./**/*.csproj"// ++ "./**/*.fsproj"
+        let projects = !! "./**/*.csproj" ++ "./**/*.fsproj"
 
         let runSingleProject project =
             DotNetCli.Build
