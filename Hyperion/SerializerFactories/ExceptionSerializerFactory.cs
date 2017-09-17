@@ -37,18 +37,30 @@ namespace Hyperion.SerializerFactories
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
+        // Workaround for CoreCLR where FormatterServices.GetUninitializedObject is not public
+        private static readonly Func<Type, object> GetUninitializedObject =
+            (Func<Type, object>)
+                typeof(string).GetTypeInfo().Assembly.GetType("System.Runtime.Serialization.FormatterServices")
+                    .GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
+                    .CreateDelegate(typeof(Func<Type, object>));
+
+        private static object FormatterServicesGetUninitializedObject(Type type) => GetUninitializedObject.Invoke(type);
+
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var exceptionSerializer = new ObjectSerializer(type);
+            var hasDefaultConstructor = type.GetTypeInfo().GetConstructor(new Type[0]) != null;
             exceptionSerializer.Initialize((stream, session) =>
             {
-                var exception = Activator.CreateInstance(type);
                 var className = stream.ReadString(session);
                 var message = stream.ReadString(session);
                 var remoteStackTraceString = stream.ReadString(session);
                 var stackTraceString = stream.ReadString(session);
                 var innerException = stream.ReadObject(session);
+
+                var exception = hasDefaultConstructor ? Activator.CreateInstance(type) :
+                    FormatterServicesGetUninitializedObject(type);
 
                 _className.SetValue(exception,className);
                 _message.SetValue(exception, message);
@@ -63,7 +75,7 @@ namespace Hyperion.SerializerFactories
                 var remoteStackTraceString = (string)_remoteStackTraceString.GetValue(exception);
                 var stackTraceString = (string)_stackTraceString.GetValue(exception);
                 var innerException = _innerException.GetValue(exception);
-                StringSerializer.WriteValueImpl(stream,className,session);
+                StringSerializer.WriteValueImpl(stream, className, session);
                 StringSerializer.WriteValueImpl(stream, message, session);
                 StringSerializer.WriteValueImpl(stream, remoteStackTraceString, session);
                 StringSerializer.WriteValueImpl(stream, stackTraceString, session);
