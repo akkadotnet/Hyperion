@@ -44,23 +44,21 @@ namespace Hyperion.SerializerFactories
                     .GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
                     .CreateDelegate(typeof(Func<Type, object>));
 
-        private static object FormatterServicesGetUninitializedObject(Type type) => GetUninitializedObject.Invoke(type);
-
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var exceptionSerializer = new ObjectSerializer(type);
             var hasDefaultConstructor = type.GetTypeInfo().GetConstructor(new Type[0]) != null;
+            var createInstance = hasDefaultConstructor ? Activator.CreateInstance : GetUninitializedObject;
+
             exceptionSerializer.Initialize((stream, session) =>
             {
+                var exception = createInstance(type);
                 var className = stream.ReadString(session);
                 var message = stream.ReadString(session);
                 var remoteStackTraceString = stream.ReadString(session);
                 var stackTraceString = stream.ReadString(session);
                 var innerException = stream.ReadObject(session);
-
-                var exception = hasDefaultConstructor ? Activator.CreateInstance(type) :
-                    FormatterServicesGetUninitializedObject(type);
 
                 _className.SetValue(exception,className);
                 _message.SetValue(exception, message);
