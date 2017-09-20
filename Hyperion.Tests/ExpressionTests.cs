@@ -340,6 +340,41 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void CanSerializeTargetInvocationException()
+        {
+            var exc = new TargetInvocationException(null);
+            var serializer = new Hyperion.Serializer();
+
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(exc, stream);
+                stream.Position = 0;
+                var deserialized = serializer.Deserialize<TargetInvocationException>(stream);
+                Assert.Equal(exc.Message, deserialized.Message);
+                Assert.Equal(exc.StackTrace, deserialized.StackTrace);
+            }
+        }
+
+        [Fact]
+        public void CanSerializeObjectDisposedException()
+        {
+            var exc = new ObjectDisposedException("Object is already disposed", new ArgumentException("One level deeper"));
+            var serializer = new Hyperion.Serializer();
+
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(exc, stream);
+                stream.Position = 0;
+                var deserialized = serializer.Deserialize<ObjectDisposedException>(stream);
+                Assert.Equal(exc.Message, deserialized.Message);
+                Assert.Equal(exc.StackTrace, deserialized.StackTrace);
+                Assert.Equal(exc.InnerException.GetType(), deserialized.InnerException.GetType());
+                Assert.Equal(exc.InnerException.Message, deserialized.InnerException.Message);
+                Assert.Equal(exc.InnerException.StackTrace, deserialized.InnerException.StackTrace);
+            }
+        }
+
+        [Fact]
         public void CanSerializeCatchBlock()
         {
             var expr = Expression.Catch(typeof(DummyException), Expression.Constant(2));
