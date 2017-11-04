@@ -1,4 +1,4 @@
-﻿namespace Hyperion.Tests.FSharpData
+namespace Hyperion.Tests.FSharpData
 
 
 type DU1 = 
