@@ -19,7 +19,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Hyperion.Tests.FSharpData",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hyperion.Benchmarks", "Hyperion.Benchmarks\Hyperion.Benchmarks.csproj", "{CAE2DB69-0BE7-4B11-96DB-D5B61D35607F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hyperion.Tests", "Hyperion.Tests\Hyperion.Tests.csproj", "{3D012049-DD13-4ECE-AEFC-0FF0EE8CA70A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hyperion.Tests", "Hyperion.Tests\Hyperion.Tests.csproj", "{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +39,10 @@ Global
 		{CAE2DB69-0BE7-4B11-96DB-D5B61D35607F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CAE2DB69-0BE7-4B11-96DB-D5B61D35607F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CAE2DB69-0BE7-4B11-96DB-D5B61D35607F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D012049-DD13-4ECE-AEFC-0FF0EE8CA70A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D012049-DD13-4ECE-AEFC-0FF0EE8CA70A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D012049-DD13-4ECE-AEFC-0FF0EE8CA70A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D012049-DD13-4ECE-AEFC-0FF0EE8CA70A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
