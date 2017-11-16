@@ -15,7 +15,7 @@ Hyperion was designed to safely transfer messages in distributed systems, for ex
 In message based systems, it is common to receive different types of messages and apply pattern matching over those messages.
 If the messages does not carry over all the relevant type information to the receiveing side, the message might no longer match exactly what your system expect.
 
-Consilder the following case:
+Consider the following case:
 
 ```csharp
 public class Envelope

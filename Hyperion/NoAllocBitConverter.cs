@@ -112,5 +112,15 @@ namespace Hyperion
                 *((long*) b) = dateTime.Ticks;
             bytes[DateTimeSerializer.Size - 1] = (byte) dateTime.Kind;
         }
+
+        public static unsafe void GetBytes(DateTimeOffset dateTime, byte[] bytes)
+        {
+            //datetime size is 9 ticks + kind
+            fixed (byte* b = bytes)
+            {
+                *((long*)b) = dateTime.Ticks;
+                *((short*) (b + sizeof(long))) = (short)dateTime.Offset.TotalMinutes;
+            }
+        }
     }
 }
