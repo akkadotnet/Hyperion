@@ -115,7 +115,7 @@ namespace Hyperion
 
         public static unsafe void GetBytes(DateTimeOffset dateTime, byte[] bytes)
         {
-            //datetime size is 9 ticks + kind
+            //datetimeoffset size is 10 ticks + offset
             fixed (byte* b = bytes)
             {
                 *((long*)b) = dateTime.Ticks;
