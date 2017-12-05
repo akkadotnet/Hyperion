@@ -37,37 +37,32 @@ namespace Hyperion.SerializerFactories
             {
                 var name = stream.ReadString(session);
                 var owner = stream.ReadObject(session) as Type;
-                var arguments = stream.ReadObject(session) as Type[];
+                var parameterTypes = stream.ReadObject(session) as Type[];
+                var method = owner.GetMethodExt(name,
+                    BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                    parameterTypes);
+                if (method.IsGenericMethodDefinition) {
+                    var genericTypeArguments = stream.ReadObject(session) as Type[];
+                    method = method.MakeGenericMethod(genericTypeArguments);
+                }
 
-#if NET45
-                var method = owner.GetTypeInfo().GetMethod(
-                    name,
-                    BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic, 
-                    null,
-                    CallingConventions.Any,
-                    arguments,
-                    null);
                 return method;
-#else
-                var methods = owner.GetTypeInfo()
-                    .GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public |
-                                BindingFlags.NonPublic);
-                var method = methods.FirstOrDefault(m => m.Name == name &&
-                                                         m.GetParameters()
-                                                             .Select(p => p.ParameterType)
-                                                             .SequenceEqual(arguments));
-                return method;
-#endif
             };
             ObjectWriter writer = (stream, obj, session) =>
             {
                 var method = (MethodInfo) obj;
                 var name = method.Name;
                 var owner = method.DeclaringType;
-                var arguments = method.GetParameters().Select(p => p.ParameterType).ToArray();
-                StringSerializer.WriteValueImpl(stream,name,session);
+                StringSerializer.WriteValueImpl(stream, name, session);
                 stream.WriteObjectWithManifest(owner, session);
+                var arguments = method.GetParameters().Select(p => p.ParameterType).ToArray();
                 stream.WriteObjectWithManifest(arguments, session);
+                if (method.IsGenericMethod) {
+                    // we use the parameter types to find the method above but, if generic, we need to store the generic type arguments as well
+                    // in order to MakeGenericType
+                    var genericTypeArguments = method.GetGenericArguments();
+                    stream.WriteObjectWithManifest(genericTypeArguments, session);
+                }
             };
             os.Initialize(reader, writer);
 
