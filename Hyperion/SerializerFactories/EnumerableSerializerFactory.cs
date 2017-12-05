@@ -13,6 +13,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Linq.Expressions;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
@@ -22,12 +23,18 @@ namespace Hyperion.SerializerFactories
     {
         public override bool CanSerialize(Serializer serializer, Type type)
         {
-            //TODO: check for constructor with IEnumerable<T> param
+            // Stack<T> has IEnumerable<T> constructor, but reverses order of the stack, so can't be used.
+            if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Stack<>))
+                return false;
 
             var countProperty = type.GetTypeInfo().GetProperty("Count");
             if (countProperty == null || countProperty.PropertyType != typeof(int))
                 return false;
 
+            var hasEnumerableConstructor = GetEnumerableConstructor(type) != null;
+            if (hasEnumerableConstructor)
+                return true;
+            
             if (!type.GetTypeInfo().GetMethods().Any(IsAddMethod))
                 return false;
 
@@ -46,7 +53,7 @@ namespace Hyperion.SerializerFactories
             && (methodInfo.ReturnType == typeof(void) || methodInfo.ReturnType == typeof(bool)) // sets return bool on Add
             && !methodInfo.IsStatic
             && HasValidParameters(methodInfo);
-
+        
         private static bool HasValidParameters(MethodInfo methodInfo)
         {
             var parameters = methodInfo.GetParameters();
@@ -68,33 +75,84 @@ namespace Hyperion.SerializerFactories
                 .FirstOrDefault();
         }
 
+        private static ConstructorInfo GetEnumerableConstructor(Type type)
+        {
+            var enumerableType = GetEnumerableType(type);
+            return enumerableType != null
+              ? type.GetTypeInfo().GetConstructor(new[] { typeof(IEnumerable<>).MakeGenericType(enumerableType) })
+              : null;
+        }
+
+        private static Func<object, object> CompileCtorToDelegate(ConstructorInfo ctor, Type argType)
+        {
+            var arg = Expression.Parameter(typeof(object));
+            var castArg = Expression.Convert(arg, argType);
+            var call = Expression.New(ctor, new Expression[] { castArg });
+            var castRes = Expression.Convert(call, typeof(object));
+            var lambda = Expression.Lambda<Func<object, object>>(castRes, arg);
+            var compiled = lambda.Compile();
+            return compiled;
+        }
+
+        private static Action<object, object> CompileMethodToDelegate(MethodInfo method, Type instanceType, Type argType)
+        {
+            var instance = Expression.Parameter(typeof(object));
+            var arg = Expression.Parameter(typeof(object));
+            var castInstance = Expression.Convert(instance, instanceType);
+            var castArg = Expression.Convert(arg, argType);
+            var call = Expression.Call(castInstance, method, new Expression[] { castArg });
+            var lambda = Expression.Lambda<Action<object, object>>(call, instance, arg);
+            var compiled = lambda.Compile();
+            return compiled;
+        }
+
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var x = new ObjectSerializer(type);
             typeMapping.TryAdd(type, x);
+
             var preserveObjectReferences = serializer.Options.PreserveObjectReferences;
 
             var elementType = GetEnumerableType(type) ?? typeof(object);
             var elementSerializer = serializer.GetSerializerByType(elementType);
 
             var countProperty = type.GetTypeInfo().GetProperty("Count");
-            var addRange = type.GetTypeInfo().GetMethod("AddRange");
-            var add = type.GetTypeInfo().GetMethod("Add");
+            var constructor = GetEnumerableConstructor(type);
+            var construct = constructor != null 
+                ? CompileCtorToDelegate(constructor, elementType.MakeArrayType()) 
+                : null;
+            var addRangeMethod = type.GetTypeInfo().GetMethod("AddRange");
+            var addRange = construct == null && addRangeMethod != null
+                 ? CompileMethodToDelegate(addRangeMethod, type, elementType.MakeArrayType())
+                 : null;
+            var addMethod = type.GetTypeInfo().GetMethod("Add");
+            var add = construct == null && addRange == null && addMethod != null
+                ? CompileMethodToDelegate(addMethod, type, elementType)
+                : null;
 
             Func<object, int> countGetter = o => (int)countProperty.GetValue(o);
-
-
+            
             ObjectReader reader = (stream, session) =>
             {
-                var instance = Activator.CreateInstance(type);
-                if (preserveObjectReferences)
+                var count = stream.ReadInt32(session);
+                if (construct != null)
                 {
-                    session.TrackDeserializedObject(instance);
+                    var enumerable = Array.CreateInstance(elementType, count);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var value = stream.ReadObject(session);
+                        enumerable.SetValue(value, i);
+                    }
+                    var instanceFromConstructor = construct(enumerable);
+                    if (preserveObjectReferences)
+                    {
+                        session.TrackDeserializedObject(instanceFromConstructor);
+                    }
+                    return instanceFromConstructor;
                 }
 
-                var count = stream.ReadInt32(session);
-
+                var instance = Activator.CreateInstance(type);
                 if (addRange != null)
                 {
                     var items = Array.CreateInstance(elementType, count);
@@ -103,9 +161,8 @@ namespace Hyperion.SerializerFactories
                         var value = stream.ReadObject(session);
                         items.SetValue(value, i);
                     }
-                    //HACK: this needs to be fixed, codegenerated or whatever
 
-                    addRange.Invoke(instance, new object[] { items });
+                    addRange(instance, items);
                     return instance;
                 }
                 if (add != null)
@@ -113,7 +170,7 @@ namespace Hyperion.SerializerFactories
                     for (var i = 0; i < count; i++)
                     {
                         var value = stream.ReadObject(session);
-                        add.Invoke(instance, new[] { value });
+                        add(instance, value);
                     }
                 }
 
