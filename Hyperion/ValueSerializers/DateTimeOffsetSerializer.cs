@@ -15,7 +15,7 @@ namespace Hyperion.ValueSerializers
     public class DateTimeOffsetSerializer : SessionAwareByteArrayRequiringValueSerializer<DateTimeOffset>
     {
         public const byte Manifest = 10;
-        public const int Size = sizeof(long) + sizeof(short);
+        public const int Size = sizeof(long) + sizeof(long);
         public static readonly DateTimeOffsetSerializer Instance = new DateTimeOffsetSerializer();
 
         public DateTimeOffsetSerializer() : base(Manifest, () => WriteValueImpl, () => ReadValueImpl)
@@ -37,9 +37,9 @@ namespace Hyperion.ValueSerializers
         private static DateTimeOffset ReadDateTimeOffset(Stream stream, byte[] bytes)
         {
             stream.Read(bytes, 0, Size);
-            var ticks = BitConverter.ToInt64(bytes, 0);
-            var minutes = BitConverter.ToInt16(bytes, sizeof(long));
-            var dateTimeOffset = new DateTimeOffset(ticks, TimeSpan.FromMinutes(minutes));
+            var dateTimeTicks = BitConverter.ToInt64(bytes, 0);
+            var offsetTicks = BitConverter.ToInt64(bytes, sizeof(long));
+            var dateTimeOffset = new DateTimeOffset(dateTimeTicks, TimeSpan.FromTicks(offsetTicks));
             return dateTimeOffset;
         }
 
