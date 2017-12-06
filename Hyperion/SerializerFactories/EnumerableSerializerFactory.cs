@@ -34,6 +34,9 @@ namespace Hyperion.SerializerFactories
             var hasEnumerableConstructor = GetEnumerableConstructor(type) != null;
             if (hasEnumerableConstructor)
                 return true;
+
+            if (!HasParameterlessConstructor(type))
+                return false;
             
             if (!type.GetTypeInfo().GetMethods().Any(IsAddMethod))
                 return false;
@@ -48,6 +51,8 @@ namespace Hyperion.SerializerFactories
             return false;
         }
 
+        private static readonly BindingFlags allInstanceBindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+
         private static bool IsAddMethod(MethodInfo methodInfo) => 
             (methodInfo.Name == "AddRange" || methodInfo.Name == "Add")
             && (methodInfo.ReturnType == typeof(void) || methodInfo.ReturnType == typeof(bool)) // sets return bool on Add
@@ -58,6 +63,13 @@ namespace Hyperion.SerializerFactories
         {
             var parameters = methodInfo.GetParameters();
             return parameters.Length == 1;
+        }
+
+        private static bool HasParameterlessConstructor(Type type)
+        {
+            return type.GetTypeInfo()
+                .GetConstructors(allInstanceBindings)
+                .Any(ctor => !ctor.GetParameters().Any());
         }
 
         public override bool CanDeserialize(Serializer serializer, Type type)
@@ -77,10 +89,21 @@ namespace Hyperion.SerializerFactories
 
         private static ConstructorInfo GetEnumerableConstructor(Type type)
         {
+            BindingFlags bindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
             var enumerableType = GetEnumerableType(type);
+            var iEnumerableType = typeof(IEnumerable<>).MakeGenericType(enumerableType);
             return enumerableType != null
-              ? type.GetTypeInfo().GetConstructor(new[] { typeof(IEnumerable<>).MakeGenericType(enumerableType) })
-              : null;
+                ? type.GetTypeInfo()
+                    .GetConstructors(bindings)
+                    .Where(ctor => HasSingleParameterOfType(ctor, iEnumerableType))
+                    .FirstOrDefault()
+                : null;
+        }
+
+        private static bool HasSingleParameterOfType(MethodBase methodInfo, Type type)
+        {
+            var parameters = methodInfo.GetParameters();
+            return parameters.Length == 1 && parameters[0].ParameterType == type;
         }
 
         private static Func<object, object> CompileCtorToDelegate(ConstructorInfo ctor, Type argType)
@@ -118,65 +141,65 @@ namespace Hyperion.SerializerFactories
             var elementSerializer = serializer.GetSerializerByType(elementType);
 
             var countProperty = type.GetTypeInfo().GetProperty("Count");
-            var constructor = GetEnumerableConstructor(type);
-            var construct = constructor != null 
-                ? CompileCtorToDelegate(constructor, elementType.MakeArrayType()) 
-                : null;
+
+            var enumerableConstructor = GetEnumerableConstructor(type);
             var addRangeMethod = type.GetTypeInfo().GetMethod("AddRange");
-            var addRange = construct == null && addRangeMethod != null
-                 ? CompileMethodToDelegate(addRangeMethod, type, elementType.MakeArrayType())
-                 : null;
             var addMethod = type.GetTypeInfo().GetMethod("Add");
-            var add = construct == null && addRange == null && addMethod != null
-                ? CompileMethodToDelegate(addMethod, type, elementType)
-                : null;
 
             Func<object, int> countGetter = o => (int)countProperty.GetValue(o);
-            
-            ObjectReader reader = (stream, session) =>
+            ObjectReader reader = null;
+            if (enumerableConstructor != null)
             {
-                var count = stream.ReadInt32(session);
-                if (construct != null)
+                var construct = CompileCtorToDelegate(enumerableConstructor, elementType.MakeArrayType());
+                reader = (stream, session) =>
                 {
-                    var enumerable = Array.CreateInstance(elementType, count);
-                    for (var i = 0; i < count; i++)
-                    {
-                        var value = stream.ReadObject(session);
-                        enumerable.SetValue(value, i);
-                    }
-                    var instanceFromConstructor = construct(enumerable);
-                    if (preserveObjectReferences)
-                    {
-                        session.TrackDeserializedObject(instanceFromConstructor);
-                    }
-                    return instanceFromConstructor;
-                }
-
-                var instance = Activator.CreateInstance(type);
-                if (addRange != null)
-                {
+                    var count = stream.ReadInt32(session);
                     var items = Array.CreateInstance(elementType, count);
                     for (var i = 0; i < count; i++)
                     {
                         var value = stream.ReadObject(session);
                         items.SetValue(value, i);
                     }
-
+                    var instance = construct(items);
+                    if (preserveObjectReferences)
+                    {
+                        session.TrackDeserializedObject(instance);
+                    }
+                    return instance;
+                };
+            }
+            else if (addRangeMethod != null)
+            {
+                var addRange = CompileMethodToDelegate(addRangeMethod, type, elementType.MakeArrayType());
+                reader = (stream, session) =>
+                {
+                    var instance = Activator.CreateInstance(type, true);
+                    var count = stream.ReadInt32(session);
+                    var items = Array.CreateInstance(elementType, count);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var value = stream.ReadObject(session);
+                        items.SetValue(value, i);
+                    }
                     addRange(instance, items);
                     return instance;
-                }
-                if (add != null)
+                };
+            }
+            else if (addMethod != null)
+            {
+                var add = CompileMethodToDelegate(addMethod, type, elementType);
+                reader = (stream, session) =>
                 {
+                    var instance = Activator.CreateInstance(type, true);
+                    var count = stream.ReadInt32(session);
                     for (var i = 0; i < count; i++)
                     {
                         var value = stream.ReadObject(session);
                         add(instance, value);
                     }
-                }
-
-
-                return instance;
-            };
+                    return instance;
+                };
+            }
 
             ObjectWriter writer = (stream, o, session) =>
             {
