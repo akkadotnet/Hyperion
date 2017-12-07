@@ -35,8 +35,12 @@ namespace Hyperion.PerfTest
 
             var guidTest = new GuidTest();
             guidTest.Run(1000000);
+
+            var dateTimeOffsetTest = new DateTimeOffsetTest();
+            dateTimeOffsetTest.Run(1000000);
+
             var typicalPersonArrayTest = new TypicalPersonArrayTest();
-            typicalPersonArrayTest.Run(1000);
+            typicalPersonArrayTest.Run(1000);           
 
             var typicalPersonTest = new TypicalPersonTest();
             typicalPersonTest.Run(100000);

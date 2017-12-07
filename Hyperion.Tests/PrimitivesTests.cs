@@ -76,9 +76,27 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDateTime()
+        public void CanSerializeDateTimeUtc()
         {
             SerializeAndAssert(DateTime.UtcNow);
+        }
+
+        [Fact]
+        public void CanSerializeDateTimeLocal()
+        {
+            SerializeAndAssert(new DateTime(DateTime.Now.Ticks, DateTimeKind.Local));
+        }
+
+        [Fact]
+        public void CanSerializeDateTimeOffsetNow()
+        {
+            SerializeAndAssert(DateTimeOffset.Now);
+        }
+
+        [Fact]
+        public void CanSerializeDateTimeOffsetUtc()
+        {
+            SerializeAndAssert(DateTimeOffset.UtcNow);
         }
 
         [Fact]
