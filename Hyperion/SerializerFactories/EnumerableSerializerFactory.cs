@@ -23,6 +23,9 @@ namespace Hyperion.SerializerFactories
     {
         public override bool CanSerialize(Serializer serializer, Type type)
         {
+            if (!typeof(IEnumerable).IsAssignableFrom(type))
+                return false;
+
             // Stack<T> has IEnumerable<T> constructor, but reverses order of the stack, so can't be used.
             if (type.GetTypeInfo().IsGenericType && type.GetGenericTypeDefinition() == typeof(Stack<>))
                 return false;
@@ -38,23 +41,13 @@ namespace Hyperion.SerializerFactories
             if (!HasParameterlessConstructor(type))
                 return false;
             
-            if (!type.GetTypeInfo().GetMethods().Any(IsAddMethod))
-                return false;
-
-            var isGenericEnumerable = GetEnumerableType(type) != null;
-            if (isGenericEnumerable)
-                return true;
-
-            if (typeof(ICollection).GetTypeInfo().IsAssignableFrom(type))
+            if (type.GetTypeInfo().GetMethods(BindingFlagsEx.All).Any(IsAddMethod))
                 return true;
 
             return false;
         }
-
-        private static readonly BindingFlags allInstanceBindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
-
         private static bool IsAddMethod(MethodInfo methodInfo) => 
-            (methodInfo.Name == "AddRange" || methodInfo.Name == "Add")
+            methodInfo.Name == "Add"
             && (methodInfo.ReturnType == typeof(void) || methodInfo.ReturnType == typeof(bool)) // sets return bool on Add
             && !methodInfo.IsStatic
             && HasValidParameters(methodInfo);
@@ -68,7 +61,7 @@ namespace Hyperion.SerializerFactories
         private static bool HasParameterlessConstructor(Type type)
         {
             return type.GetTypeInfo()
-                .GetConstructors(allInstanceBindings)
+                .GetConstructors(BindingFlagsEx.All)
                 .Any(ctor => !ctor.GetParameters().Any());
         }
 
@@ -89,12 +82,11 @@ namespace Hyperion.SerializerFactories
 
         private static ConstructorInfo GetEnumerableConstructor(Type type)
         {
-            BindingFlags bindings = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
             var enumerableType = GetEnumerableType(type);
             var iEnumerableType = typeof(IEnumerable<>).MakeGenericType(enumerableType);
             return enumerableType != null
                 ? type.GetTypeInfo()
-                    .GetConstructors(bindings)
+                    .GetConstructors(BindingFlagsEx.All)
                     .Where(ctor => HasSingleParameterOfType(ctor, iEnumerableType))
                     .FirstOrDefault()
                 : null;
@@ -142,13 +134,31 @@ namespace Hyperion.SerializerFactories
 
             var countProperty = type.GetTypeInfo().GetProperty("Count");
 
+            var addMethod = type.GetTypeInfo().GetMethod("Add", BindingFlagsEx.All);
             var enumerableConstructor = GetEnumerableConstructor(type);
-            var addRangeMethod = type.GetTypeInfo().GetMethod("AddRange");
-            var addMethod = type.GetTypeInfo().GetMethod("Add");
 
             Func<object, int> countGetter = o => (int)countProperty.GetValue(o);
             ObjectReader reader = null;
-            if (enumerableConstructor != null)
+            if (addMethod != null)
+            {
+                var add = CompileMethodToDelegate(addMethod, type, elementType);
+                reader = (stream, session) =>
+                {
+                    var instance = Activator.CreateInstance(type, true);
+                    if (preserveObjectReferences)
+                    {
+                        session.TrackDeserializedObject(instance);
+                    }
+                    var count = stream.ReadInt32(session);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var value = stream.ReadObject(session);
+                        add(instance, value);
+                    }
+                    return instance;
+                };
+            }
+            else if (enumerableConstructor != null)
             {
                 var construct = CompileCtorToDelegate(enumerableConstructor, elementType.MakeArrayType());
                 reader = (stream, session) =>
@@ -164,38 +174,6 @@ namespace Hyperion.SerializerFactories
                     if (preserveObjectReferences)
                     {
                         session.TrackDeserializedObject(instance);
-                    }
-                    return instance;
-                };
-            }
-            else if (addRangeMethod != null)
-            {
-                var addRange = CompileMethodToDelegate(addRangeMethod, type, elementType.MakeArrayType());
-                reader = (stream, session) =>
-                {
-                    var instance = Activator.CreateInstance(type, true);
-                    var count = stream.ReadInt32(session);
-                    var items = Array.CreateInstance(elementType, count);
-                    for (var i = 0; i < count; i++)
-                    {
-                        var value = stream.ReadObject(session);
-                        items.SetValue(value, i);
-                    }
-                    addRange(instance, items);
-                    return instance;
-                };
-            }
-            else if (addMethod != null)
-            {
-                var add = CompileMethodToDelegate(addMethod, type, elementType);
-                reader = (stream, session) =>
-                {
-                    var instance = Activator.CreateInstance(type, true);
-                    var count = stream.ReadInt32(session);
-                    for (var i = 0; i < count; i++)
-                    {
-                        var value = stream.ReadObject(session);
-                        add(instance, value);
                     }
                     return instance;
                 };
