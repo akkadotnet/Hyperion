@@ -35,6 +35,7 @@ namespace Hyperion.Extensions
         public static readonly Type SByteType = typeof(sbyte);
         public static readonly Type BoolType = typeof(bool);
         public static readonly Type DateTimeType = typeof(DateTime);
+        public static readonly Type DateTimeOffsetType = typeof(DateTimeOffset);
         public static readonly Type StringType = typeof(string);
         public static readonly Type GuidType = typeof(Guid);
         public static readonly Type FloatType = typeof(float);
@@ -56,6 +57,7 @@ namespace Hyperion.Extensions
                    type == ByteType ||
                    type == SByteType ||
                    type == DateTimeType ||
+                   type == DateTimeOffsetType ||
                    type == BoolType ||
                    type == StringType ||
                    type == GuidType ||
