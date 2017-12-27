@@ -21,6 +21,9 @@ namespace Hyperion.Extensions
 {
     public static class TypeEx
     {
+        private static ConcurrentDictionary<string, Type> _shortNameToTypeCache = new ConcurrentDictionary<string, Type>();
+        private static ConcurrentDictionary<Type, string> _typeToShortNameCache = new ConcurrentDictionary<Type, string>();
+
         //Why not inline typeof you ask?
         //Because it actually generates calls to get the type.
         //We prefetch all primitives here
@@ -123,8 +126,7 @@ namespace Hyperion.Extensions
             return TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-                var typename = ToQualifiedAssemblyName(shortName);
-                return Type.GetType(typename, true);
+                return GetTypeFromShortName(shortName);
             });
         }
 
@@ -201,29 +203,35 @@ namespace Hyperion.Extensions
             throw new NotSupportedException();
         }
 
-        private static readonly string CoreAssemblyName = GetCoreAssemblyName();
-
-        private static string GetCoreAssemblyName()
+        public static string GetShortAssemblyQualifiedName(this Type type)
         {
-            var name = 1.GetType().AssemblyQualifiedName;
-            var part = name.Substring( name.IndexOf(", Version", StringComparison.Ordinal));
-            return part;
+            return _typeToShortNameCache.GetOrAdd(type, t =>
+            {
+                string fullName;
+
+                if (t.IsGenericType)
+                {
+                    var args = t.GetGenericArguments().Select(gt => "[" + GetShortAssemblyQualifiedName(gt) + "]");
+                    fullName = t.Namespace + "." + t.Name + "[" + String.Join(",", args) + "]";
+                }
+                else
+                {
+                    fullName = t.FullName;
+                }
+
+                return fullName + ", " + t.Assembly.GetName().Name;
+            });
         }
 
-        public static string GetShortAssemblyQualifiedName(this Type self)
+        public static Type GetTypeFromShortName(string shortName)
         {
-            var name = self.AssemblyQualifiedName;
-            name = name.Replace(CoreAssemblyName, ",%core%");
-            name = name.Replace(", Culture=neutral", "");
-            name = name.Replace(", PublicKeyToken=null", "");
-            name = name.Replace(", Version=1.0.0.0", ""); //TODO: regex or whatever...
-            return name;
+            return _shortNameToTypeCache.GetOrAdd(shortName, name => Type.GetType(shortName, ShortNameAssemblyResolver, null, true));
         }
 
-        public static string ToQualifiedAssemblyName(string shortName)
+        private static Assembly ShortNameAssemblyResolver(AssemblyName name)
         {
-            var res = shortName.Replace(",%core%", CoreAssemblyName);
-            return res;
+            var assembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => String.Equals(a.GetName().Name, name.Name, StringComparison.OrdinalIgnoreCase));
+            return assembly ?? Assembly.Load(name);
         }
 
         /// <summary>
