@@ -100,6 +100,11 @@ namespace Hyperion.Extensions
             return type.IsArray && type.GetArrayRank() == 1 && type.GetElementType().IsHyperionPrimitive();
         }
 
+        public static HyperionAttribute[] GetHyperionAttributes(this Type type)
+        {
+            return type.GetTypeInfo().GetCustomAttributes<HyperionAttribute>().ToArray();
+        }
+
         private static readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
             new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
 

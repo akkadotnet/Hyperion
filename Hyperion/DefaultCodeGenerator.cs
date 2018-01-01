@@ -27,15 +27,15 @@ namespace Hyperion
         {
             var type = objectSerializer.Type;
             var fields = type.GetFieldInfosForType();
+            var preserveObjectReferences = objectSerializer.PreserveObjectReferences ?? serializer.Options.PreserveObjectReferences;
             int preallocatedBufferSize;
-            var writer = GetFieldsWriter(serializer, fields, out preallocatedBufferSize);
-            var reader = GetFieldsReader(serializer, fields, type);
+            var writer = GetFieldsWriter(serializer, fields, preserveObjectReferences, out preallocatedBufferSize);
+            var reader = GetFieldsReader(serializer, fields, type, preserveObjectReferences);
 
             objectSerializer.Initialize(reader, writer, preallocatedBufferSize);
         }
 
-        private ObjectReader GetFieldsReader([NotNull] Serializer serializer, [NotNull] FieldInfo[] fields,
-            [NotNull] Type type)
+        private ObjectReader GetFieldsReader([NotNull] Serializer serializer, [NotNull] FieldInfo[] fields, [NotNull] Type type, bool preserveObjectReferences)
         {
             var c = new Compiler<ObjectReader>();
             var stream = c.Parameter<Stream>("stream");
@@ -46,7 +46,7 @@ namespace Hyperion
 
             c.Emit(assignNewObjectToTarget);
 
-            if (serializer.Options.PreserveObjectReferences)
+            if (preserveObjectReferences)
             {
                 var trackDeserializedObjectMethod =
                     typeof(DeserializerSession).GetTypeInfo().GetMethod(nameof(DeserializerSession.TrackDeserializedObject));
@@ -113,8 +113,7 @@ namespace Hyperion
             return readAllFields;
         }
 
-        private static void EmitPreallocatedBuffer<T>(ICompiler<T> c, int preallocatedBufferSize, int session,
-            MethodInfo getBuffer)
+        private static void EmitPreallocatedBuffer<T>(ICompiler<T> c, int preallocatedBufferSize, int session, MethodInfo getBuffer)
         {
             var size = c.Constant(preallocatedBufferSize);
             var buffer = c.Variable<byte[]>(PreallocatedByteBuffer);
@@ -125,17 +124,16 @@ namespace Hyperion
 
         //this generates a FieldWriter that writes all fields by unrolling all fields and calling them individually
         //no loops involved
-        private ObjectWriter GetFieldsWriter([NotNull] Serializer serializer, [NotNull] IEnumerable<FieldInfo> fields,
-            out int preallocatedBufferSize)
+        private ObjectWriter GetFieldsWriter([NotNull] Serializer serializer, [NotNull] IEnumerable<FieldInfo> fields, bool preserveObjectReferences, out int preallocatedBufferSize)
         {
             var c = new Compiler<ObjectWriter>();
 
             var stream = c.Parameter<Stream>("stream");
             var target = c.Parameter<object>("target");
             var session = c.Parameter<SerializerSession>("session");
-            var preserveReferences = c.Constant(serializer.Options.PreserveObjectReferences);
+            var preserveReferences = c.Constant(preserveObjectReferences);
 
-            if (serializer.Options.PreserveObjectReferences)
+            if (preserveObjectReferences)
             {
                 var method =
                     typeof(SerializerSession).GetTypeInfo().GetMethod(nameof(SerializerSession.TrackSerializedObject));
