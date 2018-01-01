@@ -16,158 +16,158 @@ namespace Hyperion.Tests
     public class PrimitivesTest : TestBase
     {
         [Fact]
-        public void CanSerializeTuple1()
+        public void Serializer_should_work_with_Tuple1()
         {
             SerializeAndAssert(Tuple.Create("abc"));
         }
 
         [Fact]
-        public void CanSerializeTuple2()
+        public void Serializer_should_work_with_Tuple2()
         {
             SerializeAndAssert(Tuple.Create(1, 123));
         }
 
         [Fact]
-        public void CanSerializeTuple3()
+        public void Serializer_should_work_with_Tuple3()
         {
             SerializeAndAssert(Tuple.Create(1, 2, 3));
         }
 
         [Fact]
-        public void CanSerializeTuple4()
+        public void Serializer_should_work_with_Tuple4()
         {
             SerializeAndAssert(Tuple.Create(1, 2, 3, 4));
         }
 
         [Fact]
-        public void CanSerializeTuple5()
+        public void Serializer_should_work_with_Tuple5()
         {
             SerializeAndAssert(Tuple.Create(1, 2, 3, 4, 5));
         }
 
         [Fact]
-        public void CanSerializeTuple6()
+        public void Serializer_should_work_with_Tuple6()
         {
             SerializeAndAssert(Tuple.Create(1, 2, 3, 4, 5, 6));
         }
 
         [Fact]
-        public void CanSerializeTuple7()
+        public void Serializer_should_work_with_Tuple7()
         {
             SerializeAndAssert(Tuple.Create(1, 2, 3, 4, 5, 6, 7));
         }
 
         [Fact]
-        public void CanSerializeTuple8()
+        public void Serializer_should_work_with_Tuple8()
         {
             SerializeAndAssert(Tuple.Create(1, 2, 3, 4, 5, 6, 7, 8));
         }
 
         [Fact]
-        public void CanSerializeBool()
+        public void Serializer_should_work_with_Bool()
         {
             SerializeAndAssert(true);
         }
 
         [Fact]
-        public void CanSerializeGuid()
+        public void Serializer_should_work_with_Guid()
         {
             SerializeAndAssert(Guid.NewGuid());
         }
 
         [Fact]
-        public void CanSerializeDateTimeUtc()
+        public void Serializer_should_work_with_DateTime_UTC()
         {
             SerializeAndAssert(DateTime.UtcNow);
         }
 
         [Fact]
-        public void CanSerializeDateTimeLocal()
+        public void Serializer_should_work_with_DateTime_local()
         {
             SerializeAndAssert(new DateTime(DateTime.Now.Ticks, DateTimeKind.Local));
         }
 
         [Fact]
-        public void CanSerializeDateTimeOffsetNow()
+        public void Serializer_should_work_with_DateTimeOffset_now()
         {
             SerializeAndAssert(DateTimeOffset.Now);
         }
 
         [Fact]
-        public void CanSerializeDateTimeOffsetUtc()
+        public void Serializer_should_work_with_DateTimeOffset_utc()
         {
             SerializeAndAssert(DateTimeOffset.UtcNow);
         }
 
         [Fact]
-        public void CanSerializeDecimal()
+        public void Serializer_should_work_with_Decimal()
         {
             SerializeAndAssert(123m);
         }
 
         [Fact]
-        public void CanSerializeDouble()
+        public void Serializer_should_work_with_Double()
         {
             SerializeAndAssert(123d);
         }
 
 
         [Fact]
-        public void CanSerializeByte()
+        public void Serializer_should_work_with_Byte()
         {
             SerializeAndAssert((byte) 123);
         }
         [Fact]
-        public void CanSerializeSByte()
+        public void Serializer_should_work_with_SByte()
         {
             SerializeAndAssert((sbyte)123);
         }
 
         [Fact]
-        public void CanSerializeInt16()
+        public void Serializer_should_work_with_Int16()
         {
             SerializeAndAssert((short) 123);
         }
 
         [Fact]
-        public void CanSerializeInt64()
+        public void Serializer_should_work_with_Int64()
         {
             SerializeAndAssert(123L);
         }
 
         [Fact]
-        public void CanSerializeInt32()
+        public void Serializer_should_work_with_Int32()
         {
             SerializeAndAssert(123);
         }
 
         [Fact]
-        public void CanSerializeUInt16()
+        public void Serializer_should_work_with_UInt16()
         {
             SerializeAndAssert((ushort)123);
         }
 
         [Fact]
-        public void CanSerializeUInt64()
+        public void Serializer_should_work_with_UInt64()
         {
             SerializeAndAssert((ulong)123);
         }
 
         [Fact]
-        public void CanSerializeUInt32()
+        public void Serializer_should_work_with_UInt32()
         {
             SerializeAndAssert((uint)123);
         }
 
         [Fact]
-        public void CanSerializeLongString()
+        public void Serializer_should_work_with_long_String()
         {
-            var s = new string('x',1000);
+            var s = new string('x', 100000);
             SerializeAndAssert(s);
         }
 
         [Fact]
-        public void CanSerializeString()
+        public void Serializer_should_work_with_String()
         {
             SerializeAndAssert("hello");
         }

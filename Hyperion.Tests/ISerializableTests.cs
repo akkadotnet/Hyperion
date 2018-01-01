@@ -108,7 +108,7 @@ namespace Hyperion.Tests
         #endregion
 
         [Fact]
-        public void CanIgnoreFieldsWithNonSerializedAttribute()
+        public void Serializer_should_ignore_fields_marked_with_NonSerialized_attribute()
         {
             var expected = new NonSerializedTest() {
                 Field1 = 235,
@@ -123,7 +123,7 @@ namespace Hyperion.Tests
         }
 
         [Fact(Skip="Not implemented yet")]
-        public void SkipNonSerializedAttributeIfNoSerilizedAttribute()
+        public void Serializer_should_skip_NonSerialized_attribute_if_Serialized_attribute_was_not_used()
         {
             var expected = new NonSerializedWithoutSerializableTest() {
                 Field1 = 235,
@@ -138,7 +138,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeClassesWithISerializable()
+        public void Serializer_should_work_with_types_implementing_ISerializable_interface()
         {
             var expected = new Person("Scott", "Hanselman");
 
@@ -150,7 +150,7 @@ namespace Hyperion.Tests
         }
 
         [Fact(Skip="Not implemented yet")]
-        public void ShouldNotThrowIfNoConstructorWithSerializationInfo()
+        public void Serializer_should_not_fail_if_there_was_no_constructor_with_SerializationInfo()
         {
             var expected = new PersonWithoutConstructor("Scott");
 
@@ -161,7 +161,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void ShouldThrowOnNonSerializableEvent()
+        public void Serializer_should_fail_on_non_serializable_event()
         {
             var expected = new NotSerializableEvent(true);
 
@@ -169,7 +169,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void SupportsIDeserializationCallback()
+        public void Serializer_should_make_use_of_IDeserializationCallback()
         {
             var expected = new PersonWithIDeserializationCallback { FirstName = "Scott" };
 

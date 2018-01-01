@@ -8,82 +8,142 @@
 #endregion
 
 using System;
+using System.IO;
 using Xunit;
 
 namespace Hyperion.Tests
 {
-    public class LocalPreserveObjectReferencesTests : TestBase
+    public class PreserveObjectReferencesTests
     {
-        private readonly SerializerSession _serializerSession;
-        private readonly DeserializerSession _deserializerSession;
-
-        public LocalPreserveObjectReferencesTests() : base(new SerializerOptions(preserveObjectReferences: false))
+        [Fact]
+        public void When_preserve_object_references_is_off_globally_and_PreserveReferences_is_used_references_should_be_preserved()
         {
-            _serializerSession = new SerializerSession(Serializer);
-            _deserializerSession = new DeserializerSession(Serializer);
+            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: false));
+            var expected = new PreservedObject { First = "first", Second = 1234 };
+
+            AssertPreserveObjectReferencesWorks(serializer, expected, checkReferenceEquality: true);
         }
 
         [Fact]
-        public void PreserveReferencesAttributeShouldOverrideSerializerOptions()
+        public void When_preserve_object_references_is_off_globally_and_PreserveReferences_is_used_in_nested_objects_references_should_be_preserved()
         {
-            var source = new PreservedObject { First = "first", Second = 123 };
-            Serialize(source, _serializerSession);
-            Reset();
-            var actual1 = Deserialize<PreservedObject>(_deserializerSession);
+            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: false));
+            var x = new PreservedObject { First = "first", Second = 1234 };
+            var expected = new Parent(123, x);
 
-            Assert.Equal(source, actual1);
+            AssertPreserveObjectReferencesWorks(serializer, expected, checkReferenceEquality: false);
+        }
 
-            Serialize(source, _serializerSession);
-            Reset();
-            var actual2 = Deserialize<PreservedObject>(_deserializerSession);
+        [Fact]
+        public void When_preserve_object_references_is_on_globally_references_should_be_preserved_for_any_object()
+        {
+            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true));
+            var expected = new Something { Int32Prop = 1235, StringProp = "hello", BoolProp = true };
 
-            Assert.Equal(source, actual2);
+            AssertPreserveObjectReferencesWorks(serializer, expected, checkReferenceEquality: true);
+        }
+
+        [Fact]
+        public void When_preserve_object_references_is_on_globally_and_PreserveReferences_is_disabled_references_should_not_be_preserved()
+        {
+            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true));
+            var expected = new UnpreservedObject { First = "first", Second = 1234 };
+
+            var serializerSession = new SerializerSession(serializer);
+            var deserializerSession = new DeserializerSession(serializer);
+
+            using (var stream1 = new MemoryStream())
+            using (var stream2 = new MemoryStream())
+            {
+                serializer.Serialize(expected, stream1, serializerSession);
+                var payload1 = stream1.ToArray();
+                stream1.Position = 0;
+                var actual1 = serializer.Deserialize<UnpreservedObject>(stream1, deserializerSession);
+
+                serializer.Serialize(expected, stream2, serializerSession);
+                var payload2 = stream2.ToArray();
+                stream2.Position = 0;
+                var actual2 = serializer.Deserialize<UnpreservedObject>(stream1, deserializerSession);
+
+                // all objects should be equal to each other before/after serialization
+                Assert.Equal(expected, actual1);
+                Assert.Equal(expected, actual2);
+                Assert.Equal(actual1, actual2);
+                Assert.NotSame(actual1, actual2);
+
+                // payloads should be equal - even thou we have preserveObjectReferences = true,
+                // for this type it's turned off
+                Assert.Equal(payload1.Length, payload2.Length);
+            }
+        }
+
+        private static void AssertPreserveObjectReferencesWorks<T>(Serializer serializer, T expected, bool checkReferenceEquality)
+        {
+            var serializerSession = new SerializerSession(serializer);
+            var deserializerSession = new DeserializerSession(serializer);
+
+            using (var stream1 = new MemoryStream())
+            using (var stream2 = new MemoryStream())
+            {
+                serializer.Serialize(expected, stream1, serializerSession);
+                var payload1 = stream1.ToArray();
+                stream1.Position = 0;
+                var actual1 = serializer.Deserialize<T>(stream1, deserializerSession);
+
+                serializer.Serialize(expected, stream2, serializerSession);
+                var payload2 = stream2.ToArray();
+                stream2.Position = 0;
+                var actual2 = serializer.Deserialize<T>(stream1, deserializerSession);
+
+                // all objects should be equal to each other before/after serialization
+                Assert.Equal(expected, actual1);
+                Assert.Equal(expected, actual2);
+
+                if (checkReferenceEquality)
+                    Assert.Same(actual1, actual2);
+                else
+                    Assert.Equal(actual1, actual2);
+
+                // payloads should not be equal - in fact second time, second payload should be smaller
+                // since we reused metadata from session
+                Assert.NotEqual(payload1, payload2);
+                Assert.True(payload2.Length < payload1.Length, "on second serialization the result payload should be smaller");
+            }
         }
     }
 
-    public class GlobalPreserveObjectReferencesTests : TestBase
+    public sealed class Parent : IEquatable<Parent>
     {
-        private readonly SerializerSession _serializerSession;
-        private readonly DeserializerSession _deserializerSession;
+        public int Id { get; }
 
-        public GlobalPreserveObjectReferencesTests() : base(new SerializerOptions(preserveObjectReferences: true))
+        public PreservedObject Inner { get; }
+
+        public Parent(int id, PreservedObject inner)
         {
-            _serializerSession = new SerializerSession(Serializer);
-            _deserializerSession = new DeserializerSession(Serializer);
+            Id = id;
+            Inner = inner;
         }
 
-        [Fact]
-        public void PreserveObjectReferencesShouldWorkInSessionScope()
+        public bool Equals(Parent other)
         {
-            var source = new Something { Int32Prop = 123, StringProp = "hello" };
-            Serialize(source, _serializerSession);
-            Reset();
-            var actual1 = Deserialize<Something>(_deserializerSession);
-
-            Assert.Equal(source, actual1);
-
-            Serialize(source, _serializerSession);
-            Reset();
-            var actual2 = Deserialize<Something>(_deserializerSession);
-
-            Assert.Equal(source, actual2);
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return Id == other.Id && Equals(Inner, other.Inner);
         }
 
-        [Fact]
-        public void PreserveReferencesAttributeShouldOverrideSerializerOptions()
+        public override bool Equals(object obj)
         {
-            var source = new UnpreservedObject { First = "first", Second = 123 };
-            Serialize(source, _serializerSession);
-            Reset();
-            var actual1 = Deserialize<UnpreservedObject>(_deserializerSession);
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is Parent && Equals((Parent) obj);
+        }
 
-            Assert.Equal(source, actual1);
-
-            Serialize(source, _serializerSession);
-            Reset();
-            var actual2 = Deserialize<UnpreservedObject>(_deserializerSession);
-
-            Assert.Equal(source, actual2);
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Id * 397) ^ (Inner != null ? Inner.GetHashCode() : 0);
+            }
         }
     }
 
@@ -104,7 +164,7 @@ namespace Hyperion.Tests
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is PreservedObject && Equals((PreservedObject) obj);
+            return obj is PreservedObject && Equals((PreservedObject)obj);
         }
 
         public override int GetHashCode()
@@ -133,7 +193,7 @@ namespace Hyperion.Tests
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            return obj is UnpreservedObject && Equals((UnpreservedObject) obj);
+            return obj is UnpreservedObject && Equals((UnpreservedObject)obj);
         }
 
         public override int GetHashCode()

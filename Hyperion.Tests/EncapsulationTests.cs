@@ -67,7 +67,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjectsWithNonPublicConstructor()
+        public void Serializer_should_work_with_types_having_non_public_constructors()
         {
             var actual = ClassWithPrivCtor.Create(55);
             var deserialized = Roundtrip(actual);
@@ -76,7 +76,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjectsWithNonPublicConstructorInCollections()
+        public void Serializer_should_work_with_collections_of_types_having_non_public_constructors()
         {
             IList<ClassWithPrivCtor> actual = new List<ClassWithPrivCtor>
             {
@@ -94,7 +94,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeNonPublicClasses()
+        public void Serializer_should_work_with_non_public_classes()
         {
             var actual = new NonPublicClass(123);
             var deserialized = Roundtrip(actual);
@@ -103,7 +103,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeNonPublicClassesInCollections()
+        public void Serializer_should_work_with_collections_of_non_public_classes()
         {
             IList<NonPublicClass> actual = new List<NonPublicClass>
             {
@@ -121,7 +121,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeStructsWithReadonlyFields()
+        public void Serializer_should_work_with_structs_having_readonly_fields()
         {
             var actual = new StructWithReadonlyFields(123, "hello");
             var deserialized = Roundtrip(actual);
@@ -130,7 +130,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeStructsWithReadonlyFieldsInCollections()
+        public void Serializer_should_work_with_collections_of_structs_having_readonly_fields()
         {
             IList<StructWithReadonlyFields> actual = new List<StructWithReadonlyFields>
             {

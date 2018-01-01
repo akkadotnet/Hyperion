@@ -93,7 +93,7 @@ namespace Hyperion.Tests
     public class SurrogateTests
     {
         [Fact]
-        public void CanSerializeWithSurrogate()
+        public void Serializer_should_work_with_surrogates()
         {
             var surrogateHasBeenInvoked = false;
             var surrogates = new[]
@@ -119,7 +119,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeWithInterfaceSurrogate()
+        public void Serializer_should_work_with_surrogate_interfaces()
         {
             var surrogateHasBeenInvoked = false;
             var surrogates = new[]
@@ -145,7 +145,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeWithSurrogateInCollection()
+        public void Serializer_should_work_with_collections_of_surrogates()
         {
             var invoked = new List<ISurrogate>();
             var surrogates = new[]

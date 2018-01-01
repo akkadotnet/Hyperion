@@ -32,7 +32,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeInterfaceField()
+        public void Serializer_should_work_with_types_having_interface_fields()
         {
             var b = new Bar
             {

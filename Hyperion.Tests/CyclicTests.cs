@@ -16,7 +16,7 @@ namespace Hyperion.Tests
     public class CyclicTests
     {
         [Fact]
-        public void CanSerializeDeepCyclicReferences()
+        public void Serializer_should_work_with_deeply_cycled_object_references()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
@@ -37,7 +37,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDictionaryPreserveObjectReferences()
+        public void Serializer_should_work_with_dictionary_and_preserve_object_references()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
@@ -61,7 +61,7 @@ namespace Hyperion.Tests
 
         //From Orleans
         [Fact]
-        public void CanSerializeDictionaryPreserveObjectReferences2()
+        public void Serializer_should_work_with_dictionary_and_preserve_object_references_2()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
@@ -88,7 +88,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void CanSerializeCyclicReferences()
+        public void Serializer_should_work_with_cyclic_references()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
@@ -104,7 +104,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeMultiLevelCyclicReferences()
+        public void Serializer_should_work_with_multilevel_cyclic_object_references()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true));

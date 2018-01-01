@@ -19,8 +19,9 @@ namespace Hyperion.Tests
         {
             public int IntProp { get; set; }
         }
+
         [Fact]
-        public void CanSerializePrivateType()
+        public void Serializer_should_work_with_non_public_types()
         {
             var expected = new PrivateType()
             {
@@ -33,7 +34,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeTypeObject()
+        public void Serializer_should_work_with_Type()
         {
             var expected = typeof(ArgumentException);
             Serialize(expected);
@@ -43,7 +44,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeNull()
+        public void Serializer_should_work_with_null()
         {
             var expected = new Something
             {
@@ -61,7 +62,7 @@ namespace Hyperion.Tests
         //all custom exception information will be lost.
         //only message, inner exception, stacktrace and the bare minimum will be preserved.
         [Fact]
-        public void CanSerializeException()
+        public void Serializer_should_work_with_Exceptions()
         {
             var expected = new Exception("hello wire");
             Serialize(expected);
@@ -72,7 +73,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializePolymorphicObject()
+        public void Serializer_should_work_with_polymorphic_objects()
         {
             var expected = new Something
             {
@@ -89,14 +90,13 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeStruct()
+        public void Serializer_should_work_with_structs()
         {
             var expected = new StuctValue
             {
                 Prop1 = "hello",
                 Prop2 = 123,
             };
-
 
             Serialize(expected);
             Reset();
@@ -105,7 +105,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObject()
+        public void Serializer_should_work_with_custom_classes()
         {
             var expected = new Something
             {
@@ -114,8 +114,7 @@ namespace Hyperion.Tests
                 NullableInt32PropHasValue = 888,
                 StringProp = "hello",
             };
-
-
+            
             Serialize(expected);
             Reset();
             var actual = Deserialize<Something>();
@@ -123,7 +122,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjects()
+        public void Serializer_should_work_with_custom_classes_2()
         {
             var expected1 = new Something
             {
@@ -147,7 +146,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeTuple()
+        public void Serializer_should_work_with_tuples()
         {
             var expected = Tuple.Create("hello");
             Serialize(expected);
@@ -157,7 +156,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanEmptyObject()
+        public void Serializer_should_work_with_objects_without_any_fields()
         {
             var expected = new Empty();
 
@@ -168,7 +167,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjectsKnownTypes()
+        public void Serializer_should_work_with_objects_marked_as_known_types()
         {
             CustomInit(new Serializer(new SerializerOptions(knownTypes:new[] {typeof(Something)})));
             var expected1 = new Something

@@ -31,7 +31,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeMemberMethod()
+        public void Serializer_should_work_with_member_method()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions());
@@ -46,7 +46,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDelegate()
+        public void Serializer_should_work_with_delegates()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions());
@@ -68,7 +68,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeStaticDelegate()
+        public void Serializer_should_work_with_static_delegates()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions());
@@ -85,7 +85,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjectWithClosure()
+        public void Serializer_should_work_with_objects_with_closures()
         {
             var stream = new MemoryStream();
             var serializer = new Serializer(new SerializerOptions());
