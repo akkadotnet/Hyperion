@@ -17,7 +17,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class FSharpListSerializerFactory : ValueSerializerFactory
+    internal sealed class FSharpListSerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type) => type.FullName.StartsWith("Microsoft.FSharp.Collections.FSharpList`1");
 

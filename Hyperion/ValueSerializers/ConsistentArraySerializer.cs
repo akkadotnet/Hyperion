@@ -13,7 +13,7 @@ using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
-    public class ConsistentArraySerializer : ValueSerializer
+    internal sealed class ConsistentArraySerializer : ValueSerializer
     {
         public const byte Manifest = 252;
         public static readonly ConsistentArraySerializer Instance = new ConsistentArraySerializer();

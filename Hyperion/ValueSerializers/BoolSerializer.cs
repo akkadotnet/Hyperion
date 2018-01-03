@@ -11,7 +11,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class BoolSerializer : SessionIgnorantValueSerializer<bool>
+    internal sealed class BoolSerializer : SessionIgnorantValueSerializer<bool>
     {
         public const byte Manifest = 6;
         public static readonly BoolSerializer Instance = new BoolSerializer();

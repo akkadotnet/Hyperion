@@ -14,7 +14,7 @@ using Hyperion.Extensions;
 
 namespace Hyperion.Compilation
 {
-    public static class ExpressionEx
+    internal static class ExpressionEx
     {
         public static ConstantExpression ToConstant(this object self)
         {

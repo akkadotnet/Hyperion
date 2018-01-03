@@ -17,7 +17,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class FSharpMapSerializerFactory : ValueSerializerFactory
+    internal sealed class FSharpMapSerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type) => 
             type.FullName.StartsWith("Microsoft.FSharp.Collections.FSharpMap`2");

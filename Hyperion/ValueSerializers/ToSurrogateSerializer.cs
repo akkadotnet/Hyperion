@@ -13,7 +13,7 @@ using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
-    public class ToSurrogateSerializer : ValueSerializer
+    internal sealed class ToSurrogateSerializer : ValueSerializer
     {
         private readonly Func<object, object> _translator;
 

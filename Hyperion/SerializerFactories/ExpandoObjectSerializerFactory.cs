@@ -16,7 +16,7 @@ using Hyperion.ValueSerializers;
 
 namespace Hyperion.SerializerFactories
 {
-    public class ExpandoObjectSerializerFactory : ValueSerializerFactory
+    internal sealed class ExpandoObjectSerializerFactory : ValueSerializerFactory
     {
         public override bool CanSerialize(Serializer serializer, Type type) => type == typeof(System.Dynamic.ExpandoObject);
 

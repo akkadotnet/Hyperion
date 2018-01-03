@@ -12,7 +12,7 @@ using System.IO;
 
 namespace Hyperion.ValueSerializers
 {
-    public class NullSerializer : ValueSerializer
+    internal sealed class NullSerializer : ValueSerializer
     {
         public const byte Manifest = 0;
         public static readonly NullSerializer Instance = new NullSerializer();
