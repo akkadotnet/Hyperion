@@ -100,7 +100,7 @@ Target "RunTests" (fun _ ->
             (fun p -> 
                 { p with
                     Project = "./Hyperion.Tests/Hyperion.Tests.csproj"
-                    Framework = "netcoreapp1.0"
+                    Framework = "netcoreapp1.1"
                     Configuration = configuration })
 )
 
