@@ -85,7 +85,7 @@ namespace Hyperion.Tests
         #endregion
 
         [Fact]
-        public void CanSerializeImmutableHashSet()
+        public void Serializer_should_work_with_ImmutableHashSet()
         {
             var expected = ImmutableHashSet.CreateRange(new[]
             {
@@ -110,7 +110,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableSortedSet()
+        public void Serializer_should_work_with_ImmutableSortedSet()
         {
             var expected = ImmutableSortedSet.CreateRange(new[]
             {
@@ -126,7 +126,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableDictionary()
+        public void Serializer_should_work_with_ImmutableDictionary()
         {
             var expected = ImmutableDictionary.CreateRange(new Dictionary<string, Something>
             {
@@ -152,7 +152,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableQueue()
+        public void Serializer_should_work_with_ImmutableQueue()
         {
             var expected = ImmutableQueue.CreateRange(new[]
             {
@@ -178,7 +178,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableStack()
+        public void Serializer_should_work_with_ImmutableStack()
         {
             var expected = ImmutableStack.CreateRange(new[]
             {
@@ -203,7 +203,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableArray()
+        public void Serializer_should_work_with_ImmutableArray()
         {
             var expected = ImmutableArray.CreateRange(new[]
             {
@@ -229,7 +229,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableList()
+        public void Serializer_should_work_with_ImmutableList()
         {
             var expected = ImmutableList.CreateRange(new[]
             {
@@ -255,7 +255,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableCollectionsReferencedThroughInterfaceInFields()
+        public void Serializer_should_work_with_types_having_immutable_collections_referenced_through_interface()
         {
             var expected = new TestClass(
                 dictionary: ImmutableDictionary.CreateRange(new[]

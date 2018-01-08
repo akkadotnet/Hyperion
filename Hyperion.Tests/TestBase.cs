@@ -14,18 +14,24 @@ namespace Hyperion.Tests
 {
     public abstract class TestBase
     {
-        private Serializer _serializer;
+        protected Serializer Serializer;
         private readonly MemoryStream _stream;
+
+        protected TestBase(SerializerOptions options)
+        {
+            Serializer = new Serializer(options);
+            _stream = new MemoryStream();
+        }
 
         protected TestBase()
         {
-            _serializer = new Serializer();
+            Serializer = new Serializer();
             _stream = new MemoryStream();
         }
 
         protected void CustomInit(Serializer serializer)
         {
-            _serializer = serializer;
+            Serializer = serializer;
         }
 
 
@@ -36,12 +42,22 @@ namespace Hyperion.Tests
 
         public void Serialize(object o)
         {
-            _serializer.Serialize(o, _stream);
+            Serializer.Serialize(o, _stream);
+        }
+
+        public void Serialize(object o, SerializerSession session)
+        {
+            Serializer.Serialize(o, _stream, session);
         }
 
         public T Deserialize<T>()
         {
-            return _serializer.Deserialize<T>(_stream);
+            return Serializer.Deserialize<T>(_stream);
+        }
+
+        public T Deserialize<T>(DeserializerSession session)
+        {
+            return Serializer.Deserialize<T>(_stream, session);
         }
 
         public void AssertMemoryStreamConsumed()

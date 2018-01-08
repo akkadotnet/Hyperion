@@ -44,7 +44,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeFieldInfo()
+        public void Serializer_should_work_with_FieldInfo()
         {
             var fieldInfo = typeof(Dummy).GetField("TestField");
             var serializer = new Hyperion.Serializer();
@@ -59,7 +59,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializePropertyInfo()
+        public void Serializer_should_work_with_PropertyInfo()
         {
             var propertyInfo = typeof(Dummy).GetProperty("TestProperty");
             var serializer = new Hyperion.Serializer();
@@ -74,7 +74,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeMethodInfo()
+        public void Serializer_should_work_with_MethodInfo()
         {
             var methodInfo = typeof(Dummy).GetMethod("Fact");
             var serializer = new Hyperion.Serializer();
@@ -89,7 +89,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeSymbolDocumentInfo()
+        public void Serializer_should_work_with_SymbolDocumentInfo()
         {
             var info = Expression.SymbolDocument("testFile");
             var serializer = new Hyperion.Serializer();
@@ -104,7 +104,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeConstructorInfo()
+        public void Serializer_should_work_with_ConstructorInfo()
         {
             var constructorInfo = typeof(Dummy).GetConstructor(new[] { typeof(string) });
             var serializer = new Hyperion.Serializer();
@@ -119,7 +119,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeConstantExpression()
+        public void Serializer_should_work_with_ConstantExpression()
         {
             var expr = Expression.Constant(12);
             var serializer = new Hyperion.Serializer();
@@ -136,7 +136,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeUnaryExpression()
+        public void Serializer_should_work_with_UnaryExpression()
         {
             var expr = Expression.Decrement(Expression.Constant(1));
             var serializer = new Hyperion.Serializer();
@@ -154,7 +154,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeBinaryExpression()
+        public void Serializer_should_work_with_BinaryExpression()
         {
             var expr = Expression.Add(Expression.Constant(1), Expression.Constant(2));
             var serializer = new Hyperion.Serializer();
@@ -170,7 +170,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeIndexExpression()
+        public void Serializer_should_work_with_IndexExpression()
         {
             var value = new[] {1, 2, 3};
             var arrayExpr = Expression.Constant(value);
@@ -195,7 +195,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeMemberAssignment()
+        public void Serializer_should_work_with_MemberAssignment()
         {
             var property = typeof(Dummy).GetProperty("TestProperty");
             var expr = Expression.Bind(property.SetMethod, Expression.Constant(9));
@@ -213,7 +213,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeConditionalExpression()
+        public void Serializer_should_work_with_ConditionalExpression()
         {
             var expr = Expression.Condition(Expression.Constant(true), Expression.Constant(1), Expression.Constant(2));
             var serializer = new Hyperion.Serializer();
@@ -232,7 +232,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeBlockExpression()
+        public void Serializer_should_work_with_BlockExpression()
         {
             var expr = Expression.Block(new[] { Expression.Constant(1), Expression.Constant(2), Expression.Constant(3) });
             var serializer = new Hyperion.Serializer();
@@ -252,7 +252,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeLabelTarget()
+        public void Serializer_should_work_with_LabelTarget()
         {
             var label = Expression.Label(typeof(int), "testLabel");
             var serializer = new Hyperion.Serializer();
@@ -268,7 +268,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeLabelExpression()
+        public void Serializer_should_work_with_LabelExpression()
         {
             var label = Expression.Label(typeof(int), "testLabel");
             var expr = Expression.Label(label, Expression.Constant(2));
@@ -287,7 +287,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeMethodCallExpression()
+        public void Serializer_should_work_with_MethodCallExpression()
         {
             var methodInfo = typeof(Dummy).GetMethod("Fact");
             var expr = Expression.Call(Expression.Constant(new Dummy()), methodInfo, Expression.Constant("test string"));
@@ -308,7 +308,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDefaultExpression()
+        public void Serializer_should_work_with_DefaultExpression()
         {
             var expr = Expression.Default(typeof(int));
             var serializer = new Hyperion.Serializer();
@@ -324,7 +324,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeParameterExpression()
+        public void Serializer_should_work_with_ParameterExpression()
         {
             var expr = Expression.Parameter(typeof(int), "p1");
             var serializer = new Hyperion.Serializer();
@@ -341,7 +341,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeTargetInvocationException()
+        public void Serializer_should_work_with_TargetInvocationException()
         {
             var exc = new TargetInvocationException(null);
             var serializer = new Hyperion.Serializer();
@@ -357,7 +357,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjectDisposedException()
+        public void Serializer_should_work_with_ObjectDisposedException()
         {
             var exc = new ObjectDisposedException("Object is already disposed", new ArgumentException("One level deeper"));
             var serializer = new Hyperion.Serializer();
@@ -376,7 +376,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeCatchBlock()
+        public void Serializer_should_work_with_CatchBlock()
         {
             var expr = Expression.Catch(typeof(DummyException), Expression.Constant(2));
             var serializer = new Hyperion.Serializer();
@@ -392,7 +392,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeGotoExpression()
+        public void Serializer_should_work_with_GotoExpression()
         {
             var label = Expression.Label(typeof(void), "testLabel");
             var expr = Expression.Continue(label);
@@ -411,7 +411,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeNewExpression()
+        public void Serializer_should_work_with_NewExpression()
         {
             var ctor = typeof(Dummy).GetConstructor(new[] { typeof(string) });
             var expr = Expression.New(ctor, Expression.Constant("test param"));
@@ -431,7 +431,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDebugInfoExpression()
+        public void Serializer_should_work_with_DebugInfoExpression()
         {
             var info = Expression.SymbolDocument("testFile");
             var expr = Expression.DebugInfo(info, 1, 2, 3, 4);
@@ -453,7 +453,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeLambdaExpression()
+        public void Serializer_should_work_with_LambdaExpression()
         {
             var methodInfo = typeof(Dummy).GetMethod("Fact");
             var param = Expression.Parameter(typeof (Dummy), "dummy");
@@ -476,7 +476,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeLambdaExpressionContainingGenericMethod() {
+        public void Serializer_should_work_with_lambda_expression_having_generic_methods() {
             Expression<Func<Dummy, bool>> expr = dummy => dummy.TestField.Contains('s');
             var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true));
             using (var ms = new MemoryStream())
@@ -491,7 +491,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeInvocationExpression()
+        public void Serializer_should_work_with_InvocationExpression()
         {
             var methodInfo = typeof(Dummy).GetMethod("Fact");
             var param = Expression.Parameter(typeof(Dummy), "dummy");
@@ -512,7 +512,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeElementInit()
+        public void Serializer_should_work_with_ElementInit()
         {
             var listAddMethod = typeof (List<int>).GetMethod("Add");
             var expr = Expression.ElementInit(listAddMethod, Expression.Constant(1));
@@ -530,7 +530,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeLoopExpression()
+        public void Serializer_should_work_with_LoopExpression()
         {
             var breakLabel = Expression.Label(typeof (void), "break");
             var continueLabel = Expression.Label(typeof(void), "cont");

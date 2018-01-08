@@ -25,7 +25,7 @@ namespace Hyperion.Tests
     public class CollectionTests : TestBase
     {
         [Fact]
-        public void CanSerializeArrayOfTuples()
+        public void Serializer_should_work_with_array_of_tuples()
         {
             var expected = new[]
             {
@@ -40,7 +40,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeByteArray()
+        public void Serializer_should_work_with_byte_array()
         {
             var expected = new byte[]
             {
@@ -54,7 +54,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void CanSerializeDictionary()
+        public void Serializer_should_work_with_dictionary()
         {
             var expected = new Dictionary<string, string>
             {
@@ -69,7 +69,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDictionaryKeysAndValuesByteChar()
+        public void Serializer_should_work_with_dictionary_of_byte_to_char()
         {
             var instance = new Dictionary<byte, char> {{0, 'z'}, {255, 'z'}, {3, char.MinValue}};
             Serialize(instance);
@@ -85,7 +85,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeDictionaryKeysAndValuesByteString()
+        public void Serializer_should_work_with_dictionary_of_byte_to_string()
         {
             var instance = new Dictionary<byte, string> {{0, "z"}, {255, "z"}, {3, null}};
             Serialize(instance);
@@ -102,7 +102,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void CanSerializeExpandoObject()
+        public void Serializer_should_work_with_ExpandoObject()
         {
             var obj = new ExpandoObject();
             var dict = (IDictionary<string, object>) obj;
@@ -125,7 +125,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeImmutableDictionary()
+        public void Serializer_should_work_with_immutable_dictionary()
         {
             var map = ImmutableDictionary<string, object>.Empty;
             var serializer = new Serializer();
@@ -139,7 +139,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeIntArray()
+        public void Serializer_should_work_with_array_of_ints()
         {
             var expected = Enumerable.Range(0, 10000).ToArray();
             Serialize(expected);
@@ -149,7 +149,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeList()
+        public void Serializer_should_work_with_list()
         {
             var expected = new[]
             {
@@ -173,7 +173,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeLinkedList()
+        public void Serializer_should_work_with_linked_list()
         {
             var expected = new LinkedList<Something>(new[]
             {
@@ -197,7 +197,7 @@ namespace Hyperion.Tests
         }
 
         [Fact(Skip = "add support for multi dimentional arrays")]
-        public void CanSerializeMultiDimentionalArray()
+        public void Serializer_should_work_with_multi_dimensional_array()
         {
             var expected = new double[3, 3, 3];
             for (var i = 0; i < 3; i++)
@@ -217,7 +217,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeObjectArray()
+        public void Serializer_should_work_with_array_of_objects()
         {
             var expected = new[]
             {
@@ -241,7 +241,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializePrimitiveArray()
+        public void Serializer_should_work_with_array_of_primitive_types()
         {
             var expected = new[] {DateTime.MaxValue, DateTime.MinValue, DateTime.Now, DateTime.Today};
             Serialize(expected);
@@ -251,7 +251,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeSet()
+        public void Serializer_should_work_with_set()
         {
             var expected = new HashSet<Something>
             {
@@ -277,7 +277,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeStack()
+        public void Serializer_should_work_with_stack()
         {
             var expected = new Stack<Something>();
             expected.Push(new Something
@@ -363,7 +363,7 @@ namespace Hyperion.Tests
         #endregion
 
         [Fact]
-        public void CanSerializeCustomEnumerableWithNonStandardAddSignature()
+        public void Serializer_should_work_with_custom_enumerable_with_non_standard_Add_method()
         {
             var init = new CustomAdd(ImmutableList<int>.Empty);
             var expected = init.Add(1).Add(2);
@@ -375,7 +375,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeCustomEnumerableWithNonStandardAddRangeSignature()
+        public void Serializer_should_work_with_custom_enumerable_with_non_standard_AddRange_method()
         {
             var init = new CustomAddRange(ImmutableList<int>.Empty);
             var expected = init.AddRange("label", new []{ 1, 2, 3 });
@@ -490,7 +490,7 @@ namespace Hyperion.Tests
 		}
 
 	    [Fact]
-	    public void CanInstantiateSerializerForCollectionWithAmbiguousAddMethod()
+	    public void Serializer_should_work_with_collection_with_ambiguous_Add_method()
 	    {
 		    var serializer = new Serializer(
 			    new SerializerOptions(knownTypes: new List<Type> {typeof(DerivedContainer)},

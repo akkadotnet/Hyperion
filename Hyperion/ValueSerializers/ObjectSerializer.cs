@@ -29,12 +29,19 @@ namespace Hyperion.ValueSerializers
         private ObjectWriter _writer;
         int _preallocatedBufferSize;
 
+        public bool? PreserveObjectReferences { get; }
+
         public ObjectSerializer(Type type)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
 
             Type = type;
+            
+            var attributes = type.GetHyperionAttributes();
+            foreach (var attribute in attributes)
+                if (attribute is PreserveReferencesAttribute p) PreserveObjectReferences = p.Enabled;
+
             //TODO: remove version info
             var typeName = type.GetShortAssemblyQualifiedName();
             // ReSharper disable once PossibleNullReferenceException

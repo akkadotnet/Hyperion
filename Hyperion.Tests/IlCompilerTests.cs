@@ -59,7 +59,7 @@ namespace Hyperion.Tests
         private static readonly MethodInfo SetStatic = typeof(Dummy).GetMethod(nameof(Dummy.SetStatic));
 
         [Fact]
-        public void CanCallStaticMethodUsingParameter()
+        public void IlCompiler_should_call_static_methods_with_parameters()
         {
             var c = new IlCompiler<Action<Dummy>>();
             var param = c.Parameter<Dummy>("dummy");
@@ -71,7 +71,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCallInstanceMethodOnParameter()
+        public void IlCompiler_should_call_instance_methods_with_parameters()
         {
             var c = new IlCompiler<Action<Dummy>>();
             var param = c.Parameter<Dummy>("dummy");
@@ -84,7 +84,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void CanModifyParameter()
+        public void IlCompiler_can_modify_parameters()
         {
             var c = new IlCompiler<Action<Dummy>>();
             var param = c.Parameter<Dummy>("dummy");
@@ -97,7 +97,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCreateEmptyMethodWithArguments()
+        public void IlCompiler_can_create_empty_method_with_args()
         {
             var c = new IlCompiler<Action<bool>>();
             var a = c.Compile();
@@ -105,7 +105,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCreateEmptyMethodWithReturnType()
+        public void IlCompiler_can_create_empty_method_with_return_type()
         {
             var c = new IlCompiler<Func<bool>>();
             var b = c.Constant(true);
@@ -116,7 +116,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanReturnConstantString()
+        public void IlCompiler_can_return_constant_string()
         {
             var c = new IlCompiler<Func<string>>();
             var b = c.Constant("hello");
@@ -127,7 +127,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCreateEmptyMethod()
+        public void IlCompiler_can_create_empty_method()
         {
             var c = new IlCompiler<Action>();
             var a = c.Compile();
@@ -135,7 +135,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCreateObject()
+        public void IlCompiler_can_create_an_object()
         {
             var c = new IlCompiler<Func<Dummy>>();
             var obj = c.NewObject(typeof(Dummy));
@@ -145,7 +145,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanStoreBoolInField()
+        public void IlCompiler_can_assign_value_to_a_field()
         {
             var c = new IlCompiler<Action>();
             var True = c.Constant(true);
@@ -157,7 +157,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCastToAndFromObject()
+        public void IlCompiler_can_box_and_unbox()
         {
             var c = new IlCompiler<Action>();
             
@@ -173,7 +173,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanCreateObjectAndStoreInVar()
+        public void IlCompiler_can_initialize_variables()
         {
             var c = new IlCompiler<Action>();
             var variable = c.Variable<Dummy>("dummy");
@@ -186,7 +186,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void ReadSimulationFakeTupleString()
+        public void IlCompiler_can_pass_read_simulation_on_fake_tupled_string()
         {
             var value = new FakeTupleString("Hello");
             var type = value.GetType();
@@ -207,7 +207,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void ReadSimulationOptionString()
+        public void IlCompiler_can_pass_read_simulation_on_fsharp_option_of_string()
         {
             var value = FSharpOption<string>.Some("abc");
             var type = value.GetType();
@@ -226,7 +226,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void ReadSimulationTupleString()
+        public void IlCompiler_can_pass_read_simulation_on_tuple_of_string()
         {
             var value = Tuple.Create("Hello");
             var type = value.GetType();
@@ -246,7 +246,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void ReadSimulation()
+        public void IlCompiler_can_pass_read_simulation()
         {
             var serializer = new Serializer(new SerializerOptions(knownTypes:new List<Type>() {typeof(Poco)}));
             var session = new DeserializerSession(serializer);

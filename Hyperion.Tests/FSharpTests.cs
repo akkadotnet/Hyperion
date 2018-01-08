@@ -23,7 +23,7 @@ namespace Hyperion.Tests
     {
 
         [Fact]
-        public void CanSerializeFSharpMap()
+        public void Serializer_should_work_with_fsharp_Map()
         {
             var expected = TestMap.createRecordWithMap;
             Serialize(expected);
@@ -34,7 +34,7 @@ namespace Hyperion.Tests
 
 
         [Fact]
-        public void CanSerializeFSharpList()
+        public void Serializer_should_work_with_fsharp_List()
         {
             var expected = ListModule.OfArray(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 });
             Serialize(expected);
@@ -44,7 +44,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeSimpleDU()
+        public void Serializer_should_work_with_simple_discriminated_unions()
         {
             var expected = DU1.NewA(1);
             Serialize(expected);
@@ -54,7 +54,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeNestedDU()
+        public void Serializer_should_work_with_nested_discriminated_unions()
         {
             var expected = DU2.NewC(DU1.NewA(1));
             Serialize(expected);
@@ -64,7 +64,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeOptionalDU()
+        public void Serializer_should_work_with_optional_discriminated_unions()
         {
             var expected = DU2.NewE(FSharpOption<DU1>.Some(DU1.NewA(1)));
             Serialize(expected);
@@ -74,7 +74,7 @@ namespace Hyperion.Tests
         }
 
         [Fact]
-        public void CanSerializeOption()
+        public void Serializer_should_work_with_options()
         {
             var expected = FSharpOption<string>.Some("hello");
             Serialize(expected);
@@ -93,7 +93,7 @@ namespace Hyperion.Tests
 #endif
 
         [Fact]
-        public void CanSerializeUser()
+        public void Serializer_should_work_with_fsharp_records()
         {
                 var expected = new User("foo", new FSharpOption<string>(null), "hello");
                 Serialize(expected);
@@ -108,7 +108,7 @@ namespace Hyperion.Tests
 
         //FIXME: make F# quotations and Async serializable
         //[Fact]
-        public void CanSerializeQuotation()
+        public void Serializer_should_work_with_fsharp_quotations_expressions()
         {
             var expected = TestQuotations.Quotation;
             Serialize(expected);
