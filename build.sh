@@ -7,10 +7,10 @@
 SCRIPT_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 TOOLS_DIR=$SCRIPT_DIR/tools
 NUGET_EXE=$TOOLS_DIR/nuget.exe
-NUGET_URL=https://dist.nuget.org/win-x86-commandline/v3.5.0/nuget.exe
-FAKE_VERSION=4.63.0
+NUGET_URL=https://dist.nuget.org/win-x86-commandline/v4.1.0/nuget.exe
+FAKE_VERSION=4.61.2
 FAKE_EXE=$TOOLS_DIR/FAKE/tools/FAKE.exe
-DOTNET_VERSION=2.0.0
+DOTNET_VERSION=2.0.3
 DOTNET_INSTALLER_URL=https://raw.githubusercontent.com/dotnet/cli/v$DOTNET_VERSION/scripts/obtain/dotnet-install.sh
 
 # Define default arguments.
@@ -85,6 +85,11 @@ if [ ! -f "$FAKE_EXE" ]; then
     echo "Could not find Fake.exe at '$FAKE_EXE'."
     exit 1
 fi
+
+###########################################################################
+# WORKAROUND FOR MONO
+###########################################################################
+export FrameworkPathOverride=/usr/lib/mono/4.5/
 
 ###########################################################################
 # RUN BUILD SCRIPT

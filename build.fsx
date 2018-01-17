@@ -7,149 +7,178 @@ open System.Text
 
 open Fake
 open Fake.DotNetCli
+open Fake.DocFxHelper
+open Fake.FileHelper
 
-// Variables
+// Information about the project for Nuget and Assembly info files
 let configuration = "Release"
 
-// Directories
-let output = __SOURCE_DIRECTORY__  @@ "build"
-let outputTests = output @@ "TestResults"
-let outputPerfTests = output @@ "perf"
-let outputBinaries = output @@ "binaries"
-let outputNuGet = output @@ "nuget"
-let outputBinariesNet45 = outputBinaries @@ "net45"
-let outputBinariesNetStandard = outputBinaries @@ "netstandard1.6"
-
+// Read release notes and version
+let solutionFile = FindFirstMatchingFile "*.sln" __SOURCE_DIRECTORY__  // dynamically look up the solution
 let buildNumber = environVarOrDefault "BUILD_NUMBER" "0"
+let preReleaseVersionSuffix = (if (not (buildNumber = "0")) then (buildNumber) else "") + "-beta"
 let versionSuffix = 
     match (getBuildParam "nugetprerelease") with
-    | "dev" -> (if (not (buildNumber = "0")) then (buildNumber) else "") + "-beta"
+    | "dev" -> preReleaseVersionSuffix
     | _ -> ""
+
+let releaseNotes =
+    File.ReadLines "./RELEASE_NOTES.md"
+    |> ReleaseNotesHelper.parseReleaseNotes
+
+// Directories
+let toolsDir = __SOURCE_DIRECTORY__ @@ "tools"
+let output = __SOURCE_DIRECTORY__  @@ "bin"
+let outputTests = __SOURCE_DIRECTORY__ @@ "TestResults"
+let outputPerfTests = __SOURCE_DIRECTORY__ @@ "PerfResults"
+let outputNuGet = output @@ "nuget"
+
+// Copied from original NugetCreate target
+let nugetDir = output @@ "nuget"
+let workingDir = output @@ "build"
+let nugetExe = FullName @"./tools/nuget.exe"
 
 Target "Clean" (fun _ ->
     CleanDir output
     CleanDir outputTests
     CleanDir outputPerfTests
-    CleanDir outputBinaries
     CleanDir outputNuGet
-    CleanDir outputBinariesNet45
-    CleanDir outputBinariesNetStandard
-
+    CleanDir "docs/_site"
     CleanDirs !! "./**/bin"
     CleanDirs !! "./**/obj"
 )
 
-Target "RestorePackages" (fun _ ->
-    let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
+Target "AssemblyInfo" (fun _ ->
+    XmlPokeInnerText "./src/common.props" "//Project/PropertyGroup/VersionPrefix" releaseNotes.AssemblyVersion    
+    XmlPokeInnerText "./src/common.props" "//Project/PropertyGroup/PackageReleaseNotes" (releaseNotes.Notes |> String.concat "\n")
+)
 
+Target "RestorePackages" (fun _ ->
     DotNetCli.Restore
         (fun p -> 
             { p with
-                Project = "./Hyperion.sln"
-                NoCache = false 
-                AdditionalArgs = additionalArgs })
+                Project = solutionFile
+                NoCache = false})
 )
 
-Target "Build" (fun _ ->
-    let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix] else []  
-
-    if (isWindows) then
-        let projects = !! "./**/*.csproj" ++ "./**/*.fsproj"
-
-        let runSingleProject project =
-            DotNetCli.Build
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Configuration = configuration 
-                        AdditionalArgs = additionalArgs })
-
-        projects |> Seq.iter (runSingleProject)
-    else
+Target "Build" (fun _ ->   
+    let additionalArgs = if versionSuffix.Length > 0 then [sprintf "/p:VersionSuffix=%s" versionSuffix;"--no-incremental"] else ["--no-incremental"]  
+       
+    let runSingleProject project =
         DotNetCli.Build
             (fun p -> 
                 { p with
-                    Project = "./Hyperion/Hyperion.csproj"
-                    Framework = "netstandard1.6"
+                    Project = project
                     Configuration = configuration 
-                    AdditionalArgs = additionalArgs })
+                    AdditionalArgs = additionalArgs}) // "Rebuild"  
 
-        DotNetCli.Build
-            (fun p -> 
-                { p with
-                    Project = "./Hyperion.Tests/Hyperion.Tests.csproj"
-                    Framework = "netcoreapp1.1"
-                    Configuration = configuration 
-                    AdditionalArgs = additionalArgs })
+    let assemblies = !! "./src/**/*.*sproj" 
+     
+    assemblies |> Seq.iter (runSingleProject)
 )
+
+//--------------------------------------------------------------------------------
+// Tests targets 
+//--------------------------------------------------------------------------------
+module internal ResultHandling =
+    let (|OK|Failure|) = function
+        | 0 -> OK
+        | x -> Failure x
+
+    let buildErrorMessage = function
+        | OK -> None
+        | Failure errorCode ->
+            Some (sprintf "xUnit2 reported an error (Error Code %d)" errorCode)
+
+    let failBuildWithMessage = function
+        | DontFailBuild -> traceError
+        | _ -> (fun m -> raise(FailedTestsException m))
+
+    let failBuildIfXUnitReportedError errorLevel =
+        buildErrorMessage
+        >> Option.iter (failBuildWithMessage errorLevel)
 
 Target "RunTests" (fun _ ->
-    if (isWindows) then
-        let projects = !! "./**/Hyperion.Tests.csproj"
+    let projects = 
+        match (isWindows) with 
+        | true -> !! "./src/**/*.Tests.csproj"
+        | _ -> !! "./src/**/*.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
 
-        let runSingleProject project =
-            DotNetCli.Test
-                (fun p -> 
-                    { p with
-                        Project = project
-                        Configuration = configuration })
+    let runSingleProject project =
+        let result = ExecProcess(fun info ->
+            info.FileName <- "dotnet"
+            info.WorkingDirectory <- (Directory.GetParent project).FullName
+            info.Arguments <- (sprintf "xunit -c Release -nobuild -parallel none -teamcity -xml %s_xunit.xml" (outputTests @@ fileNameWithoutExt project))) (TimeSpan.FromMinutes 30.)
+        
+        ResultHandling.failBuildIfXUnitReportedError TestRunnerErrorLevel.DontFailBuild result
 
-        projects |> Seq.iter (runSingleProject)
-    else
-        DotNetCli.Test
-            (fun p -> 
-                { p with
-                    Project = "./Hyperion.Tests/Hyperion.Tests.csproj"
-                    Framework = "netcoreapp1.1"
-                    Configuration = configuration })
+    projects |> Seq.iter (log)
+    projects |> Seq.iter (runSingleProject)
 )
 
-Target "CopyOutput" (fun _ ->
-    // .NET 4.5
-    if (isWindows) then
-        DotNetCli.Publish
-            (fun p -> 
-                { p with
-                    Project = "./Hyperion/Hyperion.csproj"
-                    Framework = "net45"
-                    Output = outputBinariesNet45
-                    Configuration = configuration })
+Target "NBench" <| fun _ ->
+    let nbenchTestPath = findToolInSubPath "NBench.Runner.exe" (toolsDir @@ "NBench.Runner*")
+    printfn "Using NBench.Runner: %s" nbenchTestPath
 
-    // .NET Core
-    DotNetCli.Publish
-        (fun p -> 
-            { p with
-                Project = "./Hyperion/Hyperion.csproj"
-                Framework = "netstandard1.6"
-                Output = outputBinariesNetStandard
-                Configuration = configuration })
-)
+    let nbenchTestAssemblies = !! "./src/**/*Tests.Performance.csproj" 
 
-//--------------------------------------------------------------------------------
-// Benchmarks
-//--------------------------------------------------------------------------------
+    let runNBench assembly =
+        let includes = getBuildParam "include"
+        let excludes = getBuildParam "exclude"
+        let teamcityStr = (getBuildParam "teamcity")
+        let enableTeamCity = 
+            match teamcityStr with
+            | null -> false
+            | "" -> false
+            | _ -> bool.Parse teamcityStr
 
-Target "Benchmarks" (fun _ ->
-    () //TODO: complete BenchmarkDotNet setup
-)
+        let args = StringBuilder()
+                |> append assembly
+                |> append (sprintf "output-directory=\"%s\"" outputPerfTests)
+                |> append (sprintf "concurrent=\"%b\"" true)
+                |> append (sprintf "trace=\"%b\"" true)
+                |> append (sprintf "teamcity=\"%b\"" enableTeamCity)
+                |> appendIfNotNullOrEmpty includes "include="
+                |> appendIfNotNullOrEmpty excludes "include="
+                |> toText
+
+        let result = ExecProcess(fun info -> 
+            info.FileName <- nbenchTestPath
+            info.WorkingDirectory <- (Path.GetDirectoryName (FullName nbenchTestPath))
+            info.Arguments <- args) (System.TimeSpan.FromMinutes 45.0) (* Reasonably long-running task. *)
+        if result <> 0 then failwithf "NBench.Runner failed. %s %s" nbenchTestPath args
+    
+    nbenchTestAssemblies |> Seq.iter runNBench
+
 
 //--------------------------------------------------------------------------------
 // Nuget targets 
 //--------------------------------------------------------------------------------
 
-Target "CreateNuget" (fun _ ->
-    DotNetCli.Pack
-        (fun p -> 
-            { p with
-                Project = "./Hyperion/Hyperion.csproj"
-                Configuration = configuration
-                AdditionalArgs = ["--include-symbols"]
-                VersionSuffix = versionSuffix
-                OutputPath = outputNuGet })
+let overrideVersionSuffix (project:string) =
+    match project with
+    | _ -> versionSuffix // add additional matches to publish different versions for different projects in solution
+Target "CreateNuget" (fun _ ->    
+    let projects = !! "src/**/*.csproj" 
+                   -- "src/**/*Tests.csproj" // Don't publish unit tests
+                   -- "src/**/*Tests*.csproj"
+                   -- "src/**/*.Demo.csproj" // Don't publish demo apps
+
+    let runSingleProject project =
+        DotNetCli.Pack
+            (fun p -> 
+                { p with
+                    Project = project
+                    Configuration = configuration
+                    AdditionalArgs = ["--include-symbols"]
+                    VersionSuffix = overrideVersionSuffix project
+                    OutputPath = outputNuGet })
+
+    projects |> Seq.iter (runSingleProject)
 )
 
 Target "PublishNuget" (fun _ ->
-    let projects = !! "./build/nuget/*.nupkg" -- "./build/nuget/*.symbols.nupkg"
+    let projects = !! "./bin/nuget/*.nupkg" -- "./bin/nuget/*.symbols.nupkg"
     let apiKey = getBuildParamOrDefault "nugetkey" ""
     let source = getBuildParamOrDefault "nugetpublishurl" ""
     let symbolSource = getBuildParamOrDefault "symbolspublishurl" ""
@@ -176,53 +205,39 @@ Target "PublishNuget" (fun _ ->
 )
 
 //--------------------------------------------------------------------------------
+// Documentation 
+//--------------------------------------------------------------------------------  
+Target "DocFx" (fun _ ->
+    DotNetCli.Restore (fun p -> { p with Project = solutionFile })
+    DotNetCli.Build (fun p -> { p with Project = solutionFile; Configuration = configuration })
+
+    let docsPath = "./docs"
+
+    DocFx (fun p -> 
+                { p with 
+                    Timeout = TimeSpan.FromMinutes 30.0; 
+                    WorkingDirectory  = docsPath; 
+                    DocFxJson = docsPath @@ "docfx.json" })
+)
+
+//--------------------------------------------------------------------------------
 // Help 
 //--------------------------------------------------------------------------------
 
 Target "Help" <| fun _ ->
     List.iter printfn [
       "usage:"
-      "/build [target]"
+      "./build.ps1 [target]"
       ""
       " Targets for building:"
       " * Build      Builds"
       " * Nuget      Create and optionally publish nugets packages"
       " * RunTests   Runs tests"
-      " * Benchmarks Run BenchmarkDotNet performance tests"
       " * All        Builds, run tests, creates and optionally publish nuget packages"
+      " * DocFx      Creates a DocFx-based website for this solution"
       ""
       " Other Targets"
       " * Help       Display this help" 
-      ""]
-
-Target "HelpNuget" <| fun _ ->
-    List.iter printfn [
-      "usage: "
-      "build Nuget [nugetkey=<key> [nugetpublishurl=<url>]] "
-      "            [symbolspublishurl=<url>] "
-      ""
-      "In order to publish a nuget package, keys must be specified."
-      "If a key is not specified the nuget packages will only be created on disk"
-      "After a build you can find them in build/nuget"
-      ""
-      "For pushing nuget packages to nuget.org and symbols to symbolsource.org"
-      "you need to specify nugetkey=<key>"
-      "   build Nuget nugetKey=<key for nuget.org>"
-      ""
-      "For pushing the ordinary nuget packages to another place than nuget.org specify the url"
-      "  nugetkey=<key>  nugetpublishurl=<url>  "
-      ""
-      "For pushing symbols packages specify:"
-      "  symbolskey=<key>  symbolspublishurl=<url> "
-      ""
-      "Examples:"
-      "  build Nuget                      Build nuget packages to the build/nuget folder"
-      ""
-      "  build Nuget versionsuffix=beta1  Build nuget packages with the custom version suffix"
-      ""
-      "  build Nuget nugetkey=123         Build and publish to nuget.org and symbolsource.org"
-      ""
-      "  build Nuget nugetprerelease=dev nugetkey=123 nugetpublishurl=http://abcsymbolspublishurl=http://xyz"
       ""]
 
 //--------------------------------------------------------------------------------
@@ -234,24 +249,21 @@ Target "All" DoNothing
 Target "Nuget" DoNothing
 
 // build dependencies
-"Clean" ==> "RestorePackages" ==> "Build" ==> "CopyOutput" ==> "BuildRelease"
+"Clean" ==> "RestorePackages" ==> "AssemblyInfo" ==> "Build" ==> "BuildRelease"
 
 // tests dependencies
-"Clean" ==> "RestorePackages" ==> "Build" ==> "RunTests"
-"Clean" ==> "RestorePackages" ==> "Build"
-
-// benchmark dependencies
-"BuildRelease" ==> "Benchmarks"
 
 // nuget dependencies
 "Clean" ==> "RestorePackages" ==> "Build" ==> "CreateNuget"
-"CreateNuget" ==> "PublishNuget"
-"PublishNuget" ==> "Nuget"
+"CreateNuget" ==> "PublishNuget" ==> "Nuget"
+
+// docs
+"BuildRelease" ==> "Docfx"
 
 // all
 "BuildRelease" ==> "All"
 "RunTests" ==> "All"
-"Benchmarks" ==> "All"
+//"NBench" ==> "All"
 "Nuget" ==> "All"
 
 RunTargetOrDefault "Help"

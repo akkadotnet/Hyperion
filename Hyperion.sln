@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hyperion", "Hyperion\Hyperion.csproj", "{7AF8D2B6-9F1F-4A1C-8673-48E533108385}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hyperion", "src\Hyperion\Hyperion.csproj", "{7AF8D2B6-9F1F-4A1C-8673-48E533108385}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2F3D4EC4-3A41-48C2-9DEA-0510B0FF89B4}"
 	ProjectSection(SolutionItems) = preProject
@@ -15,11 +15,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2F3D4EC4
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 	EndProjectSection
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Hyperion.Tests.FSharpData", "Hyperion.Tests.FSharpData\Hyperion.Tests.FSharpData.fsproj", "{1E406A85-C7F5-4F62-9D72-88C67FF2D743}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Hyperion.Tests.FSharpData", "src\Hyperion.Tests.FSharpData\Hyperion.Tests.FSharpData.fsproj", "{1E406A85-C7F5-4F62-9D72-88C67FF2D743}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hyperion.Benchmarks", "Hyperion.Benchmarks\Hyperion.Benchmarks.csproj", "{CAE2DB69-0BE7-4B11-96DB-D5B61D35607F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hyperion.Benchmarks", "src\Hyperion.Benchmarks\Hyperion.Benchmarks.csproj", "{CAE2DB69-0BE7-4B11-96DB-D5B61D35607F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hyperion.Tests", "Hyperion.Tests\Hyperion.Tests.csproj", "{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hyperion.Tests", "src\Hyperion.Tests\Hyperion.Tests.csproj", "{EA096BA2-3B4C-4878-B9AD-5A88D164EBF0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

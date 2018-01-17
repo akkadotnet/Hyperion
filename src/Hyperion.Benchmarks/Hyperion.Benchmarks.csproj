@@ -3,6 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsPackable>false</IsPackable> <!-- prevents it from being published as NuGet package -->
   </PropertyGroup>
 
   <ItemGroup>
