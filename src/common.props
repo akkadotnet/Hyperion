@@ -2,8 +2,13 @@
   <PropertyGroup>
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.6</VersionPrefix>
-    <PackageReleaseNotes>Resolving issues with conflicting binary being downloaded via NuGet with version bump.</PackageReleaseNotes>
+    <VersionPrefix>0.9.7</VersionPrefix>
+    <PackageReleaseNotes>Maintenance release for Hyperion v0.9.0**
+This patch mostly contains bugfixes and enhancements to the existing Hyperion v0.9.* branch. No major API changes have been made.
+[EnumerableSerializeFactory fixes](https://github.com/akkadotnet/Hyperion/pull/81)
+[Fix: ObjectDisposedException cannot be deserialized](https://github.com/akkadotnet/Hyperion/issues/64)
+[Added support for DateTimeOffset as a primitive](https://github.com/akkadotnet/Hyperion/pull/79)
+You can [see the full set of changes for Hyperion v0.9.7 here](https://github.com/akkadotnet/Hyperion/milestone/5).</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>

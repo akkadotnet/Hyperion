@@ -1,3 +1,14 @@
+### 0.9.7 January 18 2018 ####
+**Maintenance release for Hyperion v0.9.***
+
+This patch mostly contains bugfixes and enhancements to the existing Hyperion v0.9.* branch. No major API changes have been made.
+
+* [EnumerableSerializeFactory fixes](https://github.com/akkadotnet/Hyperion/pull/81)
+* [Fix: ObjectDisposedException cannot be deserialized](https://github.com/akkadotnet/Hyperion/issues/64)
+* [Added support for DateTimeOffset as a primitive](https://github.com/akkadotnet/Hyperion/pull/79)
+
+You can [see the full set of changes for Hyperion v0.9.7 here](https://github.com/akkadotnet/Hyperion/milestone/5).
+
 ### 0.9.6 August 17 2017
 
 Resolving issues with conflicting binary being downloaded via NuGet with version bump.
