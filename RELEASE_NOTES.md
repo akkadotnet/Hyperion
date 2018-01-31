@@ -1,3 +1,9 @@
+### 0.9.8 January 31 2018 ####
+**Maintenance release for Hyperion v0.9.***
+This small patch conists of the following bug fixes to Hyperion v0.9.* branch:
+
+* [Support for FSharpSet<T>](https://github.com/akkadotnet/Hyperion/pull/92)
+
 ### 0.9.7 January 18 2018 ####
 **Maintenance release for Hyperion v0.9.***
 
