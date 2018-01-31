@@ -139,7 +139,7 @@ namespace Hyperion.SerializerFactories
 
             Func<object, int> countGetter = o => (int)countProperty.GetValue(o);
             ObjectReader reader = null;
-            if (addMethod != null)
+            if (HasParameterlessConstructor(type) && addMethod != null)
             {
                 var add = CompileMethodToDelegate(addMethod, type, elementType);
                 reader = (stream, session) =>
