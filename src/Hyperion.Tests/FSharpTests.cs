@@ -45,6 +45,16 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void CanSerializeFSharpSet()
+        {
+            var expected = SetModule.OfArray(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 });
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<object>();
+            Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void CanSerializeSimpleDU()
         {
             var expected = DU1.NewA(1);
