@@ -4,7 +4,7 @@
 
 A high performance polymorphic serializer for the .NET framework, fork of the [Wire](https://github.com/rogeralsing/Wire) serializer.
 
-Current status: **BETA** (v0.9.2).
+Current status: **BETA** (v0.9.7).
 
 ## License
 Licensed under Apache 2.0, see [LICENSE](LICENSE) for the full text.
