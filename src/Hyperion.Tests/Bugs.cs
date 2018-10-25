@@ -126,6 +126,21 @@ namespace Hyperion.Tests
             }
         }
 
+        [Fact]
+        public void CanSerializeUri()
+        {
+            var stream = new MemoryStream();
+            var msg = new Uri("http://localhost:9202/", UriKind.RelativeOrAbsolute);
+            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true, versionTolerance: true));
+            serializer.Serialize(msg, stream);
+            stream.Position = 0;
+            var res = serializer.Deserialize(stream);
+
+            Assert.Equal(msg, res);
+            Assert.Equal(stream.Length, stream.Position);
+        }
+
+
         public class SnapshotSelectionCriteria
         {
             public static SnapshotSelectionCriteria Latest { get; set; } = new SnapshotSelectionCriteria()
