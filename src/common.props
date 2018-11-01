@@ -2,10 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.8</VersionPrefix>
-    <PackageReleaseNotes>Maintenance release for Hyperion v0.9.***
-This small patch conists of the following bug fixes to Hyperion v0.9.* branch:
-[Support for FSharpSet&lt;T&gt;](https://github.com/akkadotnet/Hyperion/pull/92)</PackageReleaseNotes>
+    <VersionPrefix>0.9.9</VersionPrefix>
+    <PackageReleaseNotes>Placeholder for Nightlies*</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
