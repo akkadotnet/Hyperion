@@ -4,7 +4,7 @@
     <Authors>Akka.NET Team</Authors>
     <VersionPrefix>0.9.8</VersionPrefix>
     <PackageReleaseNotes>Maintenance release for Hyperion v0.9.***
-This small patch conists of the following bug fixes to Hyperion v0.9.*:
+This small patch conists of the following bug fixes to Hyperion v0.9.* branch:
 [Support for FSharpSet&lt;T&gt;](https://github.com/akkadotnet/Hyperion/pull/92)</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
