@@ -1,3 +1,6 @@
+### 0.9.9 November 1 2018 ####
+*Placeholder for Nightlies*
+
 ### 0.9.8 January 31 2018 ####
 **Maintenance release for Hyperion v0.9.***
 This small patch conists of the following bug fixes to Hyperion v0.9.* branch:
