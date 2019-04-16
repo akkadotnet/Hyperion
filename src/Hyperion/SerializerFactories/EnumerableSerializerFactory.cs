@@ -1,4 +1,5 @@
-﻿#region copyright
+﻿// Copyright (C) 2019 InfoVista S.A. All rights reserved.
+#region copyright
 // -----------------------------------------------------------------------
 //  <copyright file="EnumerableSerializerFactory.cs" company="Akka.NET Team">
 //      Copyright (C) 2015-2016 AsynkronIT <https://github.com/AsynkronIT>
@@ -83,6 +84,7 @@ namespace Hyperion.SerializerFactories
         private static ConstructorInfo GetEnumerableConstructor(Type type)
         {
             var enumerableType = GetEnumerableType(type);
+            enumerableType = enumerableType ?? typeof(object);
             var iEnumerableType = typeof(IEnumerable<>).MakeGenericType(enumerableType);
             return enumerableType != null
                 ? type.GetTypeInfo()

@@ -1,4 +1,5 @@
-﻿#region copyright
+﻿// Copyright (C) 2019 InfoVista S.A. All rights reserved.
+#region copyright
 // -----------------------------------------------------------------------
 //  <copyright file="CollectionTests.cs" company="Akka.NET Team">
 //      Copyright (C) 2015-2016 AsynkronIT <https://github.com/AsynkronIT>
@@ -184,6 +185,30 @@ namespace Hyperion.Tests
             Reset();
             var actual = Deserialize<List<Something>>();
             Assert.Equal(expected, actual);
+        }
+
+        [Fact]
+        public void CanSerializeArrayList()
+        {
+	        var expected = new ArrayList()
+	        {
+		        new Something
+		        {
+			        BoolProp = true,
+			        Else = new Else
+			        {
+				        Name = "Yoho"
+			        },
+			        Int32Prop = 999,
+			        StringProp = "Yesbox!"
+		        },
+		        "a", 123
+	        };
+
+	        Serialize(expected);
+	        Reset();
+	        var actual = Deserialize<ArrayList>();
+	        Assert.Equal(expected, actual);
         }
 
         [Fact]
