@@ -1,5 +1,4 @@
-﻿// Copyright (C) 2019 InfoVista S.A. All rights reserved.
-#region copyright
+﻿#region copyright
 // -----------------------------------------------------------------------
 //  <copyright file="CollectionTests.cs" company="Akka.NET Team">
 //      Copyright (C) 2015-2016 AsynkronIT <https://github.com/AsynkronIT>
