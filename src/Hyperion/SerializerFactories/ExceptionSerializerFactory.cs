@@ -38,11 +38,16 @@ namespace Hyperion.SerializerFactories
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
         // Workaround for CoreCLR where FormatterServices.GetUninitializedObject is not public
+#if NETSTANDARD1_6
         private static readonly Func<Type, object> GetUninitializedObject =
-            (Func<Type, object>)
+            (Func<Type, object>) 
                 typeof(string).GetTypeInfo().Assembly.GetType("System.Runtime.Serialization.FormatterServices")
                     .GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
                     .CreateDelegate(typeof(Func<Type, object>));
+#else
+        private static readonly Func<Type, object> GetUninitializedObject =
+            System.Runtime.Serialization.FormatterServices.GetUninitializedObject;
+#endif
 
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
