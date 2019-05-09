@@ -15,10 +15,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 
-#if SERIALIZATION
-using System.Runtime.Serialization;
-#endif
-
 namespace Hyperion.Extensions
 {
     internal static class TypeEx
@@ -70,7 +66,7 @@ namespace Hyperion.Extensions
             //add TypeSerializer with null support
         }
 
-#if !SERIALIZATION
+#if NETSTANDARD1_6
     //HACK: the GetUnitializedObject actually exists in .NET Core, its just not public
         private static readonly Func<Type, object> getUninitializedObjectDelegate = (Func<Type, object>)
             typeof(string)
@@ -88,7 +84,7 @@ namespace Hyperion.Extensions
 #else
         public static object GetEmptyObject(this Type type)
         {
-            return FormatterServices.GetUninitializedObject(type);
+            return System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
         }
 #endif
 

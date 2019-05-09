@@ -6,7 +6,7 @@
 //  </copyright>
 // -----------------------------------------------------------------------
 #endregion
-#if SERIALIZATION
+#if !NETSTANDARD1_6
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

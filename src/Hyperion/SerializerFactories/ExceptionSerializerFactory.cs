@@ -65,7 +65,13 @@ namespace Hyperion.SerializerFactories
                 var stackTraceString = stream.ReadString(session);
                 var innerException = stream.ReadObject(session);
 
-                _className.SetValue(exception,className);
+                // CoreFX 3.0 has changed the underlying implementation of Exception to
+                // simply use GetType().ToString() and no longer has a _className field.
+                // See: https://github.com/dotnet/corefx/blob/master/src/Common/src/CoreLib/System/Exception.cs
+                if (_className != null)
+                {
+                    _className.SetValue(exception, className);
+                }
                 _message.SetValue(exception, message);
                 _remoteStackTraceString.SetValue(exception, remoteStackTraceString);
                 _stackTraceString.SetValue(exception, stackTraceString);
@@ -73,7 +79,13 @@ namespace Hyperion.SerializerFactories
                 return exception;
             }, (stream, exception, session) =>
             {
-                var className = (string)_className.GetValue(exception);
+                // CoreFX 3.0 has changed the underlying implementation of Exception to
+                // simply use GetType().ToString() and no longer has a _className field.
+                // See: https://github.com/dotnet/corefx/blob/master/src/Common/src/CoreLib/System/Exception.cs
+                var className = _className != null
+                    ? (string) _className.GetValue(exception)
+                    : exception.GetType().ToString();
+
                 var message = (string)_message.GetValue(exception);
                 var remoteStackTraceString = (string)_remoteStackTraceString.GetValue(exception);
                 var stackTraceString = (string)_stackTraceString.GetValue(exception);

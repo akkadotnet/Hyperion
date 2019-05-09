@@ -39,7 +39,7 @@ namespace Hyperion
             new DictionarySerializerFactory(),
             new ArraySerializerFactory(),
             new MultipleDimensionalArraySerialzierFactory(),
-#if SERIALIZATION
+#if !NETSTANDARD1_6
             new ISerializableSerializerFactory(), //TODO: this will mess up the indexes in the serializer payload
 #endif
             new EnumerableSerializerFactory(),
