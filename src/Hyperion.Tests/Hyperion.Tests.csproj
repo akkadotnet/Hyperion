@@ -2,8 +2,8 @@
   <Import Project="..\common.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>net461;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
-    <!--<RuntimeFrameworkVersion>2.0.3</RuntimeFrameworkVersion>-->
+    <TargetFrameworks>net461;netcoreapp2.0;netcoreapp2.2;</TargetFrameworks>
+    <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">2.0.3</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <ItemGroup>
