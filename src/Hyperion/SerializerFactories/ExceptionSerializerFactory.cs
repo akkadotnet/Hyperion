@@ -17,7 +17,7 @@ namespace Hyperion.SerializerFactories
 {
     internal sealed class ExceptionSerializerFactory : ValueSerializerFactory
     {
-        private static readonly TypeInfo ExceptionTypeInfo = typeof(Exception).GetTypeInfo();
+        private readonly TypeInfo ExceptionTypeInfo;
         private readonly FieldInfo _className;
         private readonly FieldInfo _innerException;
         private readonly FieldInfo _stackTraceString;
@@ -26,6 +26,7 @@ namespace Hyperion.SerializerFactories
 
         public ExceptionSerializerFactory()
         {
+            ExceptionTypeInfo = typeof(Exception).GetTypeInfo();
             _className = ExceptionTypeInfo.GetField("_className", BindingFlagsEx.All);
             _innerException = ExceptionTypeInfo.GetField("_innerException", BindingFlagsEx.All);
             _message = ExceptionTypeInfo.GetField("_message", BindingFlagsEx.All);
@@ -60,11 +61,11 @@ namespace Hyperion.SerializerFactories
                 var stackTraceString = stream.ReadString(session);
                 var innerException = stream.ReadObject(session);
 
-                _className.SetValue(exception,className);
+                _className.SetValue(exception, className);
                 _message.SetValue(exception, message);
                 _remoteStackTraceString.SetValue(exception, remoteStackTraceString);
                 _stackTraceString.SetValue(exception, stackTraceString);
-                _innerException.SetValue(exception,innerException);
+                _innerException.SetValue(exception, innerException);
                 return exception;
             }, (stream, exception, session) =>
             {
