@@ -77,7 +77,7 @@ namespace Hyperion.SerializerFactories
             }, (stream, exception, session) =>
             {
 #if NETSTANDARD20
-                string className = _className == null ? null : (string)_className.GetValue(exception);
+                var className = (string)_className?.GetValue(exception);
 #else
                 var className = (string)_className.GetValue(exception);
 #endif
