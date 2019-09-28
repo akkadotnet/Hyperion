@@ -17,7 +17,7 @@ namespace Hyperion.SerializerFactories
 {
     internal sealed class ExceptionSerializerFactory : ValueSerializerFactory
     {
-        private readonly TypeInfo ExceptionTypeInfo;
+        private static readonly TypeInfo ExceptionTypeInfo = typeof(Exception).GetTypeInfo();
         private readonly FieldInfo _className;
         private readonly FieldInfo _innerException;
         private readonly FieldInfo _stackTraceString;
@@ -26,7 +26,6 @@ namespace Hyperion.SerializerFactories
 
         public ExceptionSerializerFactory()
         {
-            ExceptionTypeInfo = typeof(Exception).GetTypeInfo();
             _className = ExceptionTypeInfo.GetField("_className", BindingFlagsEx.All);
             _innerException = ExceptionTypeInfo.GetField("_innerException", BindingFlagsEx.All);
             _message = ExceptionTypeInfo.GetField("_message", BindingFlagsEx.All);
@@ -38,30 +37,41 @@ namespace Hyperion.SerializerFactories
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
+#if NETSTANDARD16
         // Workaround for CoreCLR where FormatterServices.GetUninitializedObject is not public
         private static readonly Func<Type, object> GetUninitializedObject =
             (Func<Type, object>)
                 typeof(string).GetTypeInfo().Assembly.GetType("System.Runtime.Serialization.FormatterServices")
                     .GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
                     .CreateDelegate(typeof(Func<Type, object>));
+#else
+        private object GetUninitializedObject(Type type) => System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
+#endif
 
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var exceptionSerializer = new ObjectSerializer(type);
             var hasDefaultConstructor = type.GetTypeInfo().GetConstructor(new Type[0]) != null;
-            var createInstance = hasDefaultConstructor ? Activator.CreateInstance : GetUninitializedObject;
+            var exceptionObject = hasDefaultConstructor ? Activator.CreateInstance(type) : GetUninitializedObject(type);
 
             exceptionSerializer.Initialize((stream, session) =>
             {
-                var exception = createInstance(type);
+                var exception = exceptionObject;
                 var className = stream.ReadString(session);
                 var message = stream.ReadString(session);
                 var remoteStackTraceString = stream.ReadString(session);
                 var stackTraceString = stream.ReadString(session);
                 var innerException = stream.ReadObject(session);
 
+#if NETSTANDARD20
+                if (_className != null)
+                {
+                    _className.SetValue(exception, className);
+                }
+#else
                 _className.SetValue(exception, className);
+#endif
                 _message.SetValue(exception, message);
                 _remoteStackTraceString.SetValue(exception, remoteStackTraceString);
                 _stackTraceString.SetValue(exception, stackTraceString);
@@ -69,7 +79,11 @@ namespace Hyperion.SerializerFactories
                 return exception;
             }, (stream, exception, session) =>
             {
+#if NETSTANDARD20
+                string className = _className == null ? null : (string)_className.GetValue(exception);
+#else
                 var className = (string)_className.GetValue(exception);
+#endif
                 var message = (string)_message.GetValue(exception);
                 var remoteStackTraceString = (string)_remoteStackTraceString.GetValue(exception);
                 var stackTraceString = (string)_stackTraceString.GetValue(exception);

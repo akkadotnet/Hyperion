@@ -12,10 +12,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-#if SERIALIZATION
-
-#endif
-
 namespace Hyperion.Extensions
 {
     internal static class BindingFlagsEx
