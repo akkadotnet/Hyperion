@@ -28,10 +28,3 @@ jobs:
       vmImage: 'ubuntu-16.04'
       scriptFileName: ./build.sh
       scriptArgs: all
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'docker_build'
-      displayName: 'Docker Build'
-      vmImage: 'ubuntu-16.04'
-      scriptFileName: ./build.sh
-      scriptArgs: Docker
