@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.6.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
   </ItemGroup>
   
