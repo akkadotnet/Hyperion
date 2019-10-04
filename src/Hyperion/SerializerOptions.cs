@@ -38,6 +38,7 @@ namespace Hyperion
             new DefaultDictionarySerializerFactory(),
             new DictionarySerializerFactory(),
             new ArraySerializerFactory(),
+            new MultipleDimensionalArraySerialzierFactory(),
 #if SERIALIZATION
             new ISerializableSerializerFactory(), //TODO: this will mess up the indexes in the serializer payload
 #endif

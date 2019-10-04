@@ -317,6 +317,59 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void CanSerializeArray2DOfInt()
+        {
+            var expected = new int[,] { { 1, 2 }, { 3, 4 }, { 5, 6 }, { 7, 8 } };   // OK
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<int[,]>();
+            for (int i = expected.GetLowerBound(0); i < expected.GetUpperBound(0); i++)
+            {
+                for (int j = expected.GetLowerBound(1); j < expected.GetUpperBound(1); j++)
+                {
+                    Assert.Equal(expected[i, j], actual[i, j]);
+                }
+            }
+        }
+
+        [Fact]
+        public void CanSerializeArray2DOfObj()
+        {
+            var expected = new object[,] { { "Header1", 2 }, { "Header2", 4 }};   // OK
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<object[,]>();
+            for (int i = expected.GetLowerBound(0); i < expected.GetUpperBound(0); i++)
+            {
+                for (int j = expected.GetLowerBound(1); j < expected.GetUpperBound(1); j++)
+                {
+                    Assert.Equal(expected[i, j], actual[i, j]);
+                }
+            }
+        }
+
+        [Fact]
+        public void CanSerializeArray3DOfInt()
+        {
+            int[,,] expected = new int[,,] { { { 1, 2, 3 }, { 4, 5, 6 } },
+                                 { { 7, 8, 9 }, { 10, 11, 12 } } };
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<int[,,]>();
+            for (int i = expected.GetLowerBound(0); i < expected.GetUpperBound(0); i++)
+            {
+                for (int j = expected.GetLowerBound(1); j < expected.GetUpperBound(1); j++)
+                {
+                    for (int m = expected.GetLowerBound(2); j < expected.GetUpperBound(2); j++)
+                    {
+                        Assert.Equal(expected[i, j, m], actual[i, j, m]);
+                    }
+                }
+            }
+        }
+
+
+        [Fact]
         public void Issue18()
         {
             var msg = new byte[] {1, 2, 3, 4};
