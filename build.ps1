@@ -30,7 +30,7 @@ Param(
 )
 
 $FakeVersion = "4.61.2"
-$NBenchVersion = "1.0.1"
+$NBenchVersion = "1.2.2"
 $DotNetChannel = "LTS";
 $DotNetVersion = "3.0.100";
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
