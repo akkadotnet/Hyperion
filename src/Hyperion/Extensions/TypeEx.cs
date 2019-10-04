@@ -125,19 +125,23 @@ namespace Hyperion.Extensions
             return TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-                if (shortName.Contains("System.Private.CoreLib,%core%") && CoreAssemblyQualifiedName.Contains("mscorlib, Version="))
+#if NET45
+                if (shortName.Contains("System.Private.CoreLib,%core%"))
                 {
                     shortName = shortName.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%");
                 }
-                else if (shortName.Contains("mscorlib,%core%") && CoreAssemblyQualifiedName.Contains("System.Private.CoreLib, Version="))
+#endif
+#if NETSTANDARD
+                if (shortName.Contains("mscorlib,%core%"))
                 {
                     shortName = shortName.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%");
                 }
+#endif
+
                 var typename = ToQualifiedAssemblyName(shortName);
                 return Type.GetType(typename, true);
             });
         }
-
         public static Type GetTypeFromManifestFull(Stream stream, DeserializerSession session)
         {
             var type = GetTypeFromManifestName(stream, session);
