@@ -30,7 +30,6 @@ Param(
 )
 
 $FakeVersion = "4.61.2"
-$NBenchVersion = "1.2.2"
 $DotNetChannel = "LTS";
 $DotNetVersion = "3.0.100";
 $DotNetInstallerUri = "https://dot.net/v1/dotnet-install.ps1";
@@ -112,20 +111,6 @@ if (!(Test-Path $FakeExePath)) {
     Invoke-Expression "&`"$NugetPath`" install Fake -ExcludeVersion -Version $FakeVersion -OutputDirectory `"$ToolPath`"" | Out-Null;
     if ($LASTEXITCODE -ne 0) {
         Throw "An error occured while restoring Fake from NuGet."
-    }
-}
-
-###########################################################################
-# INSTALL NBench Runner
-###########################################################################
-
-# Make sure NBench Runner has been installed.
-$NBenchDllPath = Join-Path $ToolPath "NBench.Runner/lib/net45/NBench.Runner.exe"
-if (!(Test-Path $NBenchDllPath)) {
-    Write-Host "Installing NBench..."
-    Invoke-Expression "&`"$NugetPath`" install NBench.Runner -ExcludeVersion -Version $NBenchVersion -OutputDirectory `"$ToolPath`"" | Out-Null;
-    if ($LASTEXITCODE -ne 0) {
-        Throw "An error occured while restoring NBench.Runner from NuGet."
     }
 }
 
