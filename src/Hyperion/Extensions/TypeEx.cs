@@ -13,9 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-#if SERIALIZATION
-using System.Runtime.Serialization;
-#endif
+using System.Text.RegularExpressions;
 
 namespace Hyperion.Extensions
 {
@@ -68,7 +66,7 @@ namespace Hyperion.Extensions
             //add TypeSerializer with null support
         }
 
-#if !SERIALIZATION
+#if NETSTANDARD16
     //HACK: the GetUnitializedObject actually exists in .NET Core, its just not public
         private static readonly Func<Type, object> getUninitializedObjectDelegate = (Func<Type, object>)
             typeof(string)
@@ -84,10 +82,7 @@ namespace Hyperion.Extensions
             return getUninitializedObjectDelegate(type);
         }
 #else
-        public static object GetEmptyObject(this Type type)
-        {
-            return FormatterServices.GetUninitializedObject(type);
-        }
+        public static object GetEmptyObject(this Type type) => System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
 #endif
 
         public static bool IsOneDimensionalArray(this Type type)
@@ -203,6 +198,10 @@ namespace Hyperion.Extensions
 
         private static readonly string CoreAssemblyName = GetCoreAssemblyName();
 
+        private static readonly Regex cleanAssemblyVersionRegex = new Regex(
+            "(, Version=([\\d\\.]+))?(, Culture=[^,\\] \\t]+)?(, PublicKeyToken=(null|[\\da-f]+))?",
+            RegexOptions.Compiled | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+
         private static string GetCoreAssemblyName()
         {
             var name = 1.GetType().AssemblyQualifiedName;
@@ -214,9 +213,7 @@ namespace Hyperion.Extensions
         {
             var name = self.AssemblyQualifiedName;
             name = name.Replace(CoreAssemblyName, ",%core%");
-            name = name.Replace(", Culture=neutral", "");
-            name = name.Replace(", PublicKeyToken=null", "");
-            name = name.Replace(", Version=1.0.0.0", ""); //TODO: regex or whatever...
+            name = cleanAssemblyVersionRegex.Replace(name, string.Empty);
             return name;
         }
 
