@@ -125,11 +125,11 @@ namespace Hyperion.Extensions
             return TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-                if (shortName.Contains("System.Private.CoreLib,%core%") && CoreAssemblyQualifiedName.Contains("mscorlib, Version="))
+                if (shortName.Contains("System.Private.CoreLib,%core%") && IsFullNetFramework)
                 {
                     shortName = shortName.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%");
                 }
-                else if (shortName.Contains("mscorlib,%core%") && CoreAssemblyQualifiedName.Contains("System.Private.CoreLib, Version="))
+                else if (shortName.Contains("mscorlib,%core%") && IsCoreNetFramework)
                 {
                     shortName = shortName.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%");
                 }
@@ -212,6 +212,8 @@ namespace Hyperion.Extensions
         }
         private static readonly string CoreAssemblyQualifiedName = 1.GetType().AssemblyQualifiedName;
         private static readonly string CoreAssemblyName = GetCoreAssemblyName();
+        private static readonly bool IsFullNetFramework = CoreAssemblyQualifiedName.Contains("mscorlib, Version=");
+        private static readonly bool IsCoreNetFramework = CoreAssemblyQualifiedName.Contains("System.Private.CoreLib, Version=");
 
         private static readonly Regex cleanAssemblyVersionRegex = new Regex(
             "(, Version=([\\d\\.]+))?(, Culture=[^,\\] \\t]+)?(, PublicKeyToken=(null|[\\da-f]+))?",
