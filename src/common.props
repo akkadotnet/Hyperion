@@ -3,15 +3,15 @@
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
     <VersionPrefix>0.9.9</VersionPrefix>
-    <PackageReleaseNotes>Placeholder for Nightlies*</PackageReleaseNotes>
+    <PackageReleaseNotes>Hyperion now supports .NET Core 3.0.</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <XunitVersion>2.3.0</XunitVersion>
-    <TestSdkVersion>15.3.0</TestSdkVersion>
+    <XunitVersion>2.4.1</XunitVersion>
+    <TestSdkVersion>16.3.0</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>
