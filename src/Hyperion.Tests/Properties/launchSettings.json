@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Hyperion.Tests": {
+      "commandName": "Project",
+      "commandLineArgs": "generate"
+    }
+  }
+}
