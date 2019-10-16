@@ -2,8 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.9</VersionPrefix>
-    <PackageReleaseNotes>Hyperion now supports .NET Core 3.0.</PackageReleaseNotes>
+    <VersionPrefix>0.9.10</VersionPrefix>
+    <PackageReleaseNotes>Hyperion now [supports cross-framework communication between .NET Core and .NET Framework](https://github.com/akkadotnet/Hyperion/pull/116).</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
