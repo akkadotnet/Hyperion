@@ -18,7 +18,7 @@ jobs:
     parameters:
       name: 'windows_pr'
       displayName: 'Windows PR Validation'
-      vmImage: 'vs2017-win2016'
+      vmImage: 'windows-2019'
       scriptFileName: build.cmd
       scriptArgs: all
   - template: azure-pipeline.template.yaml
