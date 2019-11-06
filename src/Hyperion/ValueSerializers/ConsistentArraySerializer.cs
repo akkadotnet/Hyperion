@@ -71,15 +71,16 @@ namespace Hyperion.ValueSerializers
             var elementSerializer = session.Serializer.GetSerializerByType(elementType);
             elementSerializer.WriteManifest(stream, session); //write array element type
             // ReSharper disable once PossibleNullReferenceException
-            WriteValues((dynamic)value, stream,elementSerializer,session);
+            WriteValues((Array)value, stream,elementSerializer,session);
         }
 
-        private static void WriteValues<T>(T[] array, Stream stream, ValueSerializer elementSerializer, SerializerSession session)
+        private static void WriteValues(Array array, Stream stream, ValueSerializer elementSerializer, SerializerSession session)
         {
+            var tp = array.GetType();
             Int32Serializer.WriteValueImpl(stream,array.Length,session);
-            if (typeof(T).IsFixedSizeType())
+            if (tp.IsFixedSizeType())
             {
-                var size = typeof(T).GetTypeSize();
+                var size = tp.GetTypeSize();
                 var result = new byte[array.Length * size];
                 Buffer.BlockCopy(array, 0, result, 0, result.Length);
                 stream.Write(result);
