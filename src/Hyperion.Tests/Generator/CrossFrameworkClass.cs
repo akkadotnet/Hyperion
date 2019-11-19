@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Hyperion.Tests.Generator
 {
@@ -39,6 +40,8 @@ namespace Hyperion.Tests.Generator
         public CrossFrameworkEnum Enum { get; set; }
 
         public CrossFrameworkStruct Struct { get; set; }
+
+        public Type Type { get; set; }
 
         public override bool Equals(object obj)
         {

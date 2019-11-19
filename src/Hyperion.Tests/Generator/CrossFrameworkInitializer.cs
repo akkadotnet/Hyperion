@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using Hyperion.Extensions;
 
 namespace Hyperion.Tests.Generator
 {
@@ -42,7 +46,8 @@ namespace Hyperion.Tests.Generator
                 UInt = uint.MaxValue,
                 ULong = ulong.MaxValue,
                 UShort = ushort.MaxValue,
-                Boolean = true
+                Boolean = true,
+                Type = typeof(int)
             };
         }
     }
