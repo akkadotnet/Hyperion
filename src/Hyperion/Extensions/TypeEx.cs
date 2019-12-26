@@ -130,6 +130,7 @@ namespace Hyperion.Extensions
                     shortName = shortName.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%");
                 }
 #endif
+
                 var typename = ToQualifiedAssemblyName(shortName);
                 return Type.GetType(typename, true);
             });
