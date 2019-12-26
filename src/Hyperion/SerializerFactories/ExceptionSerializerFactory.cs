@@ -37,19 +37,23 @@ namespace Hyperion.SerializerFactories
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
+#if NETSTANDARD16
         // Workaround for CoreCLR where FormatterServices.GetUninitializedObject is not public
         private static readonly Func<Type, object> GetUninitializedObject =
             (Func<Type, object>)
                 typeof(string).GetTypeInfo().Assembly.GetType("System.Runtime.Serialization.FormatterServices")
                     .GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
                     .CreateDelegate(typeof(Func<Type, object>));
+#else
+        private static readonly Func<Type,object> GetUninitializedObject = System.Runtime.Serialization.FormatterServices.GetUninitializedObject;
+#endif
 
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var exceptionSerializer = new ObjectSerializer(type);
             var hasDefaultConstructor = type.GetTypeInfo().GetConstructor(new Type[0]) != null;
-            var createInstance = hasDefaultConstructor ? Activator.CreateInstance : GetUninitializedObject;
+            var createInstance  = hasDefaultConstructor ? Activator.CreateInstance : GetUninitializedObject;
 
             exceptionSerializer.Initialize((stream, session) =>
             {
@@ -60,15 +64,23 @@ namespace Hyperion.SerializerFactories
                 var stackTraceString = stream.ReadString(session);
                 var innerException = stream.ReadObject(session);
 
-                _className.SetValue(exception,className);
+#if NETSTANDARD20
+                _className?.SetValue(exception, className);
+#else
+                _className.SetValue(exception, className);
+#endif
                 _message.SetValue(exception, message);
                 _remoteStackTraceString.SetValue(exception, remoteStackTraceString);
                 _stackTraceString.SetValue(exception, stackTraceString);
-                _innerException.SetValue(exception,innerException);
+                _innerException.SetValue(exception, innerException);
                 return exception;
             }, (stream, exception, session) =>
             {
+#if NETSTANDARD20
+                var className = (string)_className?.GetValue(exception);
+#else
                 var className = (string)_className.GetValue(exception);
+#endif
                 var message = (string)_message.GetValue(exception);
                 var remoteStackTraceString = (string)_remoteStackTraceString.GetValue(exception);
                 var stackTraceString = (string)_stackTraceString.GetValue(exception);
