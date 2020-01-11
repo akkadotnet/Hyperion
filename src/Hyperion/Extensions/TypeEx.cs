@@ -130,11 +130,26 @@ namespace Hyperion.Extensions
                     shortName = shortName.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%");
                 }
 #endif
-
-                var typename = ToQualifiedAssemblyName(shortName);
-                return Type.GetType(typename, true);
+                return LoadTypeByName(shortName);
             });
         }
+
+        public static Type LoadTypeByName(string name)
+        {
+            try
+            {
+                // Try to load type name using strict version to avoid possible conflicts
+                // i.e. if there are different version available in GAC and locally
+                var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: false);
+                return Type.GetType(typename, true);
+            }
+            catch (FileLoadException)
+            {
+                var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: true);
+                return Type.GetType(typename, true);
+            }
+        }
+        
         public static Type GetTypeFromManifestFull(Stream stream, DeserializerSession session)
         {
             var type = GetTypeFromManifestName(stream, session);
@@ -228,14 +243,17 @@ namespace Hyperion.Extensions
             return name;
         }
 
-        public static string ToQualifiedAssemblyName(string shortName)
+        public static string ToQualifiedAssemblyName(string shortName, bool ignoreAssemblyVersion)
         {
             var res = shortName.Replace(",%core%", CoreAssemblyName);
             
             // Strip out assembly version, if specified
-            var versionSubstrIndex = res.IndexOf(", Version=", StringComparison.Ordinal);
-            if (versionSubstrIndex >= 0)
-                res = res.Remove(versionSubstrIndex);
+            if (ignoreAssemblyVersion)
+            {
+                var versionSubstrIndex = res.IndexOf(", Version=", StringComparison.Ordinal);
+                if (versionSubstrIndex >= 0)
+                    res = res.Remove(versionSubstrIndex);
+            }
             
             return res;
         }
