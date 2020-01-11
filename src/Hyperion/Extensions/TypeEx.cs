@@ -231,6 +231,12 @@ namespace Hyperion.Extensions
         public static string ToQualifiedAssemblyName(string shortName)
         {
             var res = shortName.Replace(",%core%", CoreAssemblyName);
+            
+            // Strip out assembly version, if specified
+            var versionSubstrIndex = res.IndexOf(", Version=", StringComparison.Ordinal);
+            if (versionSubstrIndex >= 0)
+                res = res.Remove(versionSubstrIndex);
+            
             return res;
         }
 
