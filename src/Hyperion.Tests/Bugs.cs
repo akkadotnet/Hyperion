@@ -127,6 +127,20 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void TypeEx_ToQualifiedAssemblyName_should_strip_version_correctly_for_mscorlib_substitution()
+        {
+            var version = TypeEx.ToQualifiedAssemblyName(
+                "System.Collections.Immutable.ImmutableDictionary`2[[System.String, mscorlib,%core%],[System.Int32, mscorlib,%core%]]," +
+                " System.Collections.Immutable, Version=1.2.1.0, PublicKeyToken=b03f5f7f11d50a3a",
+                ignoreAssemblyVersion: true);
+            
+            version.Should().Be("System.Collections.Immutable.ImmutableDictionary`2" +
+                                "[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, " +
+                                "PublicKeyToken=7cec85d7bea7798e],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, " +
+                                "PublicKeyToken=7cec85d7bea7798e]], System.Collections.Immutable");
+        }
+
+        [Fact]
         public void CanSerialieCustomType_bug()
         {
             var stream = new MemoryStream();
