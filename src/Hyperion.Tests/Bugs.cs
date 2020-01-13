@@ -133,11 +133,13 @@ namespace Hyperion.Tests
                 "System.Collections.Immutable.ImmutableDictionary`2[[System.String, mscorlib,%core%],[System.Int32, mscorlib,%core%]]," +
                 " System.Collections.Immutable, Version=1.2.1.0, PublicKeyToken=b03f5f7f11d50a3a",
                 ignoreAssemblyVersion: true);
+
+            var coreAssemblyName = typeof(TypeEx).GetField("CoreAssemblyName", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
+            if (coreAssemblyName == null)
+                throw new Exception($"CoreAssemblyName private static field does not exist in {nameof(TypeEx)} class anymore");
             
             version.Should().Be("System.Collections.Immutable.ImmutableDictionary`2" +
-                                "[[System.String, mscorlib, Version=4.0.0.0, Culture=neutral, " +
-                                "PublicKeyToken=7cec85d7bea7798e],[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, " +
-                                "PublicKeyToken=7cec85d7bea7798e]], System.Collections.Immutable");
+                                $"[[System.String, mscorlib{coreAssemblyName}],[System.Int32, mscorlib{coreAssemblyName}]], System.Collections.Immutable");
         }
 
         [Fact]
