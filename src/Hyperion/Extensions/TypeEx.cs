@@ -248,9 +248,8 @@ namespace Hyperion.Extensions
             // Strip out assembly version, if specified
             if (ignoreAssemblyVersion)
             {
-                var versionSubstrIndex = shortName.IndexOf(", Version=", StringComparison.Ordinal);
-                if (versionSubstrIndex >= 0)
-                    shortName = shortName.Remove(versionSubstrIndex);
+                var versionRegex = new Regex(@",[\s]*Version=[0-9\.]*");
+                shortName = versionRegex.Replace(shortName, string.Empty);
             }
             
             var res = shortName.Replace(",%core%", CoreAssemblyName);
