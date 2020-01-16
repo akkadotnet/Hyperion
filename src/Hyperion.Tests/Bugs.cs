@@ -114,7 +114,7 @@ namespace Hyperion.Tests
             var fullName = type.AssemblyQualifiedName;
             var fullNameStream = GetStreamForManifest(fullName);
             // Set bad assembly version to make deserialization fail
-            var fullNameWithUnknownVersion = fullName.Remove(fullName.IndexOf(", Version=")) + ", Version=, Culture=neutral, PublicKeyToken=null";
+            var fullNameWithUnknownVersion = fullName.Remove(fullName.IndexOf(", Version=")) + ", Version=999999, Culture=neutral, PublicKeyToken=null";
             var fullNameWithUnknownVersionStream = GetStreamForManifest(fullNameWithUnknownVersion);
 
             this.Invoking(_ => TypeEx.GetTypeFromManifestFull(shortNameStream, serializer.GetDeserializerSession()))
@@ -139,7 +139,7 @@ namespace Hyperion.Tests
                 throw new Exception($"CoreAssemblyName private static field does not exist in {nameof(TypeEx)} class anymore");
             
             version.Should().Be("System.Collections.Immutable.ImmutableDictionary`2" +
-                                $"[[System.String, mscorlib{coreAssemblyName}],[System.Int32, mscorlib{coreAssemblyName}]], System.Collections.Immutable, PublicKeyToken=b03f5f7f11d50a3a");
+                                $"[[System.String, mscorlib{coreAssemblyName}],[System.Int32, mscorlib{coreAssemblyName}]], System.Collections.Immutable");
         }
         
         [Fact]
@@ -150,8 +150,7 @@ namespace Hyperion.Tests
                 "System.Collections.Immutable, Version=1.2.2.0, PublicKeyToken=b03f5f7f11d50a3a",
                 ignoreAssemblyVersion: true);
 
-            version.Should().Be("System.Collections.Immutable.ImmutableList`1[[Foo.Bar, Foo]], " +
-                                "System.Collections.Immutable, PublicKeyToken=b03f5f7f11d50a3a");
+            version.Should().Be("System.Collections.Immutable.ImmutableList`1[[Foo.Bar, Foo]], System.Collections.Immutable");
         }
 
         [Fact]
