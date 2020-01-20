@@ -83,6 +83,17 @@ namespace Hyperion.SerializerFactories
         private static ConstructorInfo GetEnumerableConstructor(Type type)
         {
             var enumerableType = GetEnumerableType(type);
+
+            /*
+             * In the event that we're serializing a non-generic IEnumerable such as an ArrayList,
+             * there aren't any generic parameters and the type returned will just be System.Object.
+             *
+             * The GetEnumerableType method extracts the generic argument from the IEnumerable<T> and uses that
+             * by default, however it will return null only for a non-generic implementation thus we use the
+             * null-coalescing operator to specify the return type as System.Object in order to serialize ArrayList
+             * types without errors.
+             */
+            enumerableType = enumerableType ?? typeof(object); 
             var iEnumerableType = typeof(IEnumerable<>).MakeGenericType(enumerableType);
             return enumerableType != null
                 ? type.GetTypeInfo()
