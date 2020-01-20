@@ -1,3 +1,4 @@
-### 0.9.11 November 13 2019 ####
+### 0.9.12 January 20 2020 ####
 
-[Hyperion now targets .NET 4.5 again so it can be included inside Akka.NET v1.3.* releases](https://github.com/akkadotnet/Hyperion/pull/141).
+* Added version tolerance during deserialization.
+* Added `ArrayList` and non-generic `IEnumerable` support.
