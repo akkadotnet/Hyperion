@@ -31,11 +31,11 @@
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.6' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD16</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETSTANDARD16;NETSTANDARD</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD20</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETSTANDARD20;NETSTANDARD</DefineConstants>
   </PropertyGroup>
   
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
