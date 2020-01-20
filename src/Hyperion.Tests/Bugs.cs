@@ -11,6 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
+using FluentAssertions;
+using Hyperion.Extensions;
 using Xunit;
 
 namespace Hyperion.Tests
@@ -83,6 +88,69 @@ namespace Hyperion.Tests
             serializer.Serialize(msg, stream);
             stream.Position = 0;
             var res = serializer.Deserialize(stream);
+        }
+
+        /// <summary>
+        /// Fix for https://github.com/akkadotnet/Hyperion/issues/144
+        /// </summary>
+        [Fact]
+        public void CanFindTypeByManifest_WhenManifestContainsUnknownAssemblyVersion()
+        {
+            var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
+            var type = typeof(ByteMessage);
+            
+            MemoryStream GetStreamForManifest(string manifest)
+            {
+                var stream = new MemoryStream();
+                stream.WriteLengthEncodedByteArray(manifest.ToUtf8Bytes(), serializer.GetSerializerSession());
+                stream.Position = 0;
+                return stream;
+            }
+            
+            // This is used in serialized manifest, should be something like 'Hyperion.Tests.Bugs+ByteMessage, Hyperion.Tests'
+            var shortName = type.GetShortAssemblyQualifiedName();
+            var shortNameStream = GetStreamForManifest(shortName);
+            // Something like 'Hyperion.Tests.Bugs+ByteMessage, Hyperion.Tests, Version=0.9.11.0, Culture=neutral, PublicKeyToken=null'
+            var fullName = type.AssemblyQualifiedName;
+            var fullNameStream = GetStreamForManifest(fullName);
+            // Set bad assembly version to make deserialization fail
+            var fullNameWithUnknownVersion = fullName.Remove(fullName.IndexOf(", Version=")) + ", Version=999999, Culture=neutral, PublicKeyToken=null";
+            var fullNameWithUnknownVersionStream = GetStreamForManifest(fullNameWithUnknownVersion);
+
+            this.Invoking(_ => TypeEx.GetTypeFromManifestFull(shortNameStream, serializer.GetDeserializerSession()))
+                .Should().NotThrow("When assembly short name is specified in manifest, should work");
+            this.Invoking(_ => TypeEx.GetTypeFromManifestFull(fullNameStream, serializer.GetDeserializerSession()))
+                .Should().NotThrow("When assembly fully qualified name specified and name is correct, should work even before fix");
+            // This one was initially failing
+            this.Invoking(_ => TypeEx.GetTypeFromManifestFull(fullNameWithUnknownVersionStream, serializer.GetDeserializerSession()))
+                .Should().NotThrow("When assembly fully qualified name specified and unknown/wrong, type should be detected anyway");
+        }
+
+        [Fact]
+        public void TypeEx_ToQualifiedAssemblyName_should_strip_version_correctly_for_mscorlib_substitution()
+        {
+            var version = TypeEx.ToQualifiedAssemblyName(
+                "System.Collections.Immutable.ImmutableDictionary`2[[System.String, mscorlib,%core%],[System.Int32, mscorlib,%core%]]," +
+                " System.Collections.Immutable, Version=1.2.1.0, PublicKeyToken=b03f5f7f11d50a3a",
+                ignoreAssemblyVersion: true);
+
+            var coreAssemblyName = typeof(TypeEx).GetField("CoreAssemblyName", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
+            if (coreAssemblyName == null)
+                throw new Exception($"CoreAssemblyName private static field does not exist in {nameof(TypeEx)} class anymore");
+            
+            version.Should().Be("System.Collections.Immutable.ImmutableDictionary`2" +
+                                $"[[System.String, mscorlib{coreAssemblyName}],[System.Int32, mscorlib{coreAssemblyName}]], System.Collections.Immutable");
+        }
+        
+        [Fact]
+        public void TypeEx_ToQualifiedAssemblyName_should_strip_version_correctly_for_multiple_versions_specified()
+        {
+            var version = TypeEx.ToQualifiedAssemblyName(
+                "System.Collections.Immutable.ImmutableList`1[[Foo.Bar, Foo, Version=2019.12.10.1]], " +
+                "System.Collections.Immutable, Version=1.2.2.0, PublicKeyToken=b03f5f7f11d50a3a",
+                ignoreAssemblyVersion: true);
+
+            version.Should().Be("System.Collections.Immutable.ImmutableList`1[[Foo.Bar, Foo]], System.Collections.Immutable");
         }
 
         [Fact]
