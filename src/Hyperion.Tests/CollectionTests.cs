@@ -187,6 +187,30 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void CanSerializeArrayList()
+        {
+	        var expected = new ArrayList()
+	        {
+		        new Something
+		        {
+			        BoolProp = true,
+			        Else = new Else
+			        {
+				        Name = "Yoho"
+			        },
+			        Int32Prop = 999,
+			        StringProp = "Yesbox!"
+		        },
+		        "a", 123
+	        };
+
+	        Serialize(expected);
+	        Reset();
+	        var actual = Deserialize<ArrayList>();
+	        Assert.Equal(expected, actual);
+        }
+
+        [Fact]
         public void CanSerializeLinkedList()
         {
             var expected = new LinkedList<Something>(new[]
