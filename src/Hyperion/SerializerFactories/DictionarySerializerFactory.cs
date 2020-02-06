@@ -43,22 +43,18 @@ namespace Hyperion.SerializerFactories
 
             ObjectReader reader = (stream, session) =>
             {
-                throw new NotSupportedException("Generic IDictionary<TKey,TValue> are not yet supported");
-#pragma warning disable CS0162 // Unreachable code detected
-                var instance = Activator.CreateInstance(type);
-#pragma warning restore CS0162 // Unreachable code detected
+                var instance = Activator.CreateInstance(type) as IDictionary;
                 if (preserveObjectReferences)
                 {
                     session.TrackDeserializedObject(instance);
                 }
                 var count = stream.ReadInt32(session);
-                var entries = new DictionaryEntry[count];
                 for (var i = 0; i < count; i++)
                 {
                     var entry = (DictionaryEntry) stream.ReadObject(session);
-                    entries[i] = entry;
+                    instance.Add(entry.Key, entry.Value);
                 }
-                //TODO: populate dictionary
+                
                 return instance;
             };
 
@@ -70,7 +66,7 @@ namespace Hyperion.SerializerFactories
                 }
                 var dict = obj as IDictionary;
                 // ReSharper disable once PossibleNullReferenceException
-                Int32Serializer.WriteValueImpl(stream,dict.Count,session);
+                Int32Serializer.WriteValueImpl(stream, dict.Count, session);
                 foreach (var item in dict)
                 {
                     stream.WriteObject(item, typeof (DictionaryEntry), elementSerializer,
