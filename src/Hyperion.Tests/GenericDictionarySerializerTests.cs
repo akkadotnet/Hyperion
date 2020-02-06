@@ -23,7 +23,7 @@ namespace Hyperion.Tests
             Serialize(expected);
             Reset();
             var res = Deserialize<T>();
-            expected.Should().BeEquivalentTo(res);
+            res.Should().BeEquivalentTo(expected);
             AssertMemoryStreamConsumed();
         }
 
@@ -34,6 +34,13 @@ namespace Hyperion.Tests
         {
             private readonly IDictionary<TKey, TValue> _dictGeneric;
             private readonly IDictionary _dict;
+
+            /// <summary>
+            /// For serialization
+            /// </summary>
+            public CustomDictionary() : this(new Dictionary<TKey, TValue>())
+            {
+            }
 
             public CustomDictionary(Dictionary<TKey, TValue> dict)
             {
