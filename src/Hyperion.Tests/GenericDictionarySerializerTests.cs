@@ -30,10 +30,9 @@ namespace Hyperion.Tests
         /// <summary>
         /// Just a custom class wrapper for another <see cref="IDictionary{TKey,TValue}"/>
         /// </summary>
-        class CustomDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary
+        class CustomDictionary<TKey, TValue> : IDictionary<TKey, TValue>
         {
             private readonly IDictionary<TKey, TValue> _dictGeneric;
-            private readonly IDictionary _dict;
 
             /// <summary>
             /// For serialization
@@ -45,29 +44,7 @@ namespace Hyperion.Tests
             public CustomDictionary(Dictionary<TKey, TValue> dict)
             {
                 _dictGeneric = dict;
-                _dict = dict;
             }
-
-            /// <inheritdoc />
-            public bool Contains(object key)
-            {
-                return _dict.Contains(key);
-            }
-
-            /// <inheritdoc />
-            IDictionaryEnumerator IDictionary.GetEnumerator()
-            {
-                return _dict.GetEnumerator();
-            }
-
-            /// <inheritdoc />
-            public void Remove(object key)
-            {
-                _dict.Remove(key);
-            }
-
-            /// <inheritdoc />
-            public bool IsFixedSize => _dict.IsFixedSize;
 
             /// <inheritdoc />
             public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
@@ -85,12 +62,6 @@ namespace Hyperion.Tests
             public void Add(KeyValuePair<TKey, TValue> item)
             {
                 _dictGeneric.Add(item);
-            }
-
-            /// <inheritdoc />
-            public void Add(object key, object? value)
-            {
-                _dict.Add(key, value);
             }
 
             /// <inheritdoc />
@@ -118,29 +89,10 @@ namespace Hyperion.Tests
             }
 
             /// <inheritdoc />
-            public void CopyTo(Array array, int index)
-            {
-                _dict.CopyTo(array, index);
-            }
-
-            /// <inheritdoc />
             public int Count => _dictGeneric.Count;
 
             /// <inheritdoc />
-            public bool IsSynchronized => _dict.IsSynchronized;
-
-            /// <inheritdoc />
-            public object SyncRoot => _dict.SyncRoot;
-
-            /// <inheritdoc />
             public bool IsReadOnly => _dictGeneric.IsReadOnly;
-
-            /// <inheritdoc />
-            public object? this[object key]
-            {
-                get => _dict[key];
-                set => _dict[key] = value;
-            }
 
             /// <inheritdoc />
             public void Add(TKey key, TValue value)
@@ -175,12 +127,6 @@ namespace Hyperion.Tests
 
             /// <inheritdoc />
             public ICollection<TKey> Keys => _dictGeneric.Keys;
-
-            /// <inheritdoc />
-            ICollection IDictionary.Values => _dict.Values;
-
-            /// <inheritdoc />
-            ICollection IDictionary.Keys => _dict.Keys;
 
             /// <inheritdoc />
             public ICollection<TValue> Values => _dictGeneric.Values;

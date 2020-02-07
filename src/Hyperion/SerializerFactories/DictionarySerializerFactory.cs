@@ -39,11 +39,12 @@ namespace Hyperion.SerializerFactories
             var preserveObjectReferences = serializer.Options.PreserveObjectReferences;
             var ser = new ObjectSerializer(type);
             typeMapping.TryAdd(type, ser);
-            var elementSerializer = serializer.GetSerializerByType(typeof (DictionaryEntry));
+            var dictionaryTypes = GetKeyValuePairType(type);
+            var elementSerializer = serializer.GetSerializerByType(dictionaryTypes.KeyValuePairType);
 
             ObjectReader reader = (stream, session) =>
             {
-                var instance = Activator.CreateInstance(type) as IDictionary;
+                var instance = Activator.CreateInstance(type); // IDictionary<TKey, TValue>
                 if (preserveObjectReferences)
                 {
                     session.TrackDeserializedObject(instance);
@@ -51,8 +52,16 @@ namespace Hyperion.SerializerFactories
                 var count = stream.ReadInt32(session);
                 for (var i = 0; i < count; i++)
                 {
-                    var entry = (DictionaryEntry) stream.ReadObject(session);
-                    instance.Add(entry.Key, entry.Value);
+                    var entry = stream.ReadObject(session); // KeyValuePair<TKey, TValue>
+                    
+                    // Get entry.Key and entry.Value
+                    var key = dictionaryTypes.KeyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Key)).GetValue(entry, null);
+                    var value = dictionaryTypes.KeyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Value)).GetValue(entry, null);
+                    
+                    // Same as: instance.Add(key, value)
+                    dictionaryTypes.DictionaryInterfaceType
+                        .GetMethod(nameof(IDictionary<object, object>.Add), new []{ dictionaryTypes.KeyType, dictionaryTypes.ValueType })
+                        .Invoke(instance, new [] { key, value });
                 }
                 
                 return instance;
@@ -64,19 +73,41 @@ namespace Hyperion.SerializerFactories
                 {
                     session.TrackSerializedObject(obj);
                 }
-                var dict = obj as IDictionary;
+                
+                var dict = obj as IEnumerable; // IDictionary<T, V> is IEnumerable<KeyValuePair<T, V>>
+                var count = dict.Cast<object>().Count();
                 // ReSharper disable once PossibleNullReferenceException
-                Int32Serializer.WriteValueImpl(stream, dict.Count, session);
+                Int32Serializer.WriteValueImpl(stream, count, session);
                 foreach (var item in dict)
                 {
-                    stream.WriteObject(item, typeof (DictionaryEntry), elementSerializer,
-                        serializer.Options.PreserveObjectReferences, session);
-                    // elementSerializer.WriteValue(stream,item,session);
+                    stream.WriteObject(item, dictionaryTypes.KeyValuePairType, elementSerializer, serializer.Options.PreserveObjectReferences, session);
                 }
             };
             ser.Initialize(reader, writer);
             
             return ser;
+        }
+
+        private GenericDictionaryTypes GetKeyValuePairType(Type dictImplementationType)
+        {
+            var dictInterface = dictImplementationType.GetInterfaces().First(i => i.GetGenericTypeDefinition() == typeof (IDictionary<,>));
+            var keyType = dictInterface.GetGenericArguments()[0];
+            var valueType = dictInterface.GetGenericArguments()[1];
+            return new GenericDictionaryTypes()
+            {
+                KeyType = keyType,
+                ValueType = valueType,
+                KeyValuePairType = typeof(KeyValuePair<,>).MakeGenericType(keyType, valueType),
+                DictionaryInterfaceType = typeof(IDictionary<,>).MakeGenericType(keyType, valueType)
+            };
+        }
+
+        class GenericDictionaryTypes
+        {
+            public Type KeyType { get; set; }
+            public Type ValueType { get; set; }
+            public Type KeyValuePairType { get; set; }
+            public Type DictionaryInterfaceType { get; set; }
         }
     }
 }
