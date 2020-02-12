@@ -9,15 +9,41 @@ namespace Hyperion.Tests
     public class GenericDictionarySerializerTests : TestBase
     {
         [Fact]
-        public void CanSerializeDictionary()
+        public void CanSerializeDictionaryWithPublicDefaultConstructor()
         {
             var customDict = new CustomDictionary<string, int>(new Dictionary<string, int>()
             {
-                ["key"] = 1
+                ["key1"] = 1,
+                ["key2"] = 2,
+                ["key3"] = 2,
             });
             SerializeAndAssertEquivalent(customDict);
         }
-        
+
+        [Fact]
+        public void CanSerializeDictionaryWithPrivateDefaultConstructor()
+        {
+            var customDict = new PrivateCustomDictionary<string, int>(new Dictionary<string, int>()
+            {
+                ["key1"] = 1,
+                ["key2"] = 2,
+                ["key3"] = 2,
+            });
+            SerializeAndAssertEquivalent(customDict);
+        }
+
+        [Fact]
+        public void CanSerializeDictionaryWithProtectedDefaultConstructor()
+        {
+            var customDict = new ProtectedCustomDictionary<string, int>(new Dictionary<string, int>()
+            {
+                ["key1"] = 1,
+                ["key2"] = 2,
+                ["key3"] = 2,
+            });
+            SerializeAndAssertEquivalent(customDict);
+        }
+
         private void SerializeAndAssertEquivalent<T>(T expected)
         {
             Serialize(expected);
@@ -25,6 +51,24 @@ namespace Hyperion.Tests
             var res = Deserialize<T>();
             res.Should().BeEquivalentTo(expected);
             AssertMemoryStreamConsumed();
+        }
+
+        class PrivateCustomDictionary<TKey, TValue> : CustomDictionary<TKey, TValue>
+        {
+            private PrivateCustomDictionary() : base(new Dictionary<TKey, TValue>())
+            { }
+
+            public PrivateCustomDictionary(Dictionary<TKey, TValue> dict) : base(new Dictionary<TKey, TValue>())
+            { }
+        }
+
+        class ProtectedCustomDictionary<TKey, TValue> : CustomDictionary<TKey, TValue>
+        {
+            protected ProtectedCustomDictionary() : base(new Dictionary<TKey, TValue>())
+            { }
+
+            public ProtectedCustomDictionary(Dictionary<TKey, TValue> dict) : base(new Dictionary<TKey, TValue>())
+            { }
         }
 
         /// <summary>
