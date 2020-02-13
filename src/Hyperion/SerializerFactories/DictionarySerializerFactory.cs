@@ -44,7 +44,14 @@ namespace Hyperion.SerializerFactories
 
             ObjectReader reader = (stream, session) =>
             {
-                var instance = Activator.CreateInstance(type); // IDictionary<TKey, TValue>
+                object instance;
+                try
+                {
+                    instance = Activator.CreateInstance(type, true); // IDictionary<TKey, TValue>
+                } catch(Exception) {
+                    instance = Activator.CreateInstance(type); // IDictionary<TKey, TValue>
+                }
+
                 if (preserveObjectReferences)
                 {
                     session.TrackDeserializedObject(instance);
