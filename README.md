@@ -4,7 +4,7 @@
 
 A high performance polymorphic serializer for the .NET framework.
 
-Current status: **BETA** (v0.9.12).
+Current status: **BETA** (v0.9.14).
 
 ## License
 Licensed under Apache 2.0, see [LICENSE](LICENSE) for the full text.
