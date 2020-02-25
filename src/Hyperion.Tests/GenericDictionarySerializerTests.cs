@@ -71,10 +71,15 @@ namespace Hyperion.Tests
             { }
         }
 
+        // Dictionary serializer fails to fetch the generic IDictionary interface if
+        // Type.GetInterfaces() returns a non-generic interface before the IDictionary interface
         /// <summary>
         /// Just a custom class wrapper for another <see cref="IDictionary{TKey,TValue}"/>
         /// </summary>
-        class CustomDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+        class CustomDictionary<TKey, TValue> :
+            IEnumerable, 
+            IDictionary<TKey, TValue>, 
+            IEquatable<CustomDictionary<TKey, TValue>>
         {
             private readonly IDictionary<TKey, TValue> _dictGeneric;
 
@@ -160,6 +165,11 @@ namespace Hyperion.Tests
             public bool TryGetValue(TKey key, out TValue value)
             {
                 return _dictGeneric.TryGetValue(key, out value);
+            }
+
+            public bool Equals(CustomDictionary<TKey, TValue> other)
+            {
+                return true;
             }
 
             /// <inheritdoc />
