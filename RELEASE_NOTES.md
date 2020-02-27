@@ -1,3 +1,3 @@
-### 0.9.14 February 13 2020 ####
+### 0.9.15 February 27 2020 ####
 
-* [Added support for serializing and deserializing `IDictionary<TKey, TValue>` with private and protected default constructor] (https://github.com/akkadotnet/Hyperion/pull/162)
+* [Fix `Type.GetGenericTypeDefinition()` interface error](https://github.com/akkadotnet/Hyperion/pull/166)
