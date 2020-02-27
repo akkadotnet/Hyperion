@@ -97,7 +97,10 @@ namespace Hyperion.SerializerFactories
 
         private GenericDictionaryTypes GetKeyValuePairType(Type dictImplementationType)
         {
-            var dictInterface = dictImplementationType.GetInterfaces().First(i => i.GetGenericTypeDefinition() == typeof (IDictionary<,>));
+            var dictInterface = dictImplementationType
+                .GetInterfaces()
+                .Where(i => i.GetTypeInfo().IsGenericType)
+                .First(i => i.GetGenericTypeDefinition() == typeof(IDictionary<,>));
             var keyType = dictInterface.GetGenericArguments()[0];
             var valueType = dictInterface.GetGenericArguments()[1];
             return new GenericDictionaryTypes()
