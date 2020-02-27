@@ -2,8 +2,8 @@
   <PropertyGroup>
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.13</VersionPrefix>
-    <PackageReleaseNotes>[Added support for serializing and deserializing `IDictionary&lt;TKey, TValue&gt;`](https://github.com/akkadotnet/Hyperion/pull/156)</PackageReleaseNotes>
+    <VersionPrefix>0.9.15</VersionPrefix>
+    <PackageReleaseNotes>[Fix `Type.GetGenericTypeDefinition()` interface error](https://github.com/akkadotnet/Hyperion/pull/166)</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
