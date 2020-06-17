@@ -4,7 +4,8 @@
     <Authors>Akka.NET Team</Authors>
     <VersionPrefix>0.9.16</VersionPrefix>
     <PackageReleaseNotes>[Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.1](https://github.com/akkadotnet/Hyperion/pull/174)
-[Add deserialization support for ReadOnlyDictionary](https://github.com/akkadotnet/Hyperion/pull/177)</PackageReleaseNotes>
+[Add deserialization support for ReadOnlyDictionary](https://github.com/akkadotnet/Hyperion/pull/177)
+[Bump FluentAssertions from 5.10.2 to 5.10.3](https://github.com/akkadotnet/Hyperion/pull/171)</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
