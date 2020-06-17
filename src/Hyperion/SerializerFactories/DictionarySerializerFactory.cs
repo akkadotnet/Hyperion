@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using Hyperion.Extensions;
@@ -45,6 +46,44 @@ namespace Hyperion.SerializerFactories
             ObjectReader reader = (stream, session) =>
             {
                 object instance;
+
+                void ReadDictionaryKeyValuePairs(object dictionaryInstance)
+                {
+                    var count = stream.ReadInt32(session);
+                    for (var i = 0; i < count; i++)
+                    {
+                        var entry = stream.ReadObject(session); // KeyValuePair<TKey, TValue>
+
+                        // Get entry.Key and entry.Value
+                        var key = dictionaryTypes.KeyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Key)).GetValue(entry, null);
+                        var value = dictionaryTypes.KeyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Value)).GetValue(entry, null);
+
+                        // Same as: instance.Add(key, value)
+                        dictionaryTypes.DictionaryInterfaceType
+                            .GetMethod(nameof(IDictionary<object, object>.Add), new[] { dictionaryTypes.KeyType, dictionaryTypes.ValueType })
+                            .Invoke(dictionaryInstance, new[] { key, value });
+                    }
+                }
+
+                #region Special case for ReadOnlyDictionary
+                // Special case for ReadOnlyDictionary since ReadOnlyDictionary
+                // does not have a parameterless constructor
+                var genericReadOnlyDictionary = typeof(ReadOnlyDictionary<,>);
+                var readOnlyDictionaryType = 
+                    genericReadOnlyDictionary.MakeGenericType(dictionaryTypes.KeyType, dictionaryTypes.ValueType);
+                if (type.Equals(readOnlyDictionaryType))
+                {
+                    var genericDictionary = typeof(Dictionary<,>);
+                    var genericDictionaryType = genericDictionary.MakeGenericType(dictionaryTypes.KeyType, dictionaryTypes.ValueType);
+                    var dictionary = Activator.CreateInstance(genericDictionaryType); // normal dictionary
+
+                    ReadDictionaryKeyValuePairs(dictionary);
+                    instance = Activator.CreateInstance(type, dictionary); // IDictionary<TKey, TValue>
+                    if (preserveObjectReferences) session.TrackDeserializedObject(instance);
+                    return instance;
+                }
+                #endregion
+
                 try
                 {
                     instance = Activator.CreateInstance(type, true); // IDictionary<TKey, TValue>
@@ -56,20 +95,7 @@ namespace Hyperion.SerializerFactories
                 {
                     session.TrackDeserializedObject(instance);
                 }
-                var count = stream.ReadInt32(session);
-                for (var i = 0; i < count; i++)
-                {
-                    var entry = stream.ReadObject(session); // KeyValuePair<TKey, TValue>
-                    
-                    // Get entry.Key and entry.Value
-                    var key = dictionaryTypes.KeyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Key)).GetValue(entry, null);
-                    var value = dictionaryTypes.KeyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Value)).GetValue(entry, null);
-                    
-                    // Same as: instance.Add(key, value)
-                    dictionaryTypes.DictionaryInterfaceType
-                        .GetMethod(nameof(IDictionary<object, object>.Add), new []{ dictionaryTypes.KeyType, dictionaryTypes.ValueType })
-                        .Invoke(instance, new [] { key, value });
-                }
+                ReadDictionaryKeyValuePairs(instance);
                 
                 return instance;
             };
