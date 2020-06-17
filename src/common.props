@@ -2,8 +2,9 @@
   <PropertyGroup>
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.15</VersionPrefix>
-    <PackageReleaseNotes>[Fix `Type.GetGenericTypeDefinition()` interface error](https://github.com/akkadotnet/Hyperion/pull/166)</PackageReleaseNotes>
+    <VersionPrefix>0.9.16</VersionPrefix>
+    <PackageReleaseNotes>[Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.1](https://github.com/akkadotnet/Hyperion/pull/174)
+[Add deserialization support for ReadOnlyDictionary](https://github.com/akkadotnet/Hyperion/pull/177)</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
