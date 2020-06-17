@@ -9,6 +9,7 @@
 
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Xunit;
 
@@ -147,6 +148,62 @@ namespace Hyperion.Tests
             Serialize(expected);
             Reset();
             var actual = Deserialize<ImmutableDictionary<string, Something>>();
+            Assert.Equal(expected.ToList(), actual.ToList());
+        }
+
+        [Fact]
+        public void CanSerializeIReadOnlyDictionary()
+        {
+            var dict = ImmutableDictionary.CreateRange(new Dictionary<string, Something>
+            {
+                ["a1"] = new Something
+                {
+                    BoolProp = true,
+                    Else = new Else
+                    {
+                        Name = "Yoho"
+                    },
+                    Int32Prop = 999,
+                    StringProp = "Yesbox!"
+                },
+                ["a2"] = new Something(),
+                ["a3"] = new Something(),
+                ["a4"] = null
+            });
+
+            var expected = (IReadOnlyDictionary<string, Something>)dict;
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<IReadOnlyDictionary<string, Something>>();
+            Assert.Equal(expected.ToList(), actual.ToList());
+        }
+
+        [Fact]
+        public void CanSerializeReadOnlyDictionary()
+        {
+            var dict = new Dictionary<string, Something>
+            {
+                ["a1"] = new Something
+                {
+                    BoolProp = true,
+                    Else = new Else
+                    {
+                        Name = "Yoho"
+                    },
+                    Int32Prop = 999,
+                    StringProp = "Yesbox!"
+                },
+                ["a2"] = new Something(),
+                ["a3"] = new Something(),
+                ["a4"] = null
+            };
+
+            var expected = new ReadOnlyDictionary<string, Something>(dict);
+
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<ReadOnlyDictionary<string, Something>>();
             Assert.Equal(expected.ToList(), actual.ToList());
         }
 
