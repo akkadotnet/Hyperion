@@ -3,3 +3,4 @@
 * [Add deserialization support for ReadOnlyDictionary](https://github.com/akkadotnet/Hyperion/pull/177)
 * [Bump FluentAssertions from 5.10.2 to 5.10.3](https://github.com/akkadotnet/Hyperion/pull/171)
 * [Bump System.Collections.Immutable from 1.7.0 to 1.7.1](https://github.com/akkadotnet/Hyperion/pull/175)
+* [Bump BenchmarkDotNet from 0.12.0 to 0.12.1](https://github.com/akkadotnet/Hyperion/pull/172)
