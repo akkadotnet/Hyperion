@@ -136,7 +136,13 @@ namespace Hyperion.SerializerFactories
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var x = new ObjectSerializer(type);
-            typeMapping.TryAdd(type, x);
+            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
+            {
+                var wrapper = new KnownTypeObjectSerializer(x, index);
+                typeMapping.TryAdd(type, wrapper);
+            }
+            else
+                typeMapping.TryAdd(type, x);
 
             var preserveObjectReferences = serializer.Options.PreserveObjectReferences;
 

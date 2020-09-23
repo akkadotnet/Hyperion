@@ -71,7 +71,14 @@ namespace Hyperion.SerializerFactories
                 WriteValues((dynamic)arr, stream, elementType, elementSerializer, session);
             };
             arraySerializer.Initialize(reader, writer);
-            typeMapping.TryAdd(type, arraySerializer);
+
+            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
+            {
+                var wrapper = new KnownTypeObjectSerializer(arraySerializer, index);
+                typeMapping.TryAdd(type, wrapper);
+            }
+            else
+                typeMapping.TryAdd(type, arraySerializer);
             return arraySerializer;
         }
     }
