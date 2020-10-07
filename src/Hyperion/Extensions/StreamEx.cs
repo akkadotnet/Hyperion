@@ -15,7 +15,6 @@ namespace Hyperion.Extensions
 {
     internal static class StreamEx
     {
-
         public static uint ReadVarint32(this Stream stream)
         {
             int result = 0;
@@ -75,7 +74,7 @@ namespace Hyperion.Extensions
         public static uint ReadUInt16(this Stream self, DeserializerSession session)
         {
             var buffer = session.GetBuffer(2);
-            self.Read(buffer, 0, 2);
+            self.ReadFull(buffer, 0, 2);
             var res = BitConverter.ToUInt16(buffer, 0);
             return res;
         }
@@ -83,7 +82,7 @@ namespace Hyperion.Extensions
         public static int ReadInt32(this Stream self, DeserializerSession session)
         {
             var buffer = session.GetBuffer(4);
-            self.Read(buffer, 0, 4);
+            self.ReadFull(buffer, 0, 4);
             var res = BitConverter.ToInt32(buffer, 0);
             return res;
         }
@@ -92,7 +91,7 @@ namespace Hyperion.Extensions
         {
             var length = self.ReadInt32(session);
             var buffer = new byte[length];
-            self.Read(buffer, 0, length);
+            self.ReadFull(buffer, 0, length);
             return buffer;
         }
 
@@ -190,9 +189,37 @@ namespace Hyperion.Extensions
 
             var buffer = session.GetBuffer(length);
 
-            stream.Read(buffer, 0, length);
+            stream.ReadFull(buffer, 0, length);
             var res = StringEx.FromUtf8Bytes(buffer, 0, length);
             return res;
+        }
+
+        /// <summary>
+        /// Repeats reading from stream until requested bytes were read.
+        /// Returns with partial result if stream can't provide enough bytes
+        /// Fixes issue: https://github.com/akkadotnet/Hyperion/issues/40
+        /// Reference for allowed partial streams: https://docs.microsoft.com/en-us/dotnet/api/system.io.stream.read?redirectedfrom=MSDN&view=netcore-3.1#System_IO_Stream_Read_System_Byte___System_Int32_System_Int32_
+        /// -> "An implementation is free to return fewer bytes than requested even if the end of the stream has not been reached."
+        /// </summary>
+        public static int ReadFull(this Stream stream, byte[] buffer, int offset, int count)
+        {
+            // fast path for streams which doesn't deliver partial results
+            var totalReadBytes = stream.Read(buffer, offset, count);
+            if (totalReadBytes == count)
+                return totalReadBytes;
+
+            // support streams with partial results
+            do
+            {
+                var readBytes = stream.Read(buffer, offset + totalReadBytes, count - totalReadBytes);
+                if (readBytes == 0)
+                    break;
+
+                totalReadBytes += readBytes;
+            }
+            while (totalReadBytes < count);
+
+            return totalReadBytes;
         }
     }
 }
