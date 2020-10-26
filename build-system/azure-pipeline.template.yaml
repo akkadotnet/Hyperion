@@ -25,6 +25,12 @@ jobs:
         continueOnError: true
         condition: in( variables['Agent.OS'], 'Linux', 'Darwin' )
       # Windows
+      - task: UseDotNet@2
+        displayName: 'Use .NET Core sdk 2.1.21'
+        inputs:
+          packageType: sdk
+          version: 2.1.809
+          installationPath: $(Agent.ToolsDirectory)/dotnet
       - task: BatchScript@1
         displayName: Windows Build
         inputs:
