@@ -8,9 +8,11 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
@@ -245,6 +247,27 @@ namespace Hyperion.Tests
             /// Maximum number of messages to replay. Default is no limit.
             /// </summary>
             public long ReplayMax { get; private set; }
+        }
+
+        class Temp
+        {
+            public object[] SubArray { get; set; }
+            public string aa { get; set; }
+            public Dictionary<string,string> dc { get; set; }
+        }
+
+        [Fact]
+        public void WritesManifestEvenIfKnown1()
+        {
+            var stream = new MemoryStream();
+            var msg = new Temp() { aa = "huhu", dc = new Dictionary<string, string>() { { "a", "b" } }, SubArray = new object[] { 1, (byte)2, new object[] { 3 } } };
+            var serializer = new Serializer(new SerializerOptions(knownTypes: new[] { typeof(DictionaryEntry), typeof(Dictionary<string, string>), typeof(Temp), typeof(object[]), }));
+            serializer.Serialize(msg, stream);
+            stream.Position = 0;
+            var a = stream.ToArray();
+            var text = string.Join("", a.Select(x => ((char)x).ToString()));
+            var res = serializer.Deserialize(stream);
+            Assert.DoesNotContain("System.Collections.Generic.Dictionary", text);
         }
     }
 }
