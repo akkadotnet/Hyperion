@@ -39,13 +39,7 @@ namespace Hyperion.SerializerFactories
         {
             var preserveObjectReferences = serializer.Options.PreserveObjectReferences;
             var ser = new ObjectSerializer(type);
-            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
-            {
-                var wrapper = new KnownTypeObjectSerializer(ser, index);
-                typeMapping.TryAdd(type, wrapper);
-            }
-            else
-                typeMapping.TryAdd(type, ser);
+            typeMapping.TryAdd(type, ser);
             var dictionaryTypes = GetKeyValuePairType(type);
             var elementSerializer = serializer.GetSerializerByType(dictionaryTypes.KeyValuePairType);
 
