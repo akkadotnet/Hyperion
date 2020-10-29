@@ -188,8 +188,8 @@ namespace Hyperion.Extensions
             }
 
             var buffer = session.GetBuffer(length);
-
             stream.ReadFull(buffer, 0, length);
+
             var res = StringEx.FromUtf8Bytes(buffer, 0, length);
             return res;
         }
@@ -213,11 +213,15 @@ namespace Hyperion.Extensions
             {
                 var readBytes = stream.Read(buffer, offset + totalReadBytes, count - totalReadBytes);
                 if (readBytes == 0)
-                    break;
+                    break; // EOF
 
                 totalReadBytes += readBytes;
             }
             while (totalReadBytes < count);
+
+            // received enough bytes?
+            if (totalReadBytes != count)
+                throw new EndOfStreamException("Stream didn't returned sufficient bytes");
 
             return totalReadBytes;
         }

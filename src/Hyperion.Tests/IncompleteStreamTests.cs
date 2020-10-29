@@ -1,21 +1,40 @@
 ﻿using System.IO;
+using Xunit;
 
 namespace Hyperion.Tests
 {
-    public class PartialStreamTest : PrimitivesTest
+    public class IncompleteStreamTests : TestBase
     {
-        public PartialStreamTest()
-            : base(x => new OneBytePerReadStream(x))
+        private const int IncompleteBytes = 4;
+
+        public IncompleteStreamTests()
+            : base(x => new IncompleteReadStream(x, IncompleteBytes))
         {
         }
 
-        private class OneBytePerReadStream : Stream
+        [Fact]
+        public void ThrowsOnEOF()
+        {
+            double data = 4; //double has 8 bytes
+            Serialize(data);
+            Reset();
+
+            // manifest requires 1 byte
+            // incomplete returned bytes are then (IncompleteBytes)4 - 1 = 3 => EOF
+            Assert.Throws<EndOfStreamException>(() => Deserialize<int>());
+        }
+
+        private class IncompleteReadStream : Stream
         {
             private readonly Stream _baseStream;
+            private readonly int _maxReadBytes;
 
-            public OneBytePerReadStream(Stream baseStream)
+            private int _totalReadBytes;
+
+            public IncompleteReadStream(Stream baseStream, int maxReadBytes)
             {
                 _baseStream = baseStream;
+                _maxReadBytes = maxReadBytes;
             }
 
             public override void Flush()
@@ -35,7 +54,14 @@ namespace Hyperion.Tests
 
             public override int Read(byte[] buffer, int offset, int count)
             {
-                return _baseStream.Read(buffer, offset, count > 0 ? 1 : 0);
+                var allBytes = _totalReadBytes + count;
+                var bytesToRead = allBytes > _maxReadBytes
+                    ? _maxReadBytes - _totalReadBytes
+                    : count;
+
+                var readBytes =  _baseStream.Read(buffer, offset, bytesToRead);
+                _totalReadBytes += readBytes;
+                return readBytes;
             }
 
             public override void Write(byte[] buffer, int offset, int count)
