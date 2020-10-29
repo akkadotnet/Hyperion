@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------
 #endregion
 
+using System;
 using System.IO;
 using Xunit;
 
@@ -15,12 +16,17 @@ namespace Hyperion.Tests
     public abstract class TestBase
     {
         private Serializer _serializer;
-        private readonly MemoryStream _stream;
+        private readonly Stream _stream;
 
         protected TestBase()
+            : this(x => x)
+        {
+        }
+
+        protected TestBase(Func<Stream, Stream> streamFacade)
         {
             _serializer = new Serializer();
-            _stream = new MemoryStream();
+            _stream = streamFacade(new MemoryStream());
         }
 
         protected void CustomInit(Serializer serializer)
