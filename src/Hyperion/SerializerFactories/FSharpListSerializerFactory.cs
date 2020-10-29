@@ -48,13 +48,7 @@ namespace Hyperion.SerializerFactories
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var x = new ObjectSerializer(type);
-            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
-            {
-                var wrapper = new KnownTypeObjectSerializer(x, index);
-                typeMapping.TryAdd(type, wrapper);
-            }
-            else
-                typeMapping.TryAdd(type, x);
+            typeMapping.TryAdd(type, x);
 
             var elementType = GetEnumerableType(type);
             var arrType = elementType.MakeArrayType();
