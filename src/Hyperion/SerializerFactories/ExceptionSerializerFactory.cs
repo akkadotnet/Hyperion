@@ -91,7 +91,13 @@ namespace Hyperion.SerializerFactories
                 StringSerializer.WriteValueImpl(stream, stackTraceString, session);
                 stream.WriteObjectWithManifest(innerException, session);
             });
-            typeMapping.TryAdd(type, exceptionSerializer);
+            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
+            {
+                var wrapper = new KnownTypeObjectSerializer(exceptionSerializer, index);
+                typeMapping.TryAdd(type, wrapper);
+            }
+            else
+                typeMapping.TryAdd(type, exceptionSerializer);
             return exceptionSerializer;
         }
     }

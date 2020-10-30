@@ -31,7 +31,13 @@ namespace Hyperion.SerializerFactories
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
             var os = new ObjectSerializer(type);
-            typeMapping.TryAdd(type, os);
+            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
+            {
+                var wrapper = new KnownTypeObjectSerializer(os, index);
+                typeMapping.TryAdd(type, wrapper);
+            }
+            else
+                typeMapping.TryAdd(type, os);
             var methodInfoSerializer = serializer.GetSerializerByType(typeof(MethodInfo));
             var preserveObjectReferences = serializer.Options.PreserveObjectReferences;
             ObjectReader reader = (stream, session) =>
