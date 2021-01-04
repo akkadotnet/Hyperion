@@ -10,6 +10,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
@@ -30,11 +32,23 @@ namespace Hyperion.SerializerFactories
                 stream.WriteObject(value, elementType, elementSerializer, preserveObjectReferences, session);
             }
         }
-        private static void ReadValues<T>(int length, Stream stream, DeserializerSession session, T[] array)
+        private static void ReadValues<T>(Serializer serializer, int length, Stream stream, DeserializerSession session, T[] array)
         {
             for (var i = 0; i < length; i++)
             {
-                var value = (T)stream.ReadObject(session);
+                var obj = stream.ReadObject(session);
+                var surrogate = serializer.Options.Surrogates.FirstOrDefault(s => 
+                    s.To.GetTypeInfo().IsInstanceOfType(obj) && s.From.IsAssignableFrom(typeof(T)));
+
+                T value;
+                if (surrogate != null)
+                {
+                    value = (T)surrogate.FromSurrogate(obj);
+                } else
+                {
+                    value = (T)obj;
+                }
+
                 array[i] = value;
             }
         }
@@ -57,7 +71,7 @@ namespace Hyperion.SerializerFactories
                     session.TrackDeserializedObject(array);
                 }
 
-                ReadValues(length, stream, session, (dynamic)array);
+                ReadValues(serializer, length, stream, session, (dynamic)array);
 
                 return array;
             };
