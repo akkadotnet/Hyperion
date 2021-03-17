@@ -16,7 +16,7 @@
   <PropertyGroup>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
-    <TestSdkVersion>16.8.3</TestSdkVersion>
+    <TestSdkVersion>16.9.1</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>
