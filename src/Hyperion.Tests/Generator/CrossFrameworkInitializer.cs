@@ -6,6 +6,17 @@ namespace Hyperion.Tests.Generator
     {
         public const string DefaultOutputPath = "../../../testfiles";
 
+        public static CrossFrameworkMixedClass InitMixed()
+        {
+            return new CrossFrameworkMixedClass
+            {
+                Name = "Cookie",
+                Sound = "Bark",
+                FriendType = typeof(CrossFrameworkClass),
+                Data = Init()
+            };
+        }
+
         public static CrossFrameworkClass Init()
         {
             return new CrossFrameworkClass()

@@ -122,4 +122,47 @@ namespace Hyperion.Tests.Generator
                    && Struct.Equals(other.Struct);
         }
     }
+
+    public interface ICrossFrameworkA
+    {
+        string Name { get; set; }
+    }
+
+    public interface ICrossFrameworkB : ICrossFrameworkA
+    {
+        string Sound { get; set; }
+    }
+
+    public class CrossFrameworkBase : ICrossFrameworkB
+    {
+        public string Name { get; set; }
+        public string Sound { get; set; }
+    }
+
+    public class CrossFrameworkMixedClass : CrossFrameworkBase
+    {
+        public Type FriendType { get; set; }
+        public CrossFrameworkClass Data { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is CrossFrameworkMixedClass other))
+                return false;
+            return other.Equals(this);
+        }
+
+        protected bool Equals(CrossFrameworkMixedClass other)
+        {
+            if (other.Sound != Sound || other.Name != Name)
+                return false;
+            return other.Data.Equals(Data);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = Name.GetHashCode();
+            hash = (hash * 397) ^ Sound.GetHashCode();
+            return (Data != null ? (hash * 397) ^  Data.GetHashCode() : hash);
+        }
+    }
 }

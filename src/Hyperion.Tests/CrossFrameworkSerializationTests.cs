@@ -2,26 +2,39 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Hyperion.Tests.Generator;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Hyperion.Tests
 {
     public class CrossFrameworkSerializationTests
     {
+        private readonly ITestOutputHelper _log;
         private readonly Serializer _serializer;
         private readonly CrossFrameworkClass _originalObject;
+        private readonly CrossFrameworkMixedClass _originalMixedObject;
 
-        public CrossFrameworkSerializationTests()
+        public CrossFrameworkSerializationTests(ITestOutputHelper log)
         {
+            _log = log;
             _serializer = new Serializer();
             _originalObject = CrossFrameworkInitializer.Init();
+            _originalMixedObject = CrossFrameworkInitializer.InitMixed();
         }
 
         public static IEnumerable<object[]> SerializationFiles()
         {
             const string defaultOutputPath = CrossFrameworkInitializer.DefaultOutputPath;
-            var testFiles = Directory.GetFiles(defaultOutputPath, "*.tf");
+            var testFiles = Directory.GetFiles(defaultOutputPath, "test_file_.*.tf");
+            return testFiles.Select(x => new object[] { x });
+        }
+
+        public static IEnumerable<object[]> MixedSerializationFiles()
+        {
+            const string defaultOutputPath = CrossFrameworkInitializer.DefaultOutputPath;
+            var testFiles = Directory.GetFiles(defaultOutputPath, "mixed_test_file_.*.tf");
             return testFiles.Select(x => new object[] { x });
         }
 
@@ -32,8 +45,20 @@ namespace Hyperion.Tests
             using (var fileStream = new FileStream(fileName, FileMode.Open))
             {
                 var crossFrameworkClass = _serializer.Deserialize<CrossFrameworkClass>(fileStream);
+                _originalObject.Should()
+                    .Be(crossFrameworkClass, $"[CrossFrameworkClass] {fileName} deserialization should work.");
+            }
+        }
 
-                Assert.Equal(_originalObject, crossFrameworkClass);
+        [Theory]
+        [MemberData(nameof(MixedSerializationFiles))]
+        public void CanSerializeComplexObjectCrossFramework(string fileName)
+        {
+            using (var fileStream = new FileStream(fileName, FileMode.Open))
+            {
+                var deserialized = _serializer.Deserialize<CrossFrameworkMixedClass>(fileStream);
+                _originalMixedObject.Should()
+                    .Be(deserialized, $"[CrossFrameworkMixedClass] {fileName} deserialization should work.");
             }
         }
     }
