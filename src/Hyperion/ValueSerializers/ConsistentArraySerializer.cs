@@ -36,7 +36,7 @@ namespace Hyperion.ValueSerializers
                 var size = elementType.GetTypeSize();
                 var totalSize = size*length;
                 var buffer = session.GetBuffer(totalSize);
-                stream.Read(buffer, 0, totalSize);
+                stream.ReadFull(buffer, 0, totalSize);
                 Buffer.BlockCopy(buffer, 0, array, 0, totalSize);
             }
             else

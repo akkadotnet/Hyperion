@@ -31,7 +31,7 @@ namespace Hyperion.ValueSerializers
         public static Guid ReadValueImpl(Stream stream)
         {
             var buffer = new byte[16];
-            stream.Read(buffer, 0, 16);
+            stream.ReadFull(buffer, 0, 16);
             return new Guid(buffer);
         }
     }

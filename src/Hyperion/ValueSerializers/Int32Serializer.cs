@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
@@ -37,7 +38,7 @@ namespace Hyperion.ValueSerializers
 
         public static int ReadValueImpl(Stream stream, byte[] bytes)
         {
-            stream.Read(bytes, 0, Size);
+            stream.ReadFull(bytes, 0, Size);
             return BitConverter.ToInt32(bytes, 0);
         }
 

@@ -30,13 +30,20 @@ namespace Hyperion.Tests.Generator
             }
 
             CrossFrameworkClass crossFrameworkClass = CrossFrameworkInitializer.Init();
+            var crossFrameworkMixedClass = CrossFrameworkInitializer.InitMixed();
 
             string fileName = $"test_file_{FrameworkName.ToLowerInvariant()}.tf";
             string fullPath = Path.Combine(outputPath, fileName);
-
             using (var fileStream = new FileStream(fullPath, FileMode.Create))
             {
                 Serializer.Serialize(crossFrameworkClass, fileStream);
+            }
+
+            fileName = $"mixed_test_file_{FrameworkName.ToLowerInvariant()}.tf";
+            fullPath = Path.Combine(outputPath, fileName);
+            using (var fileStream = new FileStream(fullPath, FileMode.Create))
+            {
+                Serializer.Serialize(crossFrameworkMixedClass, fileStream);
             }
         }
     }

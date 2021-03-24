@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
@@ -36,7 +37,7 @@ namespace Hyperion.ValueSerializers
 
         private static DateTime ReadDateTime(Stream stream, byte[] bytes)
         {
-            stream.Read(bytes, 0, Size);
+            stream.ReadFull(bytes, 0, Size);
             var ticks = BitConverter.ToInt64(bytes, 0);
             var kind = (DateTimeKind) bytes[Size - 1]; //avoid reading a single byte from the stream
             var dateTime = new DateTime(ticks, kind);

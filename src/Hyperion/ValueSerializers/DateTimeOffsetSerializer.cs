@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+using Hyperion.Extensions;
 
 namespace Hyperion.ValueSerializers
 {
@@ -36,7 +37,7 @@ namespace Hyperion.ValueSerializers
 
         private static DateTimeOffset ReadDateTimeOffset(Stream stream, byte[] bytes)
         {
-            stream.Read(bytes, 0, Size);
+            stream.ReadFull(bytes, 0, Size);
             var dateTimeTicks = BitConverter.ToInt64(bytes, 0);
             var offsetTicks = BitConverter.ToInt64(bytes, sizeof(long));
             var dateTimeOffset = new DateTimeOffset(dateTimeTicks, TimeSpan.FromTicks(offsetTicks));
