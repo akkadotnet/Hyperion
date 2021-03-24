@@ -218,7 +218,6 @@ namespace Hyperion.Tests
             Assert.Equal(stream.Length, stream.Position);
         }
 
-
         public class SnapshotSelectionCriteria
         {
             public static SnapshotSelectionCriteria Latest { get; set; } = new SnapshotSelectionCriteria()
