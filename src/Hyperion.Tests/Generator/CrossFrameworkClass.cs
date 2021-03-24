@@ -153,7 +153,7 @@ namespace Hyperion.Tests.Generator
 
         protected bool Equals(CrossFrameworkMixedClass other)
         {
-            if (other.Sound != Sound || other.Name != Name)
+            if (other.Sound != Sound || other.Name != Name || other.FriendType != FriendType)
                 return false;
             return other.Data.Equals(Data);
         }
