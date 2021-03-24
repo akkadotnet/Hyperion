@@ -1,6 +1,10 @@
-### 0.9.16 June 17 2020 ####
-* [Bump Microsoft.NET.Test.Sdk from 16.5.0 to 16.6.1](https://github.com/akkadotnet/Hyperion/pull/174)
-* [Add deserialization support for ReadOnlyDictionary](https://github.com/akkadotnet/Hyperion/pull/177)
-* [Bump FluentAssertions from 5.10.2 to 5.10.3](https://github.com/akkadotnet/Hyperion/pull/171)
-* [Bump System.Collections.Immutable from 1.7.0 to 1.7.1](https://github.com/akkadotnet/Hyperion/pull/175)
-* [Bump BenchmarkDotNet from 0.12.0 to 0.12.1](https://github.com/akkadotnet/Hyperion/pull/172)
+### 0.9.17 March 25 2021 ####
+* [Bump Microsoft.NET.Test.Sdk from 16.6.1 to 16.7.1](https://github.com/akkadotnet/Hyperion/pull/182)
+* [Fix unit test problem](https://github.com/akkadotnet/Hyperion/pull/191)
+* [Bump FSharp.Core from 4.7.2 to 5.0.0](https://github.com/akkadotnet/Hyperion/pull/189)
+* [Fix issue #40 regarding partial streams](https://github.com/akkadotnet/Hyperion/pull/185)
+* [Fix Hyperion not using known serializers when defined](https://github.com/akkadotnet/Hyperion/pull/184)
+* [Bump Microsoft.NET.Test.Sdk from 16.7.1 to 16.8.3](https://github.com/akkadotnet/Hyperion/pull/196)
+* [Bump System.Collections.Immutable from 1.7.1 to 5.0.0](https://github.com/akkadotnet/Hyperion/pull/195)
+* [Bump FSharp.Core from 5.0.0 to 5.0.1](https://github.com/akkadotnet/Hyperion/pull/202)
+* [Update the cross framework spec to include complex POCO object, Type serialization, and support for netcoreapp3.1 and net5.0](https://github.com/akkadotnet/Hyperion/pull/204)
