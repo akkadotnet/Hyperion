@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -24,7 +25,7 @@ using Xunit.Abstractions;
 namespace Hyperion.Tests
 {
 
-    public class Bugs
+    public class Bugs : TestBase
     {
         private readonly ITestOutputHelper _output;
 
@@ -218,6 +219,19 @@ namespace Hyperion.Tests
             Assert.Equal(stream.Length, stream.Position);
         }
 
+        #region Issue 117
+
+        [Fact]
+        public void CanSerializeColor()
+        {
+            var expected = Color.Aquamarine;
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<Color>();
+            Assert.Equal(expected, actual);
+        }
+
+        #endregion
 
         public class SnapshotSelectionCriteria
         {
