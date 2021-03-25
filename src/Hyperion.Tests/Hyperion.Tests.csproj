@@ -22,4 +22,9 @@
     <ProjectReference Include="..\Hyperion\Hyperion.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
+      <Reference Include="System.Drawing">
+        <Private>true</Private>
+      </Reference>
+  </ItemGroup>
 </Project>

@@ -123,6 +123,11 @@ namespace Hyperion.Extensions
                 {
                     shortName = shortName.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%");
                 }
+                
+                if (shortName.Contains("System.Drawing.Primitives"))
+                {
+                    shortName = shortName.Replace(".Primitives", "");
+                }
 #endif
 #if NETSTANDARD
                 if (shortName.Contains("mscorlib,%core%"))
