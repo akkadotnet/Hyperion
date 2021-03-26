@@ -27,13 +27,13 @@ namespace Hyperion.Tests
             // Demonstrating the use of custom dll package name override
             // to convert netcore System.Drawing.Primitives to netfx 
             // System.Drawing package.
-            #if NET461
+            #if NETFX
             _serializer = new Serializer(new SerializerOptions(
                 packageNameOverrides: new List<CrossPlatformPackageNameOverride>
                 {
                     new CrossPlatformPackageNameOverride("System.Drawing.Primitives", ".Primitives", "")
                 }));
-            #elif NETCOREAPP2_0_OR_GREATER
+            #elif NETCOREAPP
             _serializer = new Serializer();
             #endif
         }
