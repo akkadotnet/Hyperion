@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using FluentAssertions;
 using Hyperion.Tests.Generator;
 using Xunit;
@@ -19,9 +21,21 @@ namespace Hyperion.Tests
         public CrossFrameworkSerializationTests(ITestOutputHelper log)
         {
             _log = log;
-            _serializer = new Serializer();
             _originalObject = CrossFrameworkInitializer.Init();
             _originalMixedObject = CrossFrameworkInitializer.InitMixed();
+
+            // Demonstrating the use of custom dll package name override
+            // to convert netcore System.Drawing.Primitives to netfx 
+            // System.Drawing package.
+            #if NET461
+            _serializer = new Serializer(new SerializerOptions(
+                packageNameOverrides: new List<CrossPlatformPackageNameOverride>
+                {
+                    new CrossPlatformPackageNameOverride("System.Drawing.Primitives", ".Primitives", "")
+                }));
+            #elif NETCOREAPP2_0_OR_GREATER
+            _serializer = new Serializer();
+            #endif
         }
 
         public static IEnumerable<object[]> SerializationFiles()

@@ -16,6 +16,24 @@ namespace Hyperion
 {
     public class SerializerOptions
     {
+        internal static List<CrossPlatformPackageNameOverride> DefaultPackageNameOverrides()
+        {
+            return new List<CrossPlatformPackageNameOverride>
+            {
+#if NET45
+                new CrossPlatformPackageNameOverride(
+                    fingerprint: "System.Private.CoreLib,%core%",
+                    from: "System.Private.CoreLib,%core%",
+                    to: "mscorlib,%core%")
+#elif NETSTANDARD
+                new CrossPlatformPackageNameOverride(
+                    fingerprint: "mscorlib,%core%",
+                    from: "mscorlib,%core%",
+                    to: "System.Private.CoreLib,%core%")
+#endif
+            };
+        }
+
         internal static readonly Surrogate[] EmptySurrogates = new Surrogate[0];
         
 
@@ -53,8 +71,10 @@ namespace Hyperion
         internal readonly bool VersionTolerance;
         internal readonly Type[] KnownTypes;
         internal readonly Dictionary<Type, ushort> KnownTypesDict = new Dictionary<Type, ushort>();
+        internal readonly List<CrossPlatformPackageNameOverride> CrossFrameworkPackageNameOverrides =
+            DefaultPackageNameOverrides();
 
-        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null, bool ignoreISerializable = false)
+        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null, bool ignoreISerializable = false, IEnumerable<CrossPlatformPackageNameOverride> packageNameOverrides = null)
         {
             VersionTolerance = versionTolerance;
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
@@ -72,6 +92,22 @@ namespace Hyperion
 
             PreserveObjectReferences = preserveObjectReferences;
             IgnoreISerializable = ignoreISerializable;
+
+            if(packageNameOverrides != null)
+                CrossFrameworkPackageNameOverrides.AddRange(packageNameOverrides);
         }
+    }
+    public class CrossPlatformPackageNameOverride
+    {
+        public CrossPlatformPackageNameOverride(string fingerprint, string @from, string to)
+        {
+            Fingerprint = fingerprint;
+            RenameFrom = @from;
+            RenameTo = to;
+        }
+
+        public string Fingerprint { get; }
+        public string RenameFrom { get; }
+        public string RenameTo { get; }
     }
 }

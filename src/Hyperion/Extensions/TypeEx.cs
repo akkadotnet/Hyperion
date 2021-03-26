@@ -118,23 +118,16 @@ namespace Hyperion.Extensions
             return TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-#if NET45
-                if (shortName.Contains("System.Private.CoreLib,%core%"))
+                var overrides = session.Serializer.Options.CrossFrameworkPackageNameOverrides;
+
+                foreach (var value in overrides)
                 {
-                    shortName = shortName.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%");
+                    if (shortName.Contains(value.Fingerprint))
+                    {
+                        shortName = shortName.Replace(value.RenameFrom, value.RenameTo);
+                    }
                 }
-                
-                if (shortName.Contains("System.Drawing.Primitives"))
-                {
-                    shortName = shortName.Replace(".Primitives", "");
-                }
-#endif
-#if NETSTANDARD
-                if (shortName.Contains("mscorlib,%core%"))
-                {
-                    shortName = shortName.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%");
-                }
-#endif
+
                 return LoadTypeByName(shortName);
             });
         }
