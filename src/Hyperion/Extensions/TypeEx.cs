@@ -120,12 +120,12 @@ namespace Hyperion.Extensions
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
                 var overrides = session.Serializer.Options.CrossFrameworkPackageNameOverrides;
 
-                foreach (var value in overrides)
+                var oldName = shortName;
+                foreach (var adapter in overrides)
                 {
-                    if (shortName.Contains(value.Fingerprint))
-                    {
-                        shortName = shortName.Replace(value.RenameFrom, value.RenameTo);
-                    }
+                    shortName = adapter(shortName);
+                    if (!ReferenceEquals(oldName, shortName))
+                        break;
                 }
 
                 return LoadTypeByName(shortName);

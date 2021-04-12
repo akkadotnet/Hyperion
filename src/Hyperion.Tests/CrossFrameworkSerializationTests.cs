@@ -29,9 +29,9 @@ namespace Hyperion.Tests
             // System.Drawing package.
             #if NETFX
             _serializer = new Serializer(new SerializerOptions(
-                packageNameOverrides: new List<CrossPlatformPackageNameOverride>
+                packageNameOverrides: new List<Func<string, string>>
                 {
-                    new CrossPlatformPackageNameOverride("System.Drawing.Primitives", ".Primitives", "")
+                    str => str.Contains("System.Drawing.Primitives") ? str.Replace(".Primitives", "") : str
                 }));
             #elif NETCOREAPP
             _serializer = new Serializer();
