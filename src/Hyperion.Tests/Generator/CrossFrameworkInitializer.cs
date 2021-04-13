@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Hyperion.Tests.Generator
 {
@@ -13,6 +15,13 @@ namespace Hyperion.Tests.Generator
                 Name = "Cookie",
                 Sound = "Bark",
                 FriendType = typeof(CrossFrameworkClass),
+                Color = Color.Blue,
+                Point = new Point(10, 10),
+                PointF = new PointF(10, 10),
+                Rectangle = new Rectangle(10, 10, 10, 10),
+                RectangleF = new RectangleF(10, 10, 10, 10),
+                Size = new Size(10, 10),
+                SizeF = new SizeF(10, 10),
                 Data = Init()
             };
         }
