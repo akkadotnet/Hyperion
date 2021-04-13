@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Hyperion.Tests.Generator
 {
@@ -143,6 +145,15 @@ namespace Hyperion.Tests.Generator
     {
         public Type FriendType { get; set; }
         public CrossFrameworkClass Data { get; set; }
+
+        // Test case for (netcore) System.Drawing.Primitives to (net45) System.Drawing
+        public Color Color { get; set; }
+        public Point Point { get; set; }
+        public PointF PointF { get; set; }
+        public Rectangle Rectangle { get; set; }
+        public RectangleF RectangleF { get; set; }
+        public Size Size { get; set; }
+        public SizeF SizeF { get; set; }
 
         public override bool Equals(object obj)
         {
