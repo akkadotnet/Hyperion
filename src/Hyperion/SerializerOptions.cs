@@ -16,6 +16,22 @@ namespace Hyperion
 {
     public class SerializerOptions
     {
+        internal static List<Func<string, string>> DefaultPackageNameOverrides()
+        {
+            return new List<Func<string, string>>
+            {
+#if NET45
+                str => str.Contains("System.Private.CoreLib,%core%")
+                    ? str.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%") 
+                    : str
+#elif NETSTANDARD
+                str => str.Contains("mscorlib,%core%")
+                    ? str.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%") 
+                    : str
+#endif
+            };
+        }
+
         internal static readonly Surrogate[] EmptySurrogates = new Surrogate[0];
         
 
@@ -53,8 +69,10 @@ namespace Hyperion
         internal readonly bool VersionTolerance;
         internal readonly Type[] KnownTypes;
         internal readonly Dictionary<Type, ushort> KnownTypesDict = new Dictionary<Type, ushort>();
+        internal readonly List<Func<string, string>> CrossFrameworkPackageNameOverrides =
+            DefaultPackageNameOverrides();
 
-        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null, bool ignoreISerializable = false)
+        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null, bool ignoreISerializable = false, IEnumerable<Func<string, string>> packageNameOverrides = null)
         {
             VersionTolerance = versionTolerance;
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
@@ -72,6 +90,9 @@ namespace Hyperion
 
             PreserveObjectReferences = preserveObjectReferences;
             IgnoreISerializable = ignoreISerializable;
+
+            if(packageNameOverrides != null)
+                CrossFrameworkPackageNameOverrides.AddRange(packageNameOverrides);
         }
     }
 }
