@@ -28,8 +28,8 @@ namespace Hyperion.Tests
             // to convert netcore System.Drawing.Primitives to netfx 
             // System.Drawing package.
             #if NETFX
-            _serializer = new Serializer(new SerializerOptions(
-                packageNameOverrides: new List<Func<string, string>>
+            _serializer = new Serializer(SerializerOptions.Default.WithPackageNameOverrides(
+                new List<Func<string, string>>
                 {
                     str => str.Contains("System.Drawing.Primitives") ? str.Replace(".Primitives", "") : str
                 }));
