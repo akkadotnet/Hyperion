@@ -1,0 +1,693 @@
+﻿[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Hyperion.Tests")]
+[assembly: System.Runtime.InteropServices.ComVisible(false)]
+[assembly: System.Runtime.InteropServices.Guid("7af8d2b6-9f1f-4a1c-8673-48e533108385")]
+namespace Hyperion.Compilation
+{
+    public interface ICompiler<out TDel>
+    {
+        int Call(System.Reflection.MethodInfo method, int target, params int[] arguments);
+        int CastOrUnbox(int value, System.Type type);
+        TDel Compile();
+        int Constant(object value);
+        int Convert(int value, System.Type type);
+        int Convert<T>(int value);
+        void Emit(int value);
+        void EmitCall(System.Reflection.MethodInfo method, int target, params int[] arguments);
+        void EmitStaticCall(System.Reflection.MethodInfo method, params int[] arguments);
+        int GetVariable<T>(string name);
+        int NewObject(System.Type type);
+        int Parameter<T>(string name);
+        int ReadField(System.Reflection.FieldInfo field, int target);
+        int StaticCall(System.Reflection.MethodInfo method, params int[] arguments);
+        int Variable(string name, System.Type type);
+        int Variable<T>(string name);
+        int WriteField(System.Reflection.FieldInfo field, int typedTarget, int target, int value);
+        int WriteVar(int variable, int value);
+    }
+}
+namespace Hyperion
+{
+    public class DeserializerSession
+    {
+        public const int MinBufferSize = 9;
+        public readonly Hyperion.Serializer Serializer;
+        public DeserializerSession([Hyperion.Internal.NotNull] Hyperion.Serializer serializer) { }
+        public byte[] GetBuffer(int length) { }
+        public object GetDeserializedObject(int id) { }
+        public System.Type GetTypeFromTypeId(int typeId) { }
+        public Hyperion.TypeVersionInfo GetVersionInfo([Hyperion.Internal.NotNull] System.Type type) { }
+        public void TrackDeserializedObject([Hyperion.Internal.NotNull] object obj) { }
+        public void TrackDeserializedType([Hyperion.Internal.NotNull] System.Type type) { }
+        public void TrackDeserializedTypeWithVersion([Hyperion.Internal.NotNull] System.Type type, [Hyperion.Internal.NotNull] Hyperion.TypeVersionInfo versionInfo) { }
+    }
+    public delegate object FieldInfoReader(object obj);
+    public delegate void FieldInfoWriter(object obj, object value);
+    public delegate void FieldReader(System.IO.Stream stream, object obj, Hyperion.DeserializerSession session);
+    public delegate void FieldsWriter(System.IO.Stream stream, object obj, Hyperion.SerializerSession session);
+    public interface ICodeGenerator
+    {
+        void BuildSerializer(Hyperion.Serializer serializer, Hyperion.ValueSerializers.ObjectSerializer objectSerializer);
+    }
+    [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
+    public sealed class IgnoreAttribute : System.Attribute
+    {
+        public IgnoreAttribute() { }
+    }
+    public static class NoAllocBitConverter
+    {
+        public static void GetBytes(char value, byte[] bytes) { }
+        public static void GetBytes(System.DateTime dateTime, byte[] bytes) { }
+        public static void GetBytes(System.DateTimeOffset dateTime, byte[] bytes) { }
+        public static void GetBytes(double value, byte[] bytes) { }
+        public static void GetBytes(short value, byte[] bytes) { }
+        public static void GetBytes(int value, byte[] bytes) { }
+        public static void GetBytes(long value, byte[] bytes) { }
+        public static void GetBytes(float value, byte[] bytes) { }
+        public static void GetBytes(ushort value, byte[] bytes) { }
+        public static void GetBytes(uint value, byte[] bytes) { }
+        public static void GetBytes(ulong value, byte[] bytes) { }
+    }
+    public delegate object ObjectReader(System.IO.Stream stream, Hyperion.DeserializerSession session);
+    public delegate void ObjectWriter(System.IO.Stream stream, object obj, Hyperion.SerializerSession session);
+    public class Serializer
+    {
+        public readonly Hyperion.ICodeGenerator CodeGenerator;
+        public readonly Hyperion.SerializerOptions Options;
+        public Serializer() { }
+        public Serializer([Hyperion.Internal.NotNull] Hyperion.SerializerOptions options) { }
+        public object Deserialize([Hyperion.Internal.NotNull] System.IO.Stream stream) { }
+        public object Deserialize([Hyperion.Internal.NotNull] System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public T Deserialize<T>([Hyperion.Internal.NotNull] System.IO.Stream stream) { }
+        public T Deserialize<T>([Hyperion.Internal.NotNull] System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public Hyperion.ValueSerializers.ValueSerializer GetDeserializerByManifest([Hyperion.Internal.NotNull] System.IO.Stream stream, [Hyperion.Internal.NotNull] Hyperion.DeserializerSession session) { }
+        public Hyperion.DeserializerSession GetDeserializerSession() { }
+        public Hyperion.ValueSerializers.ValueSerializer GetSerializerByType([Hyperion.Internal.NotNull] System.Type type) { }
+        public Hyperion.SerializerSession GetSerializerSession() { }
+        public void Serialize(object obj, [Hyperion.Internal.NotNull] System.IO.Stream stream) { }
+        public void Serialize(object obj, [Hyperion.Internal.NotNull] System.IO.Stream stream, Hyperion.SerializerSession session) { }
+    }
+    public class SerializerOptions
+    {
+        public static readonly Hyperion.SerializerOptions Default;
+        [System.Obsolete]
+        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates = null, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories = null, System.Collections.Generic.IEnumerable<System.Type> knownTypes = null, bool ignoreISerializable = false) { }
+        public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides) { }
+        public Hyperion.SerializerOptions WithIgnoreSerializable(bool ignoreISerializable) { }
+        public Hyperion.SerializerOptions WithKnownTypes(System.Collections.Generic.IEnumerable<System.Type> knownTypes) { }
+        public Hyperion.SerializerOptions WithPackageNameOverrides(System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides) { }
+        public Hyperion.SerializerOptions WithPreserveObjectReferences(bool preserveObjectReferences) { }
+        public Hyperion.SerializerOptions WithSerializerFactory(System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories) { }
+        public Hyperion.SerializerOptions WithSurrogates(System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates) { }
+        public Hyperion.SerializerOptions WithVersionTolerance(bool versionTolerance) { }
+    }
+    public class SerializerSession
+    {
+        public const int MinBufferSize = 9;
+        public readonly Hyperion.Serializer Serializer;
+        public SerializerSession(Hyperion.Serializer serializer) { }
+        public byte[] GetBuffer(int length) { }
+        public bool ShouldWriteTypeManifest(System.Type type, out ushort index) { }
+        public void TrackSerializedObject(object obj) { }
+        public void TrackSerializedType(System.Type type) { }
+        public bool TryGetObjectId(object obj, out int objectId) { }
+        public bool TryGetValue(System.Type key, out ushort value) { }
+    }
+    public class Surrogate
+    {
+        public Surrogate() { }
+        public System.Type From { get; set; }
+        public System.Func<object, object> FromSurrogate { get; set; }
+        public System.Type To { get; set; }
+        public System.Func<object, object> ToSurrogate { get; set; }
+        public bool IsSurrogateFor(System.Type type) { }
+        public static Hyperion.Surrogate Create<TSource, TSurrogate>(System.Func<TSource, TSurrogate> toSurrogate, System.Func<TSurrogate, TSource> fromSurrogate) { }
+    }
+    public class Surrogate<TSource, TSurrogate> : Hyperion.Surrogate
+    {
+        public Surrogate(System.Func<TSource, TSurrogate> toSurrogate, System.Func<TSurrogate, TSource> fromSurrogate) { }
+    }
+    public class TypeVersionInfo
+    {
+        public TypeVersionInfo() { }
+    }
+    public delegate object TypedArray(object obj);
+}
+namespace Hyperion.Internal
+{
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspChildControlTypeAttribute : System.Attribute
+    {
+        public AspChildControlTypeAttribute([Hyperion.Internal.NotNull] string tagName, [Hyperion.Internal.NotNull] System.Type controlType) { }
+        [Hyperion.Internal.NotNull]
+        public System.Type ControlType { get; }
+        [Hyperion.Internal.NotNull]
+        public string TagName { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class AspDataFieldAttribute : System.Attribute
+    {
+        public AspDataFieldAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class AspDataFieldsAttribute : System.Attribute
+    {
+        public AspDataFieldsAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class AspMethodPropertyAttribute : System.Attribute
+    {
+        public AspMethodPropertyAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcActionAttribute : System.Attribute
+    {
+        public AspMvcActionAttribute() { }
+        public AspMvcActionAttribute([Hyperion.Internal.NotNull] string anonymousProperty) { }
+        [Hyperion.Internal.CanBeNull]
+        public string AnonymousProperty { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcActionSelectorAttribute : System.Attribute
+    {
+        public AspMvcActionSelectorAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcAreaAttribute : System.Attribute
+    {
+        public AspMvcAreaAttribute() { }
+        public AspMvcAreaAttribute([Hyperion.Internal.NotNull] string anonymousProperty) { }
+        [Hyperion.Internal.CanBeNull]
+        public string AnonymousProperty { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspMvcAreaMasterLocationFormatAttribute : System.Attribute
+    {
+        public AspMvcAreaMasterLocationFormatAttribute([Hyperion.Internal.NotNull] string format) { }
+        [Hyperion.Internal.NotNull]
+        public string Format { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspMvcAreaPartialViewLocationFormatAttribute : System.Attribute
+    {
+        public AspMvcAreaPartialViewLocationFormatAttribute([Hyperion.Internal.NotNull] string format) { }
+        [Hyperion.Internal.NotNull]
+        public string Format { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspMvcAreaViewLocationFormatAttribute : System.Attribute
+    {
+        public AspMvcAreaViewLocationFormatAttribute([Hyperion.Internal.NotNull] string format) { }
+        [Hyperion.Internal.NotNull]
+        public string Format { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcControllerAttribute : System.Attribute
+    {
+        public AspMvcControllerAttribute() { }
+        public AspMvcControllerAttribute([Hyperion.Internal.NotNull] string anonymousProperty) { }
+        [Hyperion.Internal.CanBeNull]
+        public string AnonymousProperty { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcDisplayTemplateAttribute : System.Attribute
+    {
+        public AspMvcDisplayTemplateAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcEditorTemplateAttribute : System.Attribute
+    {
+        public AspMvcEditorTemplateAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcMasterAttribute : System.Attribute
+    {
+        public AspMvcMasterAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspMvcMasterLocationFormatAttribute : System.Attribute
+    {
+        public AspMvcMasterLocationFormatAttribute(string format) { }
+        public string Format { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcModelTypeAttribute : System.Attribute
+    {
+        public AspMvcModelTypeAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcPartialViewAttribute : System.Attribute
+    {
+        public AspMvcPartialViewAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspMvcPartialViewLocationFormatAttribute : System.Attribute
+    {
+        public AspMvcPartialViewLocationFormatAttribute([Hyperion.Internal.NotNull] string format) { }
+        [Hyperion.Internal.NotNull]
+        public string Format { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class AspMvcSuppressViewErrorAttribute : System.Attribute
+    {
+        public AspMvcSuppressViewErrorAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcTemplateAttribute : System.Attribute
+    {
+        public AspMvcTemplateAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcViewAttribute : System.Attribute
+    {
+        public AspMvcViewAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcViewComponentAttribute : System.Attribute
+    {
+        public AspMvcViewComponentAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AspMvcViewComponentViewAttribute : System.Attribute
+    {
+        public AspMvcViewComponentViewAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspMvcViewLocationFormatAttribute : System.Attribute
+    {
+        public AspMvcViewLocationFormatAttribute([Hyperion.Internal.NotNull] string format) { }
+        [Hyperion.Internal.NotNull]
+        public string Format { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class AspRequiredAttributeAttribute : System.Attribute
+    {
+        public AspRequiredAttributeAttribute([Hyperion.Internal.NotNull] string attribute) { }
+        [Hyperion.Internal.NotNull]
+        public string Attribute { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class AspTypePropertyAttribute : System.Attribute
+    {
+        public AspTypePropertyAttribute(bool createConstructorReferences) { }
+        public bool CreateConstructorReferences { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class AssertionConditionAttribute : System.Attribute
+    {
+        public AssertionConditionAttribute(Hyperion.Internal.AssertionConditionType conditionType) { }
+        public Hyperion.Internal.AssertionConditionType ConditionType { get; }
+    }
+    public enum AssertionConditionType
+    {
+        IS_TRUE = 0,
+        IS_FALSE = 1,
+        IS_NULL = 2,
+        IS_NOT_NULL = 3,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class AssertionMethodAttribute : System.Attribute
+    {
+        public AssertionMethodAttribute() { }
+    }
+    [Hyperion.Internal.BaseTypeRequired(typeof(System.Attribute))]
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class BaseTypeRequiredAttribute : System.Attribute
+    {
+        public BaseTypeRequiredAttribute([Hyperion.Internal.NotNull] System.Type baseType) { }
+        [Hyperion.Internal.NotNull]
+        public System.Type BaseType { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Event | System.AttributeTargets.Interface | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class CanBeNullAttribute : System.Attribute
+    {
+        public CanBeNullAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Interface | System.AttributeTargets.All)]
+    public sealed class CannotApplyEqualityOperatorAttribute : System.Attribute
+    {
+        public CannotApplyEqualityOperatorAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class CollectionAccessAttribute : System.Attribute
+    {
+        public CollectionAccessAttribute(Hyperion.Internal.CollectionAccessType collectionAccessType) { }
+        public Hyperion.Internal.CollectionAccessType CollectionAccessType { get; }
+    }
+    [System.Flags]
+    public enum CollectionAccessType
+    {
+        None = 0,
+        Read = 1,
+        ModifyExistingContent = 2,
+        UpdatedContent = 6,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class ContractAnnotationAttribute : System.Attribute
+    {
+        public ContractAnnotationAttribute([Hyperion.Internal.NotNull] string contract) { }
+        public ContractAnnotationAttribute([Hyperion.Internal.NotNull] string contract, bool forceFullStates) { }
+        [Hyperion.Internal.NotNull]
+        public string Contract { get; }
+        public bool ForceFullStates { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class HtmlAttributeValueAttribute : System.Attribute
+    {
+        public HtmlAttributeValueAttribute([Hyperion.Internal.NotNull] string name) { }
+        [Hyperion.Internal.NotNull]
+        public string Name { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class HtmlElementAttributesAttribute : System.Attribute
+    {
+        public HtmlElementAttributesAttribute() { }
+        public HtmlElementAttributesAttribute([Hyperion.Internal.NotNull] string name) { }
+        [Hyperion.Internal.CanBeNull]
+        public string Name { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Interface | System.AttributeTargets.All)]
+    public sealed class ImplicitNotNullAttribute : System.Attribute
+    {
+        public ImplicitNotNullAttribute() { }
+    }
+    [System.Flags]
+    public enum ImplicitUseKindFlags
+    {
+        Default = 7,
+        Access = 1,
+        Assign = 2,
+        InstantiatedWithFixedConstructorSignature = 4,
+        InstantiatedNoFixedConstructorSignature = 8,
+    }
+    [System.Flags]
+    public enum ImplicitUseTargetFlags
+    {
+        Default = 1,
+        Itself = 1,
+        Members = 2,
+        WithMembers = 3,
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class InstantHandleAttribute : System.Attribute
+    {
+        public InstantHandleAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class InvokerParameterNameAttribute : System.Attribute
+    {
+        public InvokerParameterNameAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.All)]
+    public sealed class ItemCanBeNullAttribute : System.Attribute
+    {
+        public ItemCanBeNullAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.All)]
+    public sealed class ItemNotNullAttribute : System.Attribute
+    {
+        public ItemNotNullAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class LinqTunnelAttribute : System.Attribute
+    {
+        public LinqTunnelAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Module | System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Event | System.AttributeTargets.Interface | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.ReturnValue | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class LocalizationRequiredAttribute : System.Attribute
+    {
+        public LocalizationRequiredAttribute() { }
+        public LocalizationRequiredAttribute(bool required) { }
+        public bool Required { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class MacroAttribute : System.Attribute
+    {
+        public MacroAttribute() { }
+        public int Editable { get; set; }
+        public string Expression { get; set; }
+        public string Target { get; set; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class MeansImplicitUseAttribute : System.Attribute
+    {
+        public MeansImplicitUseAttribute() { }
+        public MeansImplicitUseAttribute(Hyperion.Internal.ImplicitUseKindFlags useKindFlags) { }
+        public MeansImplicitUseAttribute(Hyperion.Internal.ImplicitUseTargetFlags targetFlags) { }
+        public MeansImplicitUseAttribute(Hyperion.Internal.ImplicitUseKindFlags useKindFlags, Hyperion.Internal.ImplicitUseTargetFlags targetFlags) { }
+        [Hyperion.Internal.UsedImplicitly]
+        public Hyperion.Internal.ImplicitUseTargetFlags TargetFlags { get; }
+        [Hyperion.Internal.UsedImplicitly]
+        public Hyperion.Internal.ImplicitUseKindFlags UseKindFlags { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class MustUseReturnValueAttribute : System.Attribute
+    {
+        public MustUseReturnValueAttribute() { }
+        public MustUseReturnValueAttribute([Hyperion.Internal.NotNull] string justification) { }
+        [Hyperion.Internal.CanBeNull]
+        public string Justification { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class NoEnumerationAttribute : System.Attribute
+    {
+        public NoEnumerationAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Module | System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Event | System.AttributeTargets.Interface | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.ReturnValue | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class NoReorder : System.Attribute
+    {
+        public NoReorder() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Event | System.AttributeTargets.Interface | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class NotNullAttribute : System.Attribute
+    {
+        public NotNullAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class NotifyPropertyChangedInvocatorAttribute : System.Attribute
+    {
+        public NotifyPropertyChangedInvocatorAttribute() { }
+        public NotifyPropertyChangedInvocatorAttribute([Hyperion.Internal.NotNull] string parameterName) { }
+        [Hyperion.Internal.CanBeNull]
+        public string ParameterName { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class PathReferenceAttribute : System.Attribute
+    {
+        public PathReferenceAttribute() { }
+        public PathReferenceAttribute([Hyperion.Internal.NotNull] [Hyperion.Internal.PathReference] string basePath) { }
+        [Hyperion.Internal.CanBeNull]
+        public string BasePath { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Parameter | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class ProvidesContextAttribute : System.Attribute
+    {
+        public ProvidesContextAttribute() { }
+    }
+    [Hyperion.Internal.MeansImplicitUse(Hyperion.Internal.ImplicitUseTargetFlags.Default | Hyperion.Internal.ImplicitUseTargetFlags.Itself | Hyperion.Internal.ImplicitUseTargetFlags.Members | Hyperion.Internal.ImplicitUseTargetFlags.WithMembers)]
+    public sealed class PublicAPIAttribute : System.Attribute
+    {
+        public PublicAPIAttribute() { }
+        public PublicAPIAttribute([Hyperion.Internal.NotNull] string comment) { }
+        [Hyperion.Internal.CanBeNull]
+        public string Comment { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class PureAttribute : System.Attribute
+    {
+        public PureAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class RazorDirectiveAttribute : System.Attribute
+    {
+        public RazorDirectiveAttribute([Hyperion.Internal.NotNull] string directive) { }
+        [Hyperion.Internal.NotNull]
+        public string Directive { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class RazorHelperCommonAttribute : System.Attribute
+    {
+        public RazorHelperCommonAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class RazorImportNamespaceAttribute : System.Attribute
+    {
+        public RazorImportNamespaceAttribute([Hyperion.Internal.NotNull] string name) { }
+        [Hyperion.Internal.NotNull]
+        public string Name { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.All, AllowMultiple=true)]
+    public sealed class RazorInjectionAttribute : System.Attribute
+    {
+        public RazorInjectionAttribute([Hyperion.Internal.NotNull] string type, [Hyperion.Internal.NotNull] string fieldName) { }
+        [Hyperion.Internal.NotNull]
+        public string FieldName { get; }
+        [Hyperion.Internal.NotNull]
+        public string Type { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class RazorLayoutAttribute : System.Attribute
+    {
+        public RazorLayoutAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class RazorSectionAttribute : System.Attribute
+    {
+        public RazorSectionAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class RazorWriteLiteralMethodAttribute : System.Attribute
+    {
+        public RazorWriteLiteralMethodAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class RazorWriteMethodAttribute : System.Attribute
+    {
+        public RazorWriteMethodAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class RazorWriteMethodParameterAttribute : System.Attribute
+    {
+        public RazorWriteMethodParameterAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class RegexPatternAttribute : System.Attribute
+    {
+        public RegexPatternAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    public sealed class SourceTemplateAttribute : System.Attribute
+    {
+        public SourceTemplateAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Delegate | System.AttributeTargets.All)]
+    public sealed class StringFormatMethodAttribute : System.Attribute
+    {
+        public StringFormatMethodAttribute([Hyperion.Internal.NotNull] string formatParameterName) { }
+        [Hyperion.Internal.NotNull]
+        public string FormatParameterName { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Method | System.AttributeTargets.All)]
+    [System.Obsolete("Use [ContractAnnotation(\'=> halt\')] instead")]
+    public sealed class TerminatesProgramAttribute : System.Attribute
+    {
+        public TerminatesProgramAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Assembly | System.AttributeTargets.Module | System.AttributeTargets.Class | System.AttributeTargets.Struct | System.AttributeTargets.Enum | System.AttributeTargets.Constructor | System.AttributeTargets.Method | System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Event | System.AttributeTargets.Interface | System.AttributeTargets.Parameter | System.AttributeTargets.Delegate | System.AttributeTargets.ReturnValue | System.AttributeTargets.GenericParameter | System.AttributeTargets.All)]
+    public sealed class UsedImplicitlyAttribute : System.Attribute
+    {
+        public UsedImplicitlyAttribute() { }
+        public UsedImplicitlyAttribute(Hyperion.Internal.ImplicitUseKindFlags useKindFlags) { }
+        public UsedImplicitlyAttribute(Hyperion.Internal.ImplicitUseTargetFlags targetFlags) { }
+        public UsedImplicitlyAttribute(Hyperion.Internal.ImplicitUseKindFlags useKindFlags, Hyperion.Internal.ImplicitUseTargetFlags targetFlags) { }
+        public Hyperion.Internal.ImplicitUseTargetFlags TargetFlags { get; }
+        public Hyperion.Internal.ImplicitUseKindFlags UseKindFlags { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
+    public sealed class ValueProviderAttribute : System.Attribute
+    {
+        public ValueProviderAttribute([Hyperion.Internal.NotNull] string name) { }
+        [Hyperion.Internal.NotNull]
+        public string Name { get; }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.All)]
+    public sealed class XamlItemBindingOfItemsControlAttribute : System.Attribute
+    {
+        public XamlItemBindingOfItemsControlAttribute() { }
+    }
+    [System.AttributeUsage(System.AttributeTargets.Class | System.AttributeTargets.All)]
+    public sealed class XamlItemsControlAttribute : System.Attribute
+    {
+        public XamlItemsControlAttribute() { }
+    }
+}
+namespace Hyperion.SerializerFactories
+{
+    public abstract class ValueSerializerFactory
+    {
+        protected ValueSerializerFactory() { }
+        public abstract Hyperion.ValueSerializers.ValueSerializer BuildSerializer(Hyperion.Serializer serializer, System.Type type, System.Collections.Concurrent.ConcurrentDictionary<System.Type, Hyperion.ValueSerializers.ValueSerializer> typeMapping);
+        public abstract bool CanDeserialize(Hyperion.Serializer serializer, System.Type type);
+        public abstract bool CanSerialize(Hyperion.Serializer serializer, System.Type type);
+    }
+}
+namespace Hyperion.ValueSerializers
+{
+    public class DateTimeOffsetSerializer : Hyperion.ValueSerializers.SessionAwareByteArrayRequiringValueSerializer<System.DateTimeOffset>
+    {
+        public const byte Manifest = 10;
+        public const int Size = 16;
+        public static readonly Hyperion.ValueSerializers.DateTimeOffsetSerializer Instance;
+        public DateTimeOffsetSerializer() { }
+        public override int PreallocatedByteBufferSize { get; }
+        public static System.DateTimeOffset ReadValueImpl(System.IO.Stream stream, byte[] bytes) { }
+    }
+    public class KnownTypeObjectSerializer : Hyperion.ValueSerializers.ValueSerializer
+    {
+        public KnownTypeObjectSerializer(Hyperion.ValueSerializers.ObjectSerializer serializer, ushort typeIdentifier) { }
+        public override System.Type GetElementType() { }
+        public override object ReadValue(System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public override void WriteManifest(System.IO.Stream stream, Hyperion.SerializerSession session) { }
+        public override void WriteValue(System.IO.Stream stream, object value, Hyperion.SerializerSession session) { }
+    }
+    public class ObjectReferenceSerializer : Hyperion.ValueSerializers.ValueSerializer
+    {
+        public const byte Manifest = 253;
+        public static readonly Hyperion.ValueSerializers.ObjectReferenceSerializer Instance;
+        public ObjectReferenceSerializer() { }
+        public override System.Type GetElementType() { }
+        public override object ReadValue(System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public override void WriteManifest(System.IO.Stream stream, Hyperion.SerializerSession session) { }
+        public override void WriteValue(System.IO.Stream stream, object value, Hyperion.SerializerSession session) { }
+    }
+    public class ObjectSerializer : Hyperion.ValueSerializers.ValueSerializer
+    {
+        public const byte ManifestFull = 255;
+        public const byte ManifestIndex = 254;
+        public const byte ManifestVersion = 251;
+        public ObjectSerializer(System.Type type) { }
+        public override int PreallocatedByteBufferSize { get; }
+        public System.Type Type { get; }
+        public override System.Type GetElementType() { }
+        public void Initialize(Hyperion.ObjectReader reader, Hyperion.ObjectWriter writer, int preallocatedBufferSize = 0) { }
+        public override object ReadValue(System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public override void WriteManifest(System.IO.Stream stream, Hyperion.SerializerSession session) { }
+        public override void WriteValue(System.IO.Stream stream, object value, Hyperion.SerializerSession session) { }
+    }
+    public abstract class SessionAwareByteArrayRequiringValueSerializer<TElementType> : Hyperion.ValueSerializers.ValueSerializer
+    {
+        protected SessionAwareByteArrayRequiringValueSerializer(byte manifest, System.Linq.Expressions.Expression<System.Func<System.Action<System.IO.Stream, TElementType, byte[]>>> writeStaticMethod, System.Linq.Expressions.Expression<System.Func<System.Func<System.IO.Stream, byte[], TElementType>>> readStaticMethod) { }
+        public override sealed int EmitReadValue(Hyperion.Compilation.ICompiler<Hyperion.ObjectReader> c, int stream, int session, System.Reflection.FieldInfo field) { }
+        public override sealed void EmitWriteValue(Hyperion.Compilation.ICompiler<Hyperion.ObjectWriter> c, int stream, int fieldValue, int session) { }
+        public override sealed System.Type GetElementType() { }
+        public override sealed object ReadValue(System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public override sealed void WriteManifest(System.IO.Stream stream, Hyperion.SerializerSession session) { }
+        public override sealed void WriteValue(System.IO.Stream stream, object value, Hyperion.SerializerSession session) { }
+    }
+    public abstract class SessionIgnorantValueSerializer<TElementType> : Hyperion.ValueSerializers.ValueSerializer
+    {
+        protected SessionIgnorantValueSerializer(byte manifest, System.Linq.Expressions.Expression<System.Func<System.Action<System.IO.Stream, TElementType>>> writeStaticMethod, System.Linq.Expressions.Expression<System.Func<System.Func<System.IO.Stream, TElementType>>> readStaticMethod) { }
+        public override sealed int EmitReadValue(Hyperion.Compilation.ICompiler<Hyperion.ObjectReader> c, int stream, int session, System.Reflection.FieldInfo field) { }
+        public override sealed void EmitWriteValue(Hyperion.Compilation.ICompiler<Hyperion.ObjectWriter> c, int stream, int fieldValue, int session) { }
+        public override sealed System.Type GetElementType() { }
+        public override sealed object ReadValue(System.IO.Stream stream, Hyperion.DeserializerSession session) { }
+        public override sealed void WriteManifest(System.IO.Stream stream, Hyperion.SerializerSession session) { }
+        public override sealed void WriteValue(System.IO.Stream stream, object value, Hyperion.SerializerSession session) { }
+    }
+    public class UnsupportedTypeException : System.Exception
+    {
+        public System.Type Type;
+        public UnsupportedTypeException(System.Type t, string msg) { }
+    }
+    public abstract class ValueSerializer
+    {
+        protected ValueSerializer() { }
+        public virtual int PreallocatedByteBufferSize { get; }
+        public virtual int EmitReadValue([Hyperion.Internal.NotNull] Hyperion.Compilation.ICompiler<Hyperion.ObjectReader> c, int stream, int session, [Hyperion.Internal.NotNull] System.Reflection.FieldInfo field) { }
+        public virtual void EmitWriteValue(Hyperion.Compilation.ICompiler<Hyperion.ObjectWriter> c, int stream, int fieldValue, int session) { }
+        public abstract System.Type GetElementType();
+        public abstract object ReadValue([Hyperion.Internal.NotNull] System.IO.Stream stream, [Hyperion.Internal.NotNull] Hyperion.DeserializerSession session);
+        public abstract void WriteManifest([Hyperion.Internal.NotNull] System.IO.Stream stream, [Hyperion.Internal.NotNull] Hyperion.SerializerSession session);
+        public abstract void WriteValue([Hyperion.Internal.NotNull] System.IO.Stream stream, object value, [Hyperion.Internal.NotNull] Hyperion.SerializerSession session);
+        protected static System.Reflection.MethodInfo GetStatic([Hyperion.Internal.NotNull] System.Linq.Expressions.LambdaExpression expression, [Hyperion.Internal.NotNull] System.Type expectedReturnType) { }
+    }
+}
