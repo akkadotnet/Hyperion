@@ -18,6 +18,8 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
+    <AkkaVersion>1.4.18</AkkaVersion>
+    <FluentAssertionsVersion>5.10.3</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
     <TestSdkVersion>16.9.4</TestSdkVersion>
