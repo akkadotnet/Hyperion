@@ -23,7 +23,7 @@
     <FluentAssertionsVersion>5.10.3</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
-    <TestSdkVersion>16.9.4</TestSdkVersion>
+    <TestSdkVersion>16.10.0</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>
