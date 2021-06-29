@@ -103,7 +103,18 @@ namespace Hyperion.ValueSerializers
         public override void WriteValue(Stream stream, object value, SerializerSession session)
             => _writer(stream, value, session);
 
-        public override object ReadValue(Stream stream, DeserializerSession session) => _reader(stream, session);
+        public override object ReadValue(Stream stream, DeserializerSession session)
+        {
+            try
+            {
+                return _reader(stream, session);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(
+                    $"Failed to deserialize object of type [{Type}] from the stream.", e);
+            }
+        }
 
         public override Type GetElementType() => Type;
 
