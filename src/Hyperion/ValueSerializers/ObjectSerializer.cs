@@ -10,6 +10,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using Hyperion.Extensions;
 
@@ -111,8 +112,8 @@ namespace Hyperion.ValueSerializers
             }
             catch (Exception e)
             {
-                throw new Exception(
-                    $"Failed to deserialize object of type [{Type}] from the stream.", e);
+                throw new SerializationException(
+                    $"Failed to deserialize object of type [{Type}] from the stream. Cause: {e.Message}", e);
             }
         }
 
