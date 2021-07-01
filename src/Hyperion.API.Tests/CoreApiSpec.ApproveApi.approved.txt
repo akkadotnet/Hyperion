@@ -71,6 +71,7 @@ namespace Hyperion
     public delegate void ObjectWriter(System.IO.Stream stream, object obj, Hyperion.SerializerSession session);
     public class Serializer
     {
+        public readonly string BuildPlatform;
         public readonly Hyperion.ICodeGenerator CodeGenerator;
         public readonly Hyperion.SerializerOptions Options;
         public Serializer() { }

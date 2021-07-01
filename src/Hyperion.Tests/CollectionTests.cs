@@ -15,6 +15,7 @@ using System.Collections.Immutable;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Xunit;
 using Hyperion.SerializerFactories;
 using Hyperion.ValueSerializers;
@@ -616,5 +617,84 @@ namespace Hyperion.Tests
 				return os;
 			}
 		}
-	}
+	    
+	    [Fact]
+	    public void CanSerializeNullableIntArray()
+	    {
+		    SerializeAndAssert(new int?[]{1, 2, 3, 4, 5});
+	    }
+
+	    [Fact]
+	    public void CanSerializeLongArray()
+	    {
+		    SerializeAndAssert(new []{1L, 2L, 3L, 4L, 5L});
+	    }
+
+	    [Fact]
+	    public void CanSerializeNullableLongArray()
+	    {
+		    SerializeAndAssert(new long?[]{1L, 2L, 3L, 4L, 5L});
+	    }
+
+	    [Fact]
+	    public void CanSerializeShortArray()
+	    {
+		    SerializeAndAssert(new short[]{1, 2, 3, 4, 5});
+	    }
+        
+	    [Fact]
+	    public void CanSerializeNullableShortArray()
+	    {
+		    SerializeAndAssert(new short?[]{1, 2, 3, 4, 5});
+	    }
+        
+	    [Fact]
+	    public void CanSerializeStringArray()
+	    {
+		    SerializeAndAssert(new []{"1", "2", "3", "4", "5"});
+	    }
+        
+	    [Fact]
+	    public void CanSerializeDateTimeOffsetArray()
+	    {
+		    SerializeAndAssert(new []
+		    {
+			    DateTimeOffset.Now, 
+			    DateTimeOffset.UtcNow,
+		    });
+	    }
+        
+	    // Array of struct is not supported
+	    [Fact]
+	    public void ShouldThrowWhenDeserializingStructArray()
+	    {
+		    var o = new object();
+		    o.Invoking(_ =>
+			    SerializeAndAssert(new[]
+			    {
+				    new PrimitiveStruct {Int = 1, Long = 1, String = "1"},
+				    new PrimitiveStruct {Int = 2, Long = 2, String = "2"},
+				    new PrimitiveStruct {Int = 3, Long = 3, String = "3"},
+				    new PrimitiveStruct {Int = 4, Long = 4, String = "4"},
+				    new PrimitiveStruct {Int = 5, Long = 5, String = "5"},
+			    })
+		    ).Should().Throw<Exception>();
+	    }
+        
+	    private struct PrimitiveStruct
+	    {
+		    public int Int;
+		    public long Long;
+		    public string String;
+	    }	    
+	    
+	    private void SerializeAndAssert<T>(T[] expected)
+	    {
+		    Serialize(expected);
+		    Reset();
+		    var res = Deserialize<T[]>();
+		    Assert.Equal(expected, res);
+		    AssertMemoryStreamConsumed();
+	    }
+    }
 }

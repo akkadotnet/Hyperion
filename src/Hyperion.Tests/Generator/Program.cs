@@ -45,6 +45,16 @@ namespace Hyperion.Tests.Generator
             {
                 Serializer.Serialize(crossFrameworkMixedClass, fileStream);
             }
+
+            var serializer =
+                new Serializer(new SerializerOptions(preserveObjectReferences: true, versionTolerance: true));
+            var poco = new InvalidPoco(100, 1);
+            fileName = $"poco.tf";
+            fullPath = Path.Combine(outputPath, fileName);
+            using (var fileStream = new FileStream(fullPath, FileMode.Create))
+            {
+                serializer.Serialize(poco, fileStream);
+            }
         }
     }
 }

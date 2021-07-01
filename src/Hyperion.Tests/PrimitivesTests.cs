@@ -9,6 +9,7 @@
 
 using System;
 using System.IO;
+using FluentAssertions;
 using Xunit;
 
 namespace Hyperion.Tests

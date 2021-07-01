@@ -34,6 +34,8 @@ namespace Hyperion
         
         public readonly SerializerOptions Options;
 
+        public readonly string BuildPlatform;
+
         public Serializer() : this(new SerializerOptions())
         {
         }
@@ -44,6 +46,14 @@ namespace Hyperion
             AddSerializers();
             AddDeserializers();
             _knownValueSerializers = options.KnownTypes.Select(GetSerializerByType).ToArray();
+            
+#if NET45
+            BuildPlatform = "net45";
+#elif NETSTANDARD16
+            BuildPlatform = "netstandard1.6";
+#elif NETSTANDARD20
+            BuildPlatform = "netstandard2.0";
+#endif
         }
 
         private void AddDeserializers()

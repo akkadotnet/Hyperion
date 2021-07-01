@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using FluentAssertions;
+using Hyperion.Extensions;
 using Hyperion.Tests.Generator;
 using Xunit;
 using Xunit.Abstractions;
@@ -52,6 +54,13 @@ namespace Hyperion.Tests
             return testFiles.Select(x => new object[] { x });
         }
 
+        public static IEnumerable<object[]> PocoFiles()
+        {
+            const string defaultOutputPath = CrossFrameworkInitializer.DefaultOutputPath;
+            var testFiles = Directory.GetFiles(defaultOutputPath, "poco.tf");
+            return testFiles.Select(x => new object[] { x });
+        }
+        
         [Theory]
         [MemberData(nameof(SerializationFiles))]
         public void CanSerializeCrossFramework(string fileName)
@@ -74,6 +83,21 @@ namespace Hyperion.Tests
                 _originalMixedObject.Should()
                     .Be(deserialized, $"[CrossFrameworkMixedClass] {fileName} deserialization should work.");
             }
+        }
+
+        // The test file was build using an invalid InternalInvalidPoco where the Arg property was set to int type  
+        [Theory]
+        [MemberData(nameof(PocoFiles))]
+        public void InvalidPocoSpec(string fileName)
+        {
+            var serializer =
+                new Serializer(new SerializerOptions(preserveObjectReferences: true, versionTolerance: true));
+
+            serializer.Invoking(s =>
+            {
+                using var fileStream = new FileStream(fileName, FileMode.Open);
+                var deserialized = s.Deserialize<InvalidPoco>(fileStream);
+            }).Should().Throw<SerializationException>();
         }
     }
 }

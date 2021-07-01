@@ -176,4 +176,26 @@ namespace Hyperion.Tests.Generator
             return (Data != null ? (hash * 397) ^  Data.GetHashCode() : hash);
         }
     }
+
+    public class InvalidPoco
+    {
+        public InvalidPoco(int arg, int value)
+        {
+            Value = new InternalInvalidPoco(arg, value);
+        }
+
+        public InternalInvalidPoco Value { get; set; }
+    }
+    
+    public class InternalInvalidPoco
+    {
+        public InternalInvalidPoco(int arg, int value)
+        {
+            Arg = arg;
+            Value = value;
+        }
+        
+        public long Arg { get; set; }
+        public long Value { get; set; }
+    }
 }
