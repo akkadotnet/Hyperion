@@ -664,28 +664,31 @@ namespace Hyperion.Tests
 		    });
 	    }
         
-	    // Array of struct is not supported
 	    [Fact]
-	    public void ShouldThrowWhenDeserializingStructArray()
+	    public void CanSerializeStructArray()
 	    {
-		    var o = new object();
-		    o.Invoking(_ =>
-			    SerializeAndAssert(new[]
-			    {
-				    new PrimitiveStruct {Int = 1, Long = 1, String = "1"},
-				    new PrimitiveStruct {Int = 2, Long = 2, String = "2"},
-				    new PrimitiveStruct {Int = 3, Long = 3, String = "3"},
-				    new PrimitiveStruct {Int = 4, Long = 4, String = "4"},
-				    new PrimitiveStruct {Int = 5, Long = 5, String = "5"},
-			    })
-		    ).Should().Throw<Exception>();
+		    SerializeAndAssert(new IStructInterface[]
+		    {
+			    new PrimitiveStruct {Int = 1, Long = 1, String = "1"},
+			    new PrimitiveStruct {Int = 2, Long = 2, String = "2"},
+			    new PrimitiveStruct {Int = 3, Long = 3, String = "3"},
+			    new PrimitiveStruct {Int = 4, Long = 4, String = "4"},
+			    new PrimitiveStruct {Int = 5, Long = 5, String = "5"},
+		    });
 	    }
         
-	    private struct PrimitiveStruct
+	    private interface IStructInterface
 	    {
-		    public int Int;
-		    public long Long;
-		    public string String;
+		    int Int { get; set; }
+		    long Long { get; set; }
+		    string String { get; set; }
+	    }
+	    
+	    private struct PrimitiveStruct : IStructInterface
+	    {
+		    public int Int { get; set; }
+		    public long Long { get; set; }
+		    public string String { get; set; }
 	    }	    
 	    
 	    private void SerializeAndAssert<T>(T[] expected)
