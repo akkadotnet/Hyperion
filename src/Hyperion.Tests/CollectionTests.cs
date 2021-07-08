@@ -616,5 +616,87 @@ namespace Hyperion.Tests
 				return os;
 			}
 		}
-	}
+	    
+	    [Fact]
+	    public void CanSerializeNullableIntArray()
+	    {
+		    SerializeAndAssert(new int?[]{1, 2, 3, 4, 5});
+	    }
+
+	    [Fact]
+	    public void CanSerializeLongArray()
+	    {
+		    SerializeAndAssert(new []{1L, 2L, 3L, 4L, 5L});
+	    }
+
+	    [Fact]
+	    public void CanSerializeNullableLongArray()
+	    {
+		    SerializeAndAssert(new long?[]{1L, 2L, 3L, 4L, 5L});
+	    }
+
+	    [Fact]
+	    public void CanSerializeShortArray()
+	    {
+		    SerializeAndAssert(new short[]{1, 2, 3, 4, 5});
+	    }
+        
+	    [Fact]
+	    public void CanSerializeNullableShortArray()
+	    {
+		    SerializeAndAssert(new short?[]{1, 2, 3, 4, 5});
+	    }
+        
+	    [Fact]
+	    public void CanSerializeStringArray()
+	    {
+		    SerializeAndAssert(new []{"1", "2", "3", "4", "5"});
+	    }
+        
+	    [Fact]
+	    public void CanSerializeDateTimeOffsetArray()
+	    {
+		    SerializeAndAssert(new []
+		    {
+			    DateTimeOffset.Now, 
+			    DateTimeOffset.UtcNow,
+		    });
+	    }
+        
+	    [Fact]
+	    public void CanSerializeStructArray()
+	    {
+		    SerializeAndAssert(new IStructInterface[]
+		    {
+			    new PrimitiveStruct {Int = 1, Long = 1, String = "1"},
+			    new PrimitiveStruct {Int = 2, Long = 2, String = "2"},
+			    new PrimitiveStruct {Int = 3, Long = 3, String = "3"},
+			    new PrimitiveStruct {Int = 4, Long = 4, String = "4"},
+			    new PrimitiveStruct {Int = 5, Long = 5, String = "5"},
+		    });
+	    }
+        
+	    private interface IStructInterface
+	    {
+		    int Int { get; set; }
+		    long Long { get; set; }
+		    string String { get; set; }
+	    }
+	    
+	    private struct PrimitiveStruct : IStructInterface
+	    {
+		    public int Int { get; set; }
+		    public long Long { get; set; }
+		    public string String { get; set; }
+	    }	    
+	    
+	    private void SerializeAndAssert<T>(T[] expected)
+	    {
+		    Serialize(expected);
+		    Reset();
+		    var res = Deserialize<T[]>();
+		    Assert.Equal(expected, res);
+		    AssertMemoryStreamConsumed();
+	    }
+    }
 }
