@@ -71,8 +71,7 @@ namespace Hyperion.SerializerFactories
                     session.TrackSerializedObject(arr);
                 }
 
-                // This janky way of converting array to Array is done to get around the problem of ValueType arrays
-                WriteValues(((IEnumerable)arr).Cast<object>().ToArray(), stream, elementType, elementSerializer, session);
+                WriteValues((Array)arr, stream, elementType, elementSerializer, session);
             };
             arraySerializer.Initialize(reader, writer);
 
