@@ -3,7 +3,8 @@
 * [Remove dynamic keyword usage from array serializer](https://github.com/akkadotnet/Hyperion/pull/139)
 * [Change field ordering to ordinal](https://github.com/akkadotnet/Hyperion/pull/236)
 
-#### Possible breaking changes
+**Possible breaking changes**
+
 The change to the object serializer field ordering might cause a deserialization failure of persisted objects
 that are serialized using the Hyperion serializer.
 
