@@ -8,8 +8,10 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
@@ -21,7 +23,7 @@ namespace Hyperion.SerializerFactories
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
-        private static void WriteValues<T>(T[] array, Stream stream, Type elementType, ValueSerializer elementSerializer, SerializerSession session)
+        private static void WriteValues(Array array, Stream stream, Type elementType, ValueSerializer elementSerializer, SerializerSession session)
         {
             Int32Serializer.WriteValueImpl(stream, array.Length, session);
             var preserveObjectReferences = session.Serializer.Options.PreserveObjectReferences;
@@ -30,12 +32,13 @@ namespace Hyperion.SerializerFactories
                 stream.WriteObject(value, elementType, elementSerializer, preserveObjectReferences, session);
             }
         }
-        private static void ReadValues<T>(int length, Stream stream, DeserializerSession session, T[] array)
+        
+        private static void ReadValues(int length, Stream stream, DeserializerSession session, Array array)
         {
             for (var i = 0; i < length; i++)
             {
-                var value = (T)stream.ReadObject(session);
-                array[i] = value;
+                var value = stream.ReadObject(session);
+                array.SetValue(value, i);
             }
         }
 
@@ -57,7 +60,7 @@ namespace Hyperion.SerializerFactories
                     session.TrackDeserializedObject(array);
                 }
 
-                ReadValues(length, stream, session, (dynamic)array);
+                ReadValues(length, stream, session, array);
 
                 return array;
             };
@@ -68,7 +71,8 @@ namespace Hyperion.SerializerFactories
                     session.TrackSerializedObject(arr);
                 }
 
-                WriteValues((dynamic)arr, stream, elementType, elementSerializer, session);
+                // This janky way of converting array to Array is done to get around the problem of ValueType arrays
+                WriteValues(((IEnumerable)arr).Cast<object>().ToArray(), stream, elementType, elementSerializer, session);
             };
             arraySerializer.Initialize(reader, writer);
 
