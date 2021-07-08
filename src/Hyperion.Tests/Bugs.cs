@@ -489,5 +489,23 @@ namespace Hyperion.Tests
             Assert.DoesNotContain("System.Collections.Generic.Dictionary", text);
             Assert.Equal(msg, res);
         }
+
+        #region Issue 348
+
+        class FieldsToOrder
+        {
+            public string A2;
+            public string a1;
+        }
+
+        [Fact]
+        public void ShouldOrderFieldsByOrdinal()
+        {
+            string[] expected = { "A2", "a1" };
+            var actual = typeof(FieldsToOrder).GetFieldInfosForType().Select(x => x.Name).ToArray();
+            Assert.Equal(expected, actual);
+        }
+
+        #endregion
     }
 }
