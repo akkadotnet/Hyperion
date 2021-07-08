@@ -8,8 +8,10 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Linq;
 using Hyperion.Extensions;
 using Hyperion.ValueSerializers;
 
@@ -30,6 +32,7 @@ namespace Hyperion.SerializerFactories
                 stream.WriteObject(value, elementType, elementSerializer, preserveObjectReferences, session);
             }
         }
+        
         private static void ReadValues(int length, Stream stream, DeserializerSession session, Array array)
         {
             for (var i = 0; i < length; i++)
@@ -71,7 +74,14 @@ namespace Hyperion.SerializerFactories
                 WriteValues((Array)arr, stream, elementType, elementSerializer, session);
             };
             arraySerializer.Initialize(reader, writer);
-            typeMapping.TryAdd(type, arraySerializer);
+
+            if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
+            {
+                var wrapper = new KnownTypeObjectSerializer(arraySerializer, index);
+                typeMapping.TryAdd(type, wrapper);
+            }
+            else
+                typeMapping.TryAdd(type, arraySerializer);
             return arraySerializer;
         }
     }

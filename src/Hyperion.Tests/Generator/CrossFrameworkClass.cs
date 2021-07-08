@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Hyperion.Tests.Generator
 {
@@ -120,6 +122,58 @@ namespace Hyperion.Tests.Generator
                    && Exception.Message == other.Exception.Message 
                    && Enum == other.Enum
                    && Struct.Equals(other.Struct);
+        }
+    }
+
+    public interface ICrossFrameworkA
+    {
+        string Name { get; set; }
+    }
+
+    public interface ICrossFrameworkB : ICrossFrameworkA
+    {
+        string Sound { get; set; }
+    }
+
+    public class CrossFrameworkBase : ICrossFrameworkB
+    {
+        public string Name { get; set; }
+        public string Sound { get; set; }
+    }
+
+    public class CrossFrameworkMixedClass : CrossFrameworkBase
+    {
+        public Type FriendType { get; set; }
+        public CrossFrameworkClass Data { get; set; }
+
+        // Test case for (netcore) System.Drawing.Primitives to (net45) System.Drawing
+        public Color Color { get; set; }
+        public Point Point { get; set; }
+        public PointF PointF { get; set; }
+        public Rectangle Rectangle { get; set; }
+        public RectangleF RectangleF { get; set; }
+        public Size Size { get; set; }
+        public SizeF SizeF { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is CrossFrameworkMixedClass other))
+                return false;
+            return other.Equals(this);
+        }
+
+        protected bool Equals(CrossFrameworkMixedClass other)
+        {
+            if (other.Sound != Sound || other.Name != Name || other.FriendType != FriendType)
+                return false;
+            return other.Data.Equals(Data);
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = Name.GetHashCode();
+            hash = (hash * 397) ^ Sound.GetHashCode();
+            return (Data != null ? (hash * 397) ^  Data.GetHashCode() : hash);
         }
     }
 }

@@ -2,16 +2,28 @@
   <PropertyGroup>
     <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.11</VersionPrefix>
-    <PackageReleaseNotes>[Hyperion now targets .NET 4.5 again so it can be included inside Akka.NET v1.3.* releases](https://github.com/akkadotnet/Hyperion/pull/141).</PackageReleaseNotes>
+    <VersionPrefix>0.9.17</VersionPrefix>
+    <PackageReleaseNotes>[Bump Microsoft.NET.Test.Sdk from 16.6.1 to 16.7.1](https://github.com/akkadotnet/Hyperion/pull/182)
+[Fix unit test problem](https://github.com/akkadotnet/Hyperion/pull/191)
+[Bump FSharp.Core from 4.7.2 to 5.0.0](https://github.com/akkadotnet/Hyperion/pull/189)
+[Fix issue #40 regarding partial streams](https://github.com/akkadotnet/Hyperion/pull/185)
+[Fix Hyperion not using known serializers when defined](https://github.com/akkadotnet/Hyperion/pull/184)
+[Bump Microsoft.NET.Test.Sdk from 16.7.1 to 16.8.3](https://github.com/akkadotnet/Hyperion/pull/196)
+[Bump System.Collections.Immutable from 1.7.1 to 5.0.0](https://github.com/akkadotnet/Hyperion/pull/195)
+[Bump FSharp.Core from 5.0.0 to 5.0.1](https://github.com/akkadotnet/Hyperion/pull/202)
+[Update the cross framework spec to include complex POCO object, Type serialization, and support for netcoreapp3.1 and net5.0](https://github.com/akkadotnet/Hyperion/pull/204)</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
+    <AkkaVersion>1.4.21</AkkaVersion>
+
+    <FluentAssertionsVersion>5.10.3</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
-    <TestSdkVersion>16.4.0</TestSdkVersion>
+    <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
+    <TestSdkVersion>16.10.0</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>

@@ -8,6 +8,7 @@
 #endregion
 
 using System;
+using System.IO;
 using Xunit;
 
 namespace Hyperion.Tests
@@ -15,6 +16,15 @@ namespace Hyperion.Tests
     
     public class PrimitivesTest : TestBase
     {
+        public PrimitivesTest()
+        {
+        }
+
+        protected PrimitivesTest(Func<Stream, Stream> streamFacade)
+            : base(streamFacade)
+        {
+        }
+
         [Fact]
         public void CanSerializeTuple1()
         {

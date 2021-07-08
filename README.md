@@ -2,9 +2,9 @@
 
 [![Join the chat at https://gitter.im/akkadotnet/Hyperion](https://badges.gitter.im/akkadotnet/Hyperion.svg)](https://gitter.im/akkadotnet/Hyperion?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-A high performance polymorphic serializer for the .NET framework, fork of the [Wire](https://github.com/rogeralsing/Wire) serializer.
+A high performance polymorphic serializer for the .NET framework.
 
-Current status: **BETA** (v0.9.7).
+Current status: **BETA** (v0.9.14).
 
 ## License
 Licensed under Apache 2.0, see [LICENSE](LICENSE) for the full text.

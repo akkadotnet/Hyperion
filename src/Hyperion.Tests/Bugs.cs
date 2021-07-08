@@ -8,21 +8,32 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
 using FluentAssertions;
 using Hyperion.Extensions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Hyperion.Tests
 {
 
-    public class Bugs
+    public class Bugs : TestBase
     {
+        private readonly ITestOutputHelper _output;
+
+        public Bugs(ITestOutputHelper output)
+        {
+            _output = output;
+        }
+        
         #region issue 58
 
         public enum TrustLevel { Unknown, Suspicious, Partial, Fully }
@@ -208,6 +219,19 @@ namespace Hyperion.Tests
             Assert.Equal(stream.Length, stream.Position);
         }
 
+        #region Issue 117
+
+        [Fact]
+        public void CanSerializeColor()
+        {
+            var expected = Color.Aquamarine;
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<Color>();
+            Assert.Equal(expected, actual);
+        }
+
+        #endregion
 
         public class SnapshotSelectionCriteria
         {
@@ -246,5 +270,242 @@ namespace Hyperion.Tests
             /// </summary>
             public long ReplayMax { get; private set; }
         }
+
+        delegate int TestDelegate(int x, int y);
+
+        class Temp : IEquatable<Temp>
+        {
+            public object[] SubArray { get; set; }
+            public int[] IntArray { get; set; }
+            public int[,] IntIntArray { get; set; }
+            public Poco Poco { get; set; }
+            public string String { get; set; }
+            public Dictionary<int,string> Dictionary { get; set; }
+            public TestDelegate Delegate { get; set; }
+            public IEnumerable<int> TestEnum { get; set; }
+            public Exception Exception { get; set; }
+            public ImmutableList<int> ImmutableList { get; set; }
+            public ImmutableDictionary<int, string> ImmutableDictionary { get; set; }
+
+            public bool Equals(Temp other)
+            {
+                if (other == null) 
+                    throw new Exception("Equals failed.");
+                if (ReferenceEquals(this, other))
+                    throw new Exception("Equals failed.");
+                if (IntIntArray.Rank != other.IntIntArray.Rank)
+                    throw new Exception("Equals failed.");
+
+                for (var i = 0; i < IntIntArray.Rank; ++i)
+                {
+                    for (var j = 0; j < IntIntArray.GetLength(i); ++j)
+                    {
+                        if (IntIntArray[j, i] != other.IntIntArray[j, i])
+                            throw new Exception("Equals failed.");
+                    }
+                }
+
+                if (Exception.GetType() != other.Exception.GetType()) 
+                    throw new Exception("Equals failed.");
+                if (Exception.Message != other.Exception.Message)
+                    throw new Exception("Equals failed.");
+                if(Exception.InnerException != null 
+                   && Exception.InnerException.GetType() != other.Exception.InnerException.GetType())
+                    throw new Exception("Equals failed.");
+
+                for (var i = 0; i < SubArray.Length; i++)
+                {
+                    if (SubArray[i].GetType() != other.SubArray[i].GetType())
+                        throw new Exception("Equals failed.");
+                    
+                    if (SubArray[i] is Array arr)
+                    {
+                        var oArr = (Array)other.SubArray[i];
+                        for (var j = 0; j < arr.Length; ++j)
+                        {
+                            if (!arr.GetValue(j).Equals(oArr.GetValue(j)))
+                                throw new Exception("Equals failed.");
+                        }
+                    } else if (!SubArray[i].Equals(other.SubArray[i]))
+                        throw new Exception("Equals failed.");
+                }
+
+                foreach (var key in Dictionary.Keys)
+                {
+                    if (!Dictionary[key].Equals(other.Dictionary[key]))
+                        throw new Exception("Equals failed.");
+                }
+
+                foreach (var key in ImmutableDictionary.Keys)
+                {
+                    if (!ImmutableDictionary[key].Equals(other.ImmutableDictionary[key]))
+                        throw new Exception("Equals failed.");
+                }
+
+                if (other.Delegate(2, 2) != 4)
+                    throw new Exception("Equals failed.");
+
+                if(!IntArray.SequenceEqual(other.IntArray))
+                    throw new Exception("Equals failed.");
+                if(!Equals(Poco, other.Poco))
+                    throw new Exception("Equals failed.");
+                if (String != other.String)
+                    throw new Exception("Equals failed.");
+                if(!TestEnum.SequenceEqual(other.TestEnum))
+                    throw new Exception("Equals failed.");
+                if(!ImmutableList.SequenceEqual(other.ImmutableList))
+                    throw new Exception("Equals failed.");
+
+                return true;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null) throw new Exception("Equals failed.");
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) throw new Exception("Equals failed.");
+                return Equals((Temp) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    var hashCode = (SubArray != null ? SubArray.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (IntArray != null ? IntArray.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (IntIntArray != null ? IntIntArray.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (Poco != null ? Poco.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (String != null ? String.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (Dictionary != null ? Dictionary.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (Delegate != null ? Delegate.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (TestEnum != null ? TestEnum.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (Exception != null ? Exception.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (ImmutableList != null ? ImmutableList.GetHashCode() : 0);
+                    return hashCode;
+                }
+            }
+        }
+
+        class Poco : IEquatable<Poco>
+        {
+            public Poco()
+            { }
+
+            public Poco(int intValue, string stringValue)
+            {
+                Int = intValue;
+                String = stringValue;
+            }
+
+            public int Int { get; set; }
+            public string String { get; set; }
+
+            public bool Equals(Poco other)
+            {
+                if (ReferenceEquals(null, other)) 
+                    throw new Exception("Equals failed.");
+                if (ReferenceEquals(this, other)) 
+                    throw new Exception("Equals failed.");
+                if(Int != other.Int)
+                    throw new Exception("Equals failed.");
+                if(String != other.String)
+                    throw new Exception("Equals failed.");
+                return true;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) throw new Exception("Equals failed.");
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) throw new Exception("Equals failed.");
+                return Equals((Poco) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return (Int * 397) ^ (String != null ? String.GetHashCode() : 0);
+                }
+            }
+        }
+
+        [Fact]
+        public void WritesManifestEvenIfKnown()
+        {
+            var stream = new MemoryStream();
+            var msg = new Temp
+            {
+                SubArray = new object[] { 1, (byte)2, new object[] { 3 } },
+                IntArray = new [] {1, 2, 3, 4, 5},
+                IntIntArray = new [,] {{1, 2}, {3,4}, {5,6}, {7,8}},
+                Poco = new Poco(999, "666"),
+                String = "huhu", 
+                Dictionary = new Dictionary<int, string>
+                {
+                    { 666, "b" },
+                    { 999, "testString" },
+                    { 42, "iMaGiNe" }
+                }, 
+                Delegate = (x, y) => x * y,
+                TestEnum = new[]{4,8,9,3,2},
+                Exception = new ArgumentException("Test Exception", new IndexOutOfRangeException("-999")),
+                ImmutableList = new [] {9, 4, 6, 2, 5}.ToImmutableList(),
+                ImmutableDictionary = new Dictionary<int, string>
+                {
+                    { 666, "b" },
+                    { 999, "testString" },
+                    { 42, "iMaGiNe" }
+                }.ToImmutableDictionary(),
+            };
+            var serializer = new Serializer(new SerializerOptions(knownTypes: new[]
+            {
+                typeof(object[]),
+                typeof(int[]),
+                typeof(int[,]),
+                typeof(Dictionary<int, string>),
+                typeof(DictionaryEntry),
+                typeof(KeyValuePair<int,string>),
+                typeof(Temp), 
+                typeof(TestDelegate),
+                typeof(Enumerable),
+                typeof(IEnumerable<int>),
+                typeof(Exception),
+                typeof(ArgumentException),
+                typeof(IndexOutOfRangeException),
+                typeof(FieldInfo),
+                typeof(ImmutableList),
+                typeof(ImmutableList<int>),
+                typeof(ImmutableDictionary<int, string>),
+                typeof(MethodInfo),
+                typeof(PropertyInfo),
+            }));
+            serializer.Serialize(msg, stream);
+            stream.Position = 0;
+            var a = stream.ToArray();
+            var text = string.Join("", a.Select(x => x < 32 || x > 126 ? "" : ((char)x).ToString()));
+            _output.WriteLine(text);
+            var res = (Temp)serializer.Deserialize(stream);
+            Assert.DoesNotContain("System.Collections.Generic.Dictionary", text);
+            Assert.Equal(msg, res);
+        }
+
+        #region Issue 348
+
+        class FieldsToOrder
+        {
+            public string A2;
+            public string a1;
+        }
+
+        [Fact]
+        public void ShouldOrderFieldsByOrdinal()
+        {
+            string[] expected = { "A2", "a1" };
+            var actual = typeof(FieldsToOrder).GetFieldInfosForType().Select(x => x.Name).ToArray();
+            Assert.Equal(expected, actual);
+        }
+
+        #endregion
     }
 }

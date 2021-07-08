@@ -10,6 +10,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using Hyperion.Extensions;
 
@@ -103,7 +104,18 @@ namespace Hyperion.ValueSerializers
         public override void WriteValue(Stream stream, object value, SerializerSession session)
             => _writer(stream, value, session);
 
-        public override object ReadValue(Stream stream, DeserializerSession session) => _reader(stream, session);
+        public override object ReadValue(Stream stream, DeserializerSession session)
+        {
+            try
+            {
+                return _reader(stream, session);
+            }
+            catch (Exception e)
+            {
+                throw new SerializationException(
+                    $"Failed to deserialize object of type [{Type}] from the stream. Cause: {e.Message}", e);
+            }
+        }
 
         public override Type GetElementType() => Type;
 

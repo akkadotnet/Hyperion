@@ -16,8 +16,32 @@ namespace Hyperion
 {
     public class SerializerOptions
     {
+        public static readonly SerializerOptions Default = new SerializerOptions(
+            versionTolerance: false,
+            preserveObjectReferences: false,
+            surrogates: null,
+            serializerFactories: null,
+            knownTypes: null,
+            ignoreISerializable: false,
+            packageNameOverrides: null);
+
+        internal static List<Func<string, string>> DefaultPackageNameOverrides()
+        {
+            return new List<Func<string, string>>
+            {
+#if NET45
+                str => str.Contains("System.Private.CoreLib,%core%")
+                    ? str.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%") 
+                    : str
+#elif NETSTANDARD
+                str => str.Contains("mscorlib,%core%")
+                    ? str.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%") 
+                    : str
+#endif
+            };
+        }
+
         internal static readonly Surrogate[] EmptySurrogates = new Surrogate[0];
-        
 
         private static readonly ValueSerializerFactory[] DefaultValueSerializerFactories =
         {
@@ -53,8 +77,28 @@ namespace Hyperion
         internal readonly bool VersionTolerance;
         internal readonly Type[] KnownTypes;
         internal readonly Dictionary<Type, ushort> KnownTypesDict = new Dictionary<Type, ushort>();
+        internal readonly List<Func<string, string>> CrossFrameworkPackageNameOverrides =
+            DefaultPackageNameOverrides();
 
-        public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, IEnumerable<Surrogate> surrogates = null, IEnumerable<ValueSerializerFactory> serializerFactories = null, IEnumerable<Type> knownTypes = null, bool ignoreISerializable = false)
+        [Obsolete]
+        public SerializerOptions(
+            bool versionTolerance = false, 
+            bool preserveObjectReferences = false, 
+            IEnumerable<Surrogate> surrogates = null, 
+            IEnumerable<ValueSerializerFactory> serializerFactories = null, 
+            IEnumerable<Type> knownTypes = null, 
+            bool ignoreISerializable = false)
+            : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, null)
+        { }
+
+        public SerializerOptions(
+            bool versionTolerance, 
+            bool preserveObjectReferences, 
+            IEnumerable<Surrogate> surrogates, 
+            IEnumerable<ValueSerializerFactory> serializerFactories, 
+            IEnumerable<Type> knownTypes, 
+            bool ignoreISerializable, 
+            IEnumerable<Func<string, string>> packageNameOverrides)
         {
             VersionTolerance = versionTolerance;
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
@@ -72,6 +116,42 @@ namespace Hyperion
 
             PreserveObjectReferences = preserveObjectReferences;
             IgnoreISerializable = ignoreISerializable;
+
+            if(packageNameOverrides != null)
+                CrossFrameworkPackageNameOverrides.AddRange(packageNameOverrides);
         }
+
+        public SerializerOptions WithVersionTolerance(bool versionTolerance)
+            => Copy(versionTolerance: versionTolerance);
+        public SerializerOptions WithPreserveObjectReferences(bool preserveObjectReferences)
+            => Copy(preserveObjectReferences: preserveObjectReferences);
+        public SerializerOptions WithSurrogates(IEnumerable<Surrogate> surrogates)
+            => Copy(surrogates: surrogates);
+        public SerializerOptions WithSerializerFactory(IEnumerable<ValueSerializerFactory> serializerFactories)
+            => Copy(serializerFactories: serializerFactories);
+        public SerializerOptions WithKnownTypes(IEnumerable<Type> knownTypes)
+            => Copy(knownTypes: knownTypes);
+        public SerializerOptions WithIgnoreSerializable(bool ignoreISerializable)
+            => Copy(ignoreISerializable: ignoreISerializable);
+        public SerializerOptions WithPackageNameOverrides(IEnumerable<Func<string, string>> packageNameOverrides)
+            => Copy(packageNameOverrides: packageNameOverrides);
+
+        private SerializerOptions Copy(
+            bool? versionTolerance = null,
+            bool? preserveObjectReferences = null,
+            IEnumerable<Surrogate> surrogates = null,
+            IEnumerable<ValueSerializerFactory> serializerFactories = null,
+            IEnumerable<Type> knownTypes = null,
+            bool? ignoreISerializable = null,
+            IEnumerable<Func<string, string>> packageNameOverrides = null)
+            => new SerializerOptions(
+                versionTolerance ?? VersionTolerance,
+                preserveObjectReferences ?? PreserveObjectReferences,
+                surrogates ?? Surrogates,
+                serializerFactories ?? ValueSerializerFactories,
+                knownTypes ?? KnownTypes,
+                ignoreISerializable ?? IgnoreISerializable,
+                packageNameOverrides ?? CrossFrameworkPackageNameOverrides
+            );
     }
 }
