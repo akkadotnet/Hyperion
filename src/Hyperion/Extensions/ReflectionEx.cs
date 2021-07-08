@@ -48,7 +48,7 @@ namespace Hyperion.Extensions
                 fieldInfos.AddRange(tfields);
                 current = current.GetTypeInfo().BaseType;
             }
-            var fields = fieldInfos.OrderBy(f => f.Name).ToArray();
+            var fields = fieldInfos.OrderBy(f => f.Name, StringComparer.Ordinal).ToArray();
             return fields;
         }
     }
