@@ -17,6 +17,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Text;
+using Akka.Actor;
 using FluentAssertions;
 using Hyperion.Extensions;
 using Xunit;
@@ -507,5 +508,139 @@ namespace Hyperion.Tests
         }
 
         #endregion
+        
+        [Serializable]
+        public sealed class ShardState
+        {
+            /// <summary>
+            /// TBD
+            /// </summary>
+            public readonly string ShardId;
+            /// <summary>
+            /// TBD
+            /// </summary>
+            public readonly IImmutableSet<string> EntityIds;
+
+            /// <summary>
+            /// TBD
+            /// </summary>
+            /// <param name="shardId">TBD</param>
+            /// <param name="entityIds">TBD</param>
+            public ShardState(string shardId, IImmutableSet<string> entityIds)
+            {
+                ShardId = shardId;
+                EntityIds = entityIds;
+            }
+        }
+        
+        public interface IShardRegionQuery { }
+        
+        [Serializable]
+        public sealed class CurrentShardRegionState
+        {
+            /// <summary>
+            /// TBD
+            /// </summary>
+            public readonly IImmutableSet<ShardState> Shards;
+
+            /// <summary>
+            /// TBD
+            /// </summary>
+            /// <param name="shards">TBD</param>
+            public CurrentShardRegionState(IImmutableSet<ShardState> shards)
+            {
+                Shards = shards;
+            }
+        }
+        
+        [Serializable]
+        public sealed class GetShardRegionState : IShardRegionQuery
+        {
+            /// <summary>
+            /// TBD
+            /// </summary>
+            public static readonly GetShardRegionState Instance = new GetShardRegionState();
+
+            private GetShardRegionState()
+            {
+            }
+        }
+        
+        [Serializable]
+        public sealed class CurrentRegions
+        {
+            /// <summary>
+            /// TBD
+            /// </summary>
+            public readonly IImmutableSet<Address> Regions;
+            /// <summary>
+            /// TBD
+            /// </summary>
+            /// <param name="regions">TBD</param>
+            public CurrentRegions(IImmutableSet<Address> regions)
+            {
+                Regions = regions;
+            }
+        }
+
+        [Fact]
+        public void ShouldSerializeShardState()
+        {
+            var ids = new HashSet<string> {"AAAA", "BBBB", "CCCC", "DDDD"};
+            var state = new ShardState("shard id", ids.ToImmutableHashSet());
+
+            var res = ValidateSerialization(state);
+            Assert.Equal(state.ShardId, res.ShardId);
+            Assert.Equal(state.EntityIds, res.EntityIds);
+        }
+
+        [Fact]
+        public void ShouldSerializeCurrentShardRegionState()
+        {
+            var set = new HashSet<ShardState>();
+            
+            var ids = new HashSet<string> {"AAAA", "BBBB", "CCCC", "DDDD"};
+            set.Add(new ShardState("shard id 1", ids.ToImmutableHashSet()));
+            set.Add(new ShardState("shard id 2", ids.ToImmutableHashSet()));
+            set.Add(new ShardState("shard id 3", ids.ToImmutableHashSet()));
+            set.Add(new ShardState("shard id 4", ids.ToImmutableHashSet()));
+            
+            var regionState = new CurrentShardRegionState(set.ToImmutableHashSet());
+
+            var res = ValidateSerialization(regionState);
+        }
+
+        [Fact]
+        public void ShouldSerializeGetShardRegionState()
+        {
+            ValidateSerialization(GetShardRegionState.Instance);
+        }
+
+        [Fact]
+        public void ShouldSerializeCurrentRegions()
+        {
+            var set = new HashSet<Address>
+            {
+                new Address("akka.tcp", "sys1"),
+                new Address("akka.tcp", "sys2", "Alice"),
+                new Address("akka.tcp", "sys3", "Bob", 100),
+                new Address("akka.tcp", "sys4")
+            };
+
+            var regions = new CurrentRegions(set.ToImmutableHashSet());
+            ValidateSerialization(regions);
+        }
+        
+        private T ValidateSerialization<T>(T expected)
+        {
+            var stream = new MemoryStream();
+            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true, versionTolerance: true));
+            serializer.Serialize(expected, stream);
+            stream.Position = 0;
+            var res = (T)serializer.Deserialize(stream);
+            Assert.Equal(stream.Length, stream.Position);
+            
+            return res;
+        }
     }
 }
