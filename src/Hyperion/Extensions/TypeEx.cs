@@ -10,13 +10,25 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
 using System.Text.RegularExpressions;
 
 namespace Hyperion.Extensions
 {
+    public class EvilDeserializationException : SecurityException
+    {
+        public EvilDeserializationException(string message,
+            string typeString) : base(message)
+        {
+            BadTypeString = typeString;
+        }
+
+        public string BadTypeString { get; }
+    }
     internal static class TypeEx
     {
         //Why not inline typeof you ask?
@@ -132,19 +144,82 @@ namespace Hyperion.Extensions
             });
         }
 
+        public static bool disallowUnsafeTypes = true;
+
+        private static ReadOnlyCollection<string> unsafeTypesDenySet =
+            new ReadOnlyCollection<string>(new[]
+            {
+                "System.Security.Claims.ClaimsIdentity",
+                "System.Windows.Forms.AxHost.State",
+                "System.Windows.Data.ObjectDataProvider",
+                "System.Management.Automation.PSObject",
+                "System.Web.Security.RolePrincipal",
+                "System.IdentityModel.Tokens.SessionSecurityToken",
+                "SessionViewStateHistoryItem",
+                "TextFormattingRunProperties",
+                "ToolboxItemContainer",
+                "System.Security.Principal.WindowsClaimsIdentity",
+                "System.Security.Principal.WindowsIdentity",
+                "System.Security.Principal.WindowsPrincipal",
+                "System.CodeDom.Compiler.TempFileCollection",
+                "System.IO.FileSystemInfo",
+                "System.Activities.Presentation.WorkflowDesigner",
+                "System.Windows.ResourceDictionary",
+                "System.Windows.Forms.BindingSource",
+                "Microsoft.Exchange.Management.SystemManager.WinForms.ExchangeSettingsProvider",
+                "System.Diagnostics.Process",
+                "System.Management.IWbemClassObjectFreeThreaded"
+            });
+
+#if NETSTANDARD1_6
+#else
+        public static bool UnsafeInheritanceCheck(Type type)
+        {
+            if (type.IsValueType)
+                return false;
+            var currentBase = type.BaseType;
+            while (currentBase != typeof(object))
+            {
+                if (unsafeTypesDenySet.Any(r => currentBase.FullName.Contains(r)))
+                    return true;
+                currentBase = currentBase.BaseType;
+            }
+
+            return false;
+        }
+     #endif    
         public static Type LoadTypeByName(string name)
         {
+            if (disallowUnsafeTypes && unsafeTypesDenySet.Any(r => name.Contains(r)))
+            {
+                throw new EvilDeserializationException(
+                    "Unsafe Type Deserialization Detected!", name);
+            }
             try
             {
                 // Try to load type name using strict version to avoid possible conflicts
                 // i.e. if there are different version available in GAC and locally
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: false);
-                return Type.GetType(typename, true);
+                var type = Type.GetType(typename, true);
+#if  NETSTANDARD1_6
+                #else
+                if (UnsafeInheritanceCheck(type))
+                    throw new EvilDeserializationException(
+                        "Unsafe Type Deserialization Detected!", name);
+#endif
+                return type;
             }
             catch (FileLoadException)
             {
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: true);
-                return Type.GetType(typename, true);
+                var type =  Type.GetType(typename, true);
+#if  NETSTANDARD1_6
+#else
+                if (UnsafeInheritanceCheck(type))
+                    throw new EvilDeserializationException(
+                        "Unsafe Type Deserialization Detected!", name);
+#endif
+                return type;
             }
         }
         

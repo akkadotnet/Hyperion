@@ -8,6 +8,7 @@
 #endregion
 
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using Hyperion.Extensions;
 
@@ -60,13 +61,16 @@ namespace Hyperion.ValueSerializers
             }
         }
 
+        private static readonly ConcurrentDictionary<string, Type> TypeNameLookup =
+            new ConcurrentDictionary<string, Type>();
         public override object ReadValue(Stream stream, DeserializerSession session)
         {
             var shortname = stream.ReadString(session);
             if (shortname == null)
                 return null;
 
-            var type = TypeEx.LoadTypeByName(shortname);
+            var type = TypeNameLookup.GetOrAdd(shortname,
+                name => TypeEx.LoadTypeByName(shortname));
 
             //add the deserialized type to lookup
             if (session.Serializer.Options.PreserveObjectReferences)
