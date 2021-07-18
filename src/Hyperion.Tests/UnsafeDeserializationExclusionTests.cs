@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Hyperion.Extensions;
+using Hyperion.Internal;
 using Xunit;
 
 namespace Hyperion.Tests

@@ -14,21 +14,11 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Security;
 using System.Text.RegularExpressions;
+using Hyperion.Internal;
 
 namespace Hyperion.Extensions
 {
-    public class EvilDeserializationException : SecurityException
-    {
-        public EvilDeserializationException(string message,
-            string typeString) : base(message)
-        {
-            BadTypeString = typeString;
-        }
-
-        public string BadTypeString { get; }
-    }
     internal static class TypeEx
     {
         //Why not inline typeof you ask?
