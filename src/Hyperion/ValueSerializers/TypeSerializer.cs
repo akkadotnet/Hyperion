@@ -70,7 +70,7 @@ namespace Hyperion.ValueSerializers
                 return null;
 
             var type = TypeNameLookup.GetOrAdd(shortname,
-                name => TypeEx.LoadTypeByName(shortname));
+                name => TypeEx.LoadTypeByName(shortname, session.Serializer.Options.DisallowUnsafeTypes));
 
             //add the deserialized type to lookup
             if (session.Serializer.Options.PreserveObjectReferences)
