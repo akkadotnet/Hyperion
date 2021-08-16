@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks>net461;netcoreapp3.1;net5.0</TargetFrameworks>
     <IsPackable>false</IsPackable> <!-- prevents it from being published as NuGet package -->
   </PropertyGroup>
 
