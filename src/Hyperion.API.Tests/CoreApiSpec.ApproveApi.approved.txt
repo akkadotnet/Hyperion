@@ -91,7 +91,10 @@ namespace Hyperion
         public static readonly Hyperion.SerializerOptions Default;
         [System.Obsolete]
         public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates = null, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories = null, System.Collections.Generic.IEnumerable<System.Type> knownTypes = null, bool ignoreISerializable = false) { }
+        [System.Obsolete]
         public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides) { }
+        public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides, bool disallowUnsafeTypes) { }
+        public Hyperion.SerializerOptions WithDisallowUnsafeType(bool disallowUnsafeType) { }
         public Hyperion.SerializerOptions WithIgnoreSerializable(bool ignoreISerializable) { }
         public Hyperion.SerializerOptions WithKnownTypes(System.Collections.Generic.IEnumerable<System.Type> knownTypes) { }
         public Hyperion.SerializerOptions WithPackageNameOverrides(System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides) { }

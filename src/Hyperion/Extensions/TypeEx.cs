@@ -130,7 +130,7 @@ namespace Hyperion.Extensions
                         break;
                 }
 
-                return LoadTypeByName(shortName);
+                return LoadTypeByName(shortName, session.Serializer.Options.DisallowUnsafeTypes);
             });
         }
 
@@ -178,7 +178,7 @@ namespace Hyperion.Extensions
         }
 #endif
         
-        public static Type LoadTypeByName(string name)
+        public static Type LoadTypeByName(string name, bool disallowUnsafeTypes)
         {
             if (disallowUnsafeTypes && unsafeTypesDenySet.Any(r => name.Contains(r)))
             {
