@@ -25,7 +25,7 @@ let output = __SOURCE_DIRECTORY__  @@ "bin"
 let outputTests = __SOURCE_DIRECTORY__ @@ "TestResults"
 let outputPerfTests = __SOURCE_DIRECTORY__ @@ "PerfResults"
 let outputBinaries = output @@ "binaries"
-let outputBinariesNet461 = outputBinaries @@ "net461"
+let outputBinariesNet461 = outputBinaries @@ "net471"
 let outputBinariesNetStandard = outputBinaries @@ "netstandard2.0"
 let outputBinariesNet = outputBinaries @@ "net5.0"
 let outputNuGet = output @@ "nuget"
@@ -52,7 +52,7 @@ let versionSuffix =
     | str -> str
 
 // Configuration values for tests
-let testNetFrameworkVersion = "net461"
+let testNetFrameworkVersion = "net471"
 let testNetCoreVersion = "netcoreapp3.1"
 let testNetVersion = "net5.0"
 
