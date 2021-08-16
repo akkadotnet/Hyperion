@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
+    <Copyright>Copyright © 2016-2021 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
     <VersionPrefix>0.9.17</VersionPrefix>
     <PackageReleaseNotes>[Bump Microsoft.NET.Test.Sdk from 16.6.1 to 16.7.1](https://github.com/akkadotnet/Hyperion/pull/182)
@@ -19,7 +19,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <AkkaVersion>1.4.23</AkkaVersion>
-
     <FluentAssertionsVersion>6.0.0</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
