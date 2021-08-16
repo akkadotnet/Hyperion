@@ -350,6 +350,11 @@ namespace Hyperion.Internal
         public string Contract { get; }
         public bool ForceFullStates { get; }
     }
+    public class EvilDeserializationException : System.Security.SecurityException
+    {
+        public EvilDeserializationException(string message, string typeString) { }
+        public string BadTypeString { get; }
+    }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
     public sealed class HtmlAttributeValueAttribute : System.Attribute
     {
