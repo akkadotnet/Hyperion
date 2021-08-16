@@ -18,6 +18,13 @@
     <DefineConstants>$(DefineConstants);NETFX</DefineConstants>
   </PropertyGroup>
 
+  
+  <ItemGroup Condition="'$(TargetFramework)' == '$(NetFrameworkTestVersion)'">
+      <Reference Include="System.Drawing">
+        <Private>true</Private>
+      </Reference>
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
@@ -31,9 +38,4 @@
     <ProjectReference Include="..\Hyperion\Hyperion.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net461'">
-      <Reference Include="System.Drawing">
-        <Private>true</Private>
-      </Reference>
-  </ItemGroup>
 </Project>
