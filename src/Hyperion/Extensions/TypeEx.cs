@@ -161,23 +161,23 @@ namespace Hyperion.Extensions
                 "System.Management.IWbemClassObjectFreeThreaded"
             });
 
-#if NETSTANDARD1_6
-#else
+#if !NETSTANDARD1_6
         public static bool UnsafeInheritanceCheck(Type type)
         {
             if (type.IsValueType)
                 return false;
             var currentBase = type.BaseType;
-            while (currentBase != typeof(object))
+            while (currentBase != null)
             {
-                if (unsafeTypesDenySet.Any(r => currentBase.FullName.Contains(r)))
+                if (unsafeTypesDenySet.Any(r => currentBase.FullName?.Contains(r) ?? false))
                     return true;
                 currentBase = currentBase.BaseType;
             }
 
             return false;
         }
-     #endif    
+#endif
+        
         public static Type LoadTypeByName(string name)
         {
             if (disallowUnsafeTypes && unsafeTypesDenySet.Any(r => name.Contains(r)))
