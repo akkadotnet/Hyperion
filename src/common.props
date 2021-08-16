@@ -18,12 +18,12 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <AkkaVersion>1.4.21</AkkaVersion>
+    <AkkaVersion>1.4.23</AkkaVersion>
 
-    <FluentAssertionsVersion>5.10.3</FluentAssertionsVersion>
+    <FluentAssertionsVersion>6.0.0</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
-    <TestSdkVersion>16.10.0</TestSdkVersion>
+    <TestSdkVersion>16.11.0</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>
