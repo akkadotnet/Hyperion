@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\common.props" />
+  <Import Project="..\..\xunitSettings.props" />
 
   <PropertyGroup>
     <TargetFrameworks>$(NetFrameworkTestVersion);$(NetTestVersion);$(NetCoreTestVersion)</TargetFrameworks>
