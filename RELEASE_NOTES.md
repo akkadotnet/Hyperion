@@ -1,3 +1,33 @@
+### 0.11.1 August 17 2021 ####
+* Add [unsafe deserialization type blacklist](https://github.com/akkadotnet/Hyperion/pull/242)
+* Bump [Akka version from 1.4.21 to 1.4.23](https://github.com/akkadotnet/Hyperion/pull/246)
+
+We've added a deserialization safety check to block dangerous types from being deserialized. 
+This is done to add a layer of security from possible code injection and code execution attack.
+Currently it is an all or nothing feature that can be turned on and off by using the new `DisallowUnsafeTypes` flag inside `SerializerOptions` (defaults to true).
+
+The unsafe types that are currently blocked are:
+- System.Security.Claims.ClaimsIdentity
+- System.Windows.Forms.AxHost.State
+- System.Windows.Data.ObjectDataProvider
+- System.Management.Automation.PSObject
+- System.Web.Security.RolePrincipal
+- System.IdentityModel.Tokens.SessionSecurityToken
+- SessionViewStateHistoryItem
+- TextFormattingRunProperties
+- ToolboxItemContainer
+- System.Security.Principal.WindowsClaimsIdentity
+- System.Security.Principal.WindowsIdentity
+- System.Security.Principal.WindowsPrincipal
+- System.CodeDom.Compiler.TempFileCollection
+- System.IO.FileSystemInfo
+- System.Activities.Presentation.WorkflowDesigner
+- System.Windows.ResourceDictionary
+- System.Windows.Forms.BindingSource
+- Microsoft.Exchange.Management.SystemManager.WinForms.ExchangeSettingsProvider
+- System.Diagnostics.Process
+- System.Management.IWbemClassObjectFreeThreaded
+
 ### 0.11.0 July 8 2021 ####
 * [Fix array of user defined structs serialization failure](https://github.com/akkadotnet/Hyperion/pull/235)
 * [Remove dynamic keyword usage from array serializer](https://github.com/akkadotnet/Hyperion/pull/139)

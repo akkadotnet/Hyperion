@@ -1,29 +1,31 @@
 <Project>
   <PropertyGroup>
-    <Copyright>Copyright © 2016-2017 Akka.NET Team</Copyright>
+    <Copyright>Copyright © 2016-2021 Akka.NET Team</Copyright>
     <Authors>Akka.NET Team</Authors>
-    <VersionPrefix>0.9.17</VersionPrefix>
-    <PackageReleaseNotes>[Bump Microsoft.NET.Test.Sdk from 16.6.1 to 16.7.1](https://github.com/akkadotnet/Hyperion/pull/182)
-[Fix unit test problem](https://github.com/akkadotnet/Hyperion/pull/191)
-[Bump FSharp.Core from 4.7.2 to 5.0.0](https://github.com/akkadotnet/Hyperion/pull/189)
-[Fix issue #40 regarding partial streams](https://github.com/akkadotnet/Hyperion/pull/185)
-[Fix Hyperion not using known serializers when defined](https://github.com/akkadotnet/Hyperion/pull/184)
-[Bump Microsoft.NET.Test.Sdk from 16.7.1 to 16.8.3](https://github.com/akkadotnet/Hyperion/pull/196)
-[Bump System.Collections.Immutable from 1.7.1 to 5.0.0](https://github.com/akkadotnet/Hyperion/pull/195)
-[Bump FSharp.Core from 5.0.0 to 5.0.1](https://github.com/akkadotnet/Hyperion/pull/202)
-[Update the cross framework spec to include complex POCO object, Type serialization, and support for netcoreapp3.1 and net5.0](https://github.com/akkadotnet/Hyperion/pull/204)</PackageReleaseNotes>
+    <VersionPrefix>0.11.0</VersionPrefix>
+    <PackageReleaseNotes>[Fix array of user defined structs serialization failure](https://github.com/akkadotnet/Hyperion/pull/235)
+[Remove dynamic keyword usage from array serializer](https://github.com/akkadotnet/Hyperion/pull/139)
+[Change field ordering to ordinal](https://github.com/akkadotnet/Hyperion/pull/236)
+Possible breaking changes**
+The change to the object serializer field ordering might cause a deserialization failure of persisted objects
+that are serialized using the Hyperion serializer.
+Please report any serialization problem that occurs after an upgrade to this version at the
+[issue tracker](https://github.com/akkadotnet/Hyperion/issues)</PackageReleaseNotes>
     <PackageIconUrl>http://getakka.net/images/akkalogo.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/akkadotnet/Hyperion</PackageProjectUrl>
     <PackageLicenseUrl>https://github.com/akkadotnet/Hyperion/blob/master/LICENSE</PackageLicenseUrl>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
-    <AkkaVersion>1.4.21</AkkaVersion>
-
-    <FluentAssertionsVersion>5.10.3</FluentAssertionsVersion>
+    <NetCoreTestVersion>netcoreapp3.1</NetCoreTestVersion>
+    <NetTestVersion>net5.0</NetTestVersion>
+    <NetFrameworkTestVersion>net471</NetFrameworkTestVersion>
+    <NetStandardLibVersion>netstandard2.0</NetStandardLibVersion>
+    <AkkaVersion>1.4.23</AkkaVersion>
+    <FluentAssertionsVersion>6.0.0</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
-    <TestSdkVersion>16.10.0</TestSdkVersion>
+    <TestSdkVersion>16.11.0</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>

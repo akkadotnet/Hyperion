@@ -10,10 +10,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Hyperion.Internal;
 
 namespace Hyperion.Extensions
 {
@@ -44,6 +46,31 @@ namespace Hyperion.Extensions
         public static readonly Type TypeType = typeof(Type);
         public static readonly Type RuntimeType = Type.GetType("System.RuntimeType");
 
+        private static readonly ReadOnlyCollection<string> UnsafeTypesDenySet =
+            new ReadOnlyCollection<string>(new[]
+            {
+                "System.Security.Claims.ClaimsIdentity",
+                "System.Windows.Forms.AxHost.State",
+                "System.Windows.Data.ObjectDataProvider",
+                "System.Management.Automation.PSObject",
+                "System.Web.Security.RolePrincipal",
+                "System.IdentityModel.Tokens.SessionSecurityToken",
+                "SessionViewStateHistoryItem",
+                "TextFormattingRunProperties",
+                "ToolboxItemContainer",
+                "System.Security.Principal.WindowsClaimsIdentity",
+                "System.Security.Principal.WindowsIdentity",
+                "System.Security.Principal.WindowsPrincipal",
+                "System.CodeDom.Compiler.TempFileCollection",
+                "System.IO.FileSystemInfo",
+                "System.Activities.Presentation.WorkflowDesigner",
+                "System.Windows.ResourceDictionary",
+                "System.Windows.Forms.BindingSource",
+                "Microsoft.Exchange.Management.SystemManager.WinForms.ExchangeSettingsProvider",
+                "System.Diagnostics.Process",
+                "System.Management.IWbemClassObjectFreeThreaded"
+            });
+        
         public static bool IsHyperionPrimitive(this Type type)
         {
             return type == Int32Type ||
@@ -67,8 +94,15 @@ namespace Hyperion.Extensions
         }
 
 #if NETSTANDARD16
-    //HACK: the GetUnitializedObject actually exists in .NET Core, its just not public
-        private static readonly Func<Type, object> getUninitializedObjectDelegate = (Func<Type, object>)
+        //HACK: IsValueType does not exist for netstandard1.6
+        private static bool IsValueType(this Type type)
+            => type.IsSubclassOf(typeof(ValueType));
+        
+        private static bool IsSubclassOf(this Type p, Type c)
+            =>  c.IsAssignableFrom(p);
+        
+        //HACK: the GetUnitializedObject actually exists in .NET Core, its just not public
+        private static readonly Func<Type, object> GetUninitializedObjectDelegate = (Func<Type, object>)
             typeof(string)
                 .GetTypeInfo()
                 .Assembly
@@ -79,7 +113,7 @@ namespace Hyperion.Extensions
 
         public static object GetEmptyObject(this Type type)
         {
-            return getUninitializedObjectDelegate(type);
+            return GetUninitializedObjectDelegate(type);
         }
 #else
         public static object GetEmptyObject(this Type type) => System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
@@ -128,23 +162,62 @@ namespace Hyperion.Extensions
                         break;
                 }
 
-                return LoadTypeByName(shortName);
+                return LoadTypeByName(shortName, session.Serializer.Options.DisallowUnsafeTypes);
             });
         }
 
-        public static Type LoadTypeByName(string name)
+        private static bool UnsafeInheritanceCheck(Type type)
         {
+#if NETSTANDARD1_6
+            if (type.IsValueType())
+                return false;
+            var currentBase = type.DeclaringType;
+#else
+            if (type.IsValueType)
+                return false;
+            var currentBase = type.BaseType;
+#endif
+            
+            while (currentBase != null)
+            {
+                if (UnsafeTypesDenySet.Any(r => currentBase.FullName?.Contains(r) ?? false))
+                    return true;
+#if NETSTANDARD1_6
+                currentBase = currentBase.DeclaringType;
+#else
+                currentBase = currentBase.BaseType;
+#endif
+            }
+
+            return false;
+        }
+        
+        public static Type LoadTypeByName(string name, bool disallowUnsafeTypes)
+        {
+            if (disallowUnsafeTypes && UnsafeTypesDenySet.Any(name.Contains))
+            {
+                throw new EvilDeserializationException(
+                    "Unsafe Type Deserialization Detected!", name);
+            }
             try
             {
                 // Try to load type name using strict version to avoid possible conflicts
                 // i.e. if there are different version available in GAC and locally
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: false);
-                return Type.GetType(typename, true);
+                var type = Type.GetType(typename, true);
+                if (UnsafeInheritanceCheck(type))
+                    throw new EvilDeserializationException(
+                        "Unsafe Type Deserialization Detected!", name);
+                return type;
             }
             catch (FileLoadException)
             {
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: true);
-                return Type.GetType(typename, true);
+                var type =  Type.GetType(typename, true);
+                if (UnsafeInheritanceCheck(type))
+                    throw new EvilDeserializationException(
+                        "Unsafe Type Deserialization Detected!", name);
+                return type;
             }
         }
         
@@ -333,6 +406,11 @@ namespace Hyperion.Extensions
         /// </summary>
         private static bool IsSimilarType(this Type thisType, Type type)
         {
+            if (thisType == null && type == null)
+                return true;
+            if (thisType == null || type == null)
+                return false;
+            
             // Ignore any 'ref' types
             if (thisType.IsByRef)
                 thisType = thisType.GetElementType();
