@@ -20,3 +20,10 @@ jobs:
     vmImage: 'windows-2019'
     scriptFileName: build.cmd
     scriptArgs: all
+- template: azure-pipeline.template.yaml
+  parameters:
+    name: 'linux_pr'
+    displayName: 'Linux PR Validation'
+    vmImage: 'ubuntu-18.04'
+    scriptFileName: ./build.sh
+    scriptArgs: all

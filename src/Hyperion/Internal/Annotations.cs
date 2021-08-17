@@ -8,6 +8,7 @@
 #endregion
 
 using System;
+using System.Security;
 
 #pragma warning disable 1591
 // ReSharper disable UnusedMember.Global
@@ -19,6 +20,16 @@ using System;
 
 namespace Hyperion.Internal
 {
+    public class EvilDeserializationException : SecurityException
+    {
+        public EvilDeserializationException(string message,
+            string typeString) : base(message)
+        {
+            BadTypeString = typeString;
+        }
+
+        public string BadTypeString { get; }
+    }
     /// <summary>
     /// Indicates that the value of the marked element could be <c>null</c> sometimes,
     /// so the check for <c>null</c> is necessary before its usage.

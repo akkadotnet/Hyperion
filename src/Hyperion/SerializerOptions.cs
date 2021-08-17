@@ -23,7 +23,8 @@ namespace Hyperion
             serializerFactories: null,
             knownTypes: null,
             ignoreISerializable: false,
-            packageNameOverrides: null);
+            packageNameOverrides: null,
+            disallowUnsafeTypes: true);
 
         internal static List<Func<string, string>> DefaultPackageNameOverrides()
         {
@@ -77,8 +78,8 @@ namespace Hyperion
         internal readonly bool VersionTolerance;
         internal readonly Type[] KnownTypes;
         internal readonly Dictionary<Type, ushort> KnownTypesDict = new Dictionary<Type, ushort>();
-        internal readonly List<Func<string, string>> CrossFrameworkPackageNameOverrides =
-            DefaultPackageNameOverrides();
+        internal readonly List<Func<string, string>> CrossFrameworkPackageNameOverrides = DefaultPackageNameOverrides();
+        internal readonly bool DisallowUnsafeTypes;
 
         [Obsolete]
         public SerializerOptions(
@@ -91,6 +92,7 @@ namespace Hyperion
             : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, null)
         { }
 
+        [Obsolete]
         public SerializerOptions(
             bool versionTolerance, 
             bool preserveObjectReferences, 
@@ -99,6 +101,18 @@ namespace Hyperion
             IEnumerable<Type> knownTypes, 
             bool ignoreISerializable, 
             IEnumerable<Func<string, string>> packageNameOverrides)
+            : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, null, true)
+        { }
+        
+        public SerializerOptions(
+            bool versionTolerance, 
+            bool preserveObjectReferences, 
+            IEnumerable<Surrogate> surrogates, 
+            IEnumerable<ValueSerializerFactory> serializerFactories, 
+            IEnumerable<Type> knownTypes, 
+            bool ignoreISerializable, 
+            IEnumerable<Func<string, string>> packageNameOverrides,
+            bool disallowUnsafeTypes)
         {
             VersionTolerance = versionTolerance;
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
@@ -119,6 +133,8 @@ namespace Hyperion
 
             if(packageNameOverrides != null)
                 CrossFrameworkPackageNameOverrides.AddRange(packageNameOverrides);
+
+            DisallowUnsafeTypes = disallowUnsafeTypes;
         }
 
         public SerializerOptions WithVersionTolerance(bool versionTolerance)
@@ -135,6 +151,8 @@ namespace Hyperion
             => Copy(ignoreISerializable: ignoreISerializable);
         public SerializerOptions WithPackageNameOverrides(IEnumerable<Func<string, string>> packageNameOverrides)
             => Copy(packageNameOverrides: packageNameOverrides);
+        public SerializerOptions WithDisallowUnsafeType(bool disallowUnsafeType)
+            => Copy(disallowUnsafeType: disallowUnsafeType);
 
         private SerializerOptions Copy(
             bool? versionTolerance = null,
@@ -143,7 +161,8 @@ namespace Hyperion
             IEnumerable<ValueSerializerFactory> serializerFactories = null,
             IEnumerable<Type> knownTypes = null,
             bool? ignoreISerializable = null,
-            IEnumerable<Func<string, string>> packageNameOverrides = null)
+            IEnumerable<Func<string, string>> packageNameOverrides = null,
+            bool? disallowUnsafeType = null)
             => new SerializerOptions(
                 versionTolerance ?? VersionTolerance,
                 preserveObjectReferences ?? PreserveObjectReferences,
@@ -151,7 +170,8 @@ namespace Hyperion
                 serializerFactories ?? ValueSerializerFactories,
                 knownTypes ?? KnownTypes,
                 ignoreISerializable ?? IgnoreISerializable,
-                packageNameOverrides ?? CrossFrameworkPackageNameOverrides
+                packageNameOverrides ?? CrossFrameworkPackageNameOverrides,
+                disallowUnsafeType ?? DisallowUnsafeTypes
             );
     }
 }

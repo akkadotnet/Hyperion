@@ -25,7 +25,7 @@ let output = __SOURCE_DIRECTORY__  @@ "bin"
 let outputTests = __SOURCE_DIRECTORY__ @@ "TestResults"
 let outputPerfTests = __SOURCE_DIRECTORY__ @@ "PerfResults"
 let outputBinaries = output @@ "binaries"
-let outputBinariesNet461 = outputBinaries @@ "net461"
+let outputBinariesNet461 = outputBinaries @@ "net471"
 let outputBinariesNetStandard = outputBinaries @@ "netstandard2.0"
 let outputBinariesNet = outputBinaries @@ "net5.0"
 let outputNuGet = output @@ "nuget"
@@ -52,7 +52,7 @@ let versionSuffix =
     | str -> str
 
 // Configuration values for tests
-let testNetFrameworkVersion = "net461"
+let testNetFrameworkVersion = "net471"
 let testNetCoreVersion = "netcoreapp3.1"
 let testNetVersion = "net5.0"
 
@@ -115,7 +115,8 @@ Target "RunTests" (fun _ ->
     let projects = 
         match (isWindows) with 
         | true -> !! "./src/**/*.Tests.csproj"
-        | _ -> !! "./src/**/*.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
+        | _ -> !! "./src/**/*.Tests.csproj"
+               -- "./src/**/*.API.Tests.csproj" // if you need to filter specs for Linux vs. Windows, do it here
 
     let runSingleProject project =
         let arguments =
