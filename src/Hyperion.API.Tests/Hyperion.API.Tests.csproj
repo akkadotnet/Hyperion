@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ApprovalTests" Version="5.7.0" />
+    <PackageReference Include="ApprovalTests" Version="5.7.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
     <PackageReference Include="PublicApiGenerator" Version="10.2.0" />
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
