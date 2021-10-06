@@ -15,6 +15,7 @@ using System.Collections.Immutable;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
+using FluentAssertions;
 using Xunit;
 using Hyperion.SerializerFactories;
 using Hyperion.ValueSerializers;
@@ -415,6 +416,35 @@ namespace Hyperion.Tests
             Assert.True(msg.SequenceEqual(deserialized));
         }
 
+        [Fact]
+        public void Issue263_CanSerializeArrayOfSurrogate_WhenPreservingObjectReference()
+        {
+	        var invoked = new List<SurrogatedClass.ClassSurrogate>();
+	        var serializer = new Serializer(new SerializerOptions(
+		        preserveObjectReferences: true, 
+		        surrogates: new []
+		        {
+			        Surrogate.Create<SurrogatedClass, SurrogatedClass.ClassSurrogate>( 
+				        to => to.ToSurrogate(),
+				        from => { 
+					        invoked.Add(from);
+					        return from.FromSurrogate();
+				        }), 
+		        }));
+	        
+	        var objectRef = new SurrogatedClass(5);
+	        var expected = new List<SurrogatedClass> { objectRef, objectRef };
+	        using (var stream = new MemoryStream())
+	        {
+		        serializer.Serialize(expected, stream);
+		        stream.Position = 0;
+		        var deserialized = serializer.Deserialize<List<SurrogatedClass>>(stream);
+		        deserialized.Count.Should().Be(2);
+		        invoked.Count.Should().Be(1);
+		        ReferenceEquals(deserialized[0], deserialized[1]).Should().BeTrue();
+	        }
+        }
+        
         #region test classes
 
         public class CustomAdd : IEnumerable<int>
@@ -451,6 +481,56 @@ namespace Hyperion.Tests
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
+        public class SurrogatedClass
+        {
+	        public class ClassSurrogate
+	        {
+		        public ClassSurrogate(string value)
+		        {
+			        Value = value;
+		        }
+
+		        public string Value { get; }
+
+		        public SurrogatedClass FromSurrogate()
+			        => new SurrogatedClass(int.Parse(Value));
+
+		        public override bool Equals(object obj)
+		        {
+			        if (ReferenceEquals(null, obj)) return false;
+			        if (ReferenceEquals(this, obj)) return true;
+			        return obj is ClassSurrogate s && s.Value == Value;
+		        }
+
+		        public override int GetHashCode()
+		        {
+			        return (Value != null ? Value.GetHashCode() : 0);
+		        }
+	        }
+	        
+	        public SurrogatedClass(int value)
+	        {
+		        Value = value;
+	        }
+
+	        public int Value { get; }
+
+	        public ClassSurrogate ToSurrogate()
+		        => new ClassSurrogate(Value.ToString());
+
+	        public override bool Equals(object obj)
+	        {
+		        if (ReferenceEquals(null, obj)) return false;
+		        if (ReferenceEquals(this, obj)) return true;
+		        return obj is SurrogatedClass s && s.Value == Value;
+	        }
+
+	        public override int GetHashCode()
+	        {
+		        return Value;
+	        }
+        }
+        
         #endregion
 
         [Fact]
