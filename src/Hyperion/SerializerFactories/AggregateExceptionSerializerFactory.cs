@@ -78,7 +78,6 @@ namespace Hyperion.SerializerFactories
                 info.AddValue("ExceptionMethod", stream.ReadString(session), typeof (string));
                 info.AddValue("HResult", stream.ReadInt32(session));
                 info.AddValue("Source", stream.ReadString(session), typeof (string));
-                info.AddValue("WatsonBuckets", stream.ReadLengthEncodedByteArray(session), typeof (byte[]));
                 info.AddValue("InnerExceptions", stream.ReadObject(session), typeof (Exception[]));
                 
                 return Activator.CreateInstance(type, BindingFlags.NonPublic | BindingFlags.CreateInstance | BindingFlags.Instance, null, new object[]{info, new StreamingContext()}, null);
@@ -99,15 +98,6 @@ namespace Hyperion.SerializerFactories
                 var exceptionMethod = info.GetString("ExceptionMethod");
                 var hResult = info.GetInt32("HResult");
                 var source = info.GetString("Source");
-                byte[] watsonBuckets;
-                try
-                {
-                    watsonBuckets = (byte[]) info.GetValue("WatsonBuckets", typeof(byte[]));
-                }
-                catch
-                {
-                    watsonBuckets = new byte[0];
-                }
                 var innerExceptions = (Exception[]) info.GetValue("InnerExceptions", typeof(Exception[]));
                 
                 StringSerializer.WriteValueImpl(stream, className, session);
@@ -121,7 +111,6 @@ namespace Hyperion.SerializerFactories
                 StringSerializer.WriteValueImpl(stream, exceptionMethod, session);
                 Int32Serializer.WriteValueImpl(stream, hResult, session);
                 StringSerializer.WriteValueImpl(stream, source, session);
-                stream.WriteLengthEncodedByteArray(watsonBuckets, session);
                 stream.WriteObjectWithManifest(innerExceptions, session);
             });
             if (serializer.Options.KnownTypesDict.TryGetValue(type, out var index))
