@@ -65,6 +65,15 @@ namespace Hyperion
             return _objectById[id];
         }
 
+        public void ReplaceOrAddTrackedDeserializedObject([NotNull] object origin, [NotNull] object replacement)
+        {
+            var index = _objectById.IndexOf(origin);
+            if (index == -1)
+                _objectById.Add(origin);
+            else
+                _objectById[index] = replacement;
+        }
+
         public void TrackDeserializedType([NotNull]Type type)
         {
             if (_identifierToType == null)
