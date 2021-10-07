@@ -99,7 +99,15 @@ namespace Hyperion.SerializerFactories
                 var exceptionMethod = info.GetString("ExceptionMethod");
                 var hResult = info.GetInt32("HResult");
                 var source = info.GetString("Source");
-                var watsonBuckets = (byte[]) info.GetValue("WatsonBuckets", typeof(byte[])) ?? new byte[0];
+                var watsonBuckets = new byte[0];
+                try
+                {
+                    watsonBuckets = (byte[]) info.GetValue("WatsonBuckets", typeof(byte[]));
+                }
+                catch
+                {
+                    // no-op
+                }
                 var innerExceptions = (Exception[]) info.GetValue("InnerExceptions", typeof(Exception[]));
                 
                 StringSerializer.WriteValueImpl(stream, className, session);
