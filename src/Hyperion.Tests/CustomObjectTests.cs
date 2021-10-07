@@ -86,6 +86,44 @@ namespace Hyperion.Tests
         }
 
         [Fact]
+        public void CanSerializeAggregateException()
+        {
+            Exception ex1;
+            Exception ex2;
+            AggregateException expected;
+            try
+            {
+                throw new Exception("hello wire 1");
+            }
+            catch (Exception e)
+            {
+                ex1 = e;
+            }
+            try
+            {
+                throw new Exception("hello wire 2");
+            }
+            catch (Exception e)
+            {
+                ex2 = e;
+            }
+            try
+            {
+                throw new AggregateException("Aggregate", ex1, ex2);
+            }
+            catch (AggregateException e)
+            {
+                expected = e;
+            }
+            Serialize(expected);
+            Reset();
+            var actual = Deserialize<AggregateException>();
+            Assert.Equal(expected.StackTrace, actual.StackTrace);
+            Assert.Equal(expected.Message, actual.Message);
+            Assert.Equal(expected.InnerExceptions.Count, actual.InnerExceptions.Count);
+        }
+
+        [Fact]
         public void CanSerializePolymorphicObject()
         {
             var expected = new Something

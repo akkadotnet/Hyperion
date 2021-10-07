@@ -31,7 +31,7 @@ namespace Hyperion.SerializerFactories
             var surrogate = serializer.Options.Surrogates.FirstOrDefault(s => s.To.GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()));
             var objectSerializer = new ObjectSerializer(type);
             // ReSharper disable once PossibleNullReferenceException
-            var fromSurrogateSerializer = new FromSurrogateSerializer(surrogate.FromSurrogate, objectSerializer);
+            var fromSurrogateSerializer = new FromSurrogateSerializer(surrogate.FromSurrogate, objectSerializer, serializer.Options.PreserveObjectReferences);
             typeMapping.TryAdd(type, fromSurrogateSerializer);
 
 

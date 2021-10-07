@@ -1,3 +1,8 @@
+### 0.11.2 October 7 2021 ####
+* Fix exception thrown during deserialization when preserve object reference was turned on 
+  and a surrogate instance was inserted into a collection multiple times. [#264](https://github.com/akkadotnet/Hyperion/pull/264)
+* Add support for AggregateException serialization. [#266](https://github.com/akkadotnet/Hyperion/pull/266)
+
 ### 0.11.1 August 17 2021 ####
 * Add [unsafe deserialization type blacklist](https://github.com/akkadotnet/Hyperion/pull/242)
 * Bump [Akka version from 1.4.21 to 1.4.23](https://github.com/akkadotnet/Hyperion/pull/246)

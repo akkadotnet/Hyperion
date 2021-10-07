@@ -16,11 +16,16 @@ namespace Hyperion.ValueSerializers
     {
         private readonly ValueSerializer _surrogateSerializer;
         private readonly Func<object, object> _translator;
+        private readonly bool _preserveObjectReferences;
 
-        public FromSurrogateSerializer(Func<object, object> translator, ValueSerializer surrogateSerializer)
+        public FromSurrogateSerializer(
+            Func<object, object> translator,
+            ValueSerializer surrogateSerializer,
+            bool preserveObjectReferences)
         {
             _translator = translator;
             _surrogateSerializer = surrogateSerializer;
+            _preserveObjectReferences = preserveObjectReferences;
         }
 
         public override void WriteManifest(Stream stream, SerializerSession session)
@@ -37,6 +42,8 @@ namespace Hyperion.ValueSerializers
         {
             var surrogateValue = _surrogateSerializer.ReadValue(stream, session);
             var value = _translator(surrogateValue);
+            if(_preserveObjectReferences)
+                session.ReplaceOrAddTrackedDeserializedObject(surrogateValue, value);
             return value;
         }
 

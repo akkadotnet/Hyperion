@@ -36,6 +36,7 @@ namespace Hyperion
         public object GetDeserializedObject(int id) { }
         public System.Type GetTypeFromTypeId(int typeId) { }
         public Hyperion.TypeVersionInfo GetVersionInfo([Hyperion.Internal.NotNull] System.Type type) { }
+        public void ReplaceOrAddTrackedDeserializedObject([Hyperion.Internal.NotNull] object origin, [Hyperion.Internal.NotNull] object replacement) { }
         public void TrackDeserializedObject([Hyperion.Internal.NotNull] object obj) { }
         public void TrackDeserializedType([Hyperion.Internal.NotNull] System.Type type) { }
         public void TrackDeserializedTypeWithVersion([Hyperion.Internal.NotNull] System.Type type, [Hyperion.Internal.NotNull] Hyperion.TypeVersionInfo versionInfo) { }
