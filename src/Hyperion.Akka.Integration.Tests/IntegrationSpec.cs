@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Akka.Actor;
 using Akka.Configuration;
 using Akka.Serialization;
@@ -60,6 +61,32 @@ namespace Hyperion.Akka.Integration.Tests
             deserialized.Count.Should().Be(24);
         }
 
+        [Fact]
+        public void Bugfix263_Akka_HyperionSerializer_should_serialize_ActorPath_list()
+        {
+            var actor = Sys.ActorOf(Props.Create<MyActor>());
+            var container = new ContainerClass(new List<ActorPath>{ actor.Path, actor.Path });
+            var serialized = _serializer.ToBinary(container);
+            var deserialized = _serializer.FromBinary<ContainerClass>(serialized);
+            deserialized.Destinations.Count.Should().Be(2);
+            deserialized.Destinations[0].Should().Be(deserialized.Destinations[1]);
+        }
+
+        private class MyActor: ReceiveActor
+        {
+            
+        }
+        
+        private class ContainerClass
+        {
+            public ContainerClass(List<ActorPath> destinations)
+            {
+                Destinations = destinations;
+            }
+
+            public List<ActorPath> Destinations { get; }
+        }
+        
         private class MyPocoClass
         {
             public string Name { get; set; }
