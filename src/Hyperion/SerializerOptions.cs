@@ -57,6 +57,7 @@ namespace Hyperion
             new FSharpMapSerializerFactory(), 
             new FSharpListSerializerFactory(), 
             //order is important, try dictionaries before enumerables as dicts are also enumerable
+            new AggregateExceptionSerializerFactory(),
             new ExceptionSerializerFactory(), 
             new ImmutableCollectionsSerializerFactory(),
             new ExpandoObjectSerializerFactory(),
