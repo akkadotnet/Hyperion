@@ -210,7 +210,7 @@ namespace Hyperion.Extensions
                         "Unsafe Type Deserialization Detected!", name);
                 return type;
             }
-            catch (FileLoadException)
+            catch (IOException)
             {
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: true);
                 var type =  Type.GetType(typename, true);
