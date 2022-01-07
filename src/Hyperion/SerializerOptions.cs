@@ -16,15 +16,7 @@ namespace Hyperion
 {
     public class SerializerOptions
     {
-        public static readonly SerializerOptions Default = new SerializerOptions(
-            versionTolerance: false,
-            preserveObjectReferences: false,
-            surrogates: null,
-            serializerFactories: null,
-            knownTypes: null,
-            ignoreISerializable: false,
-            packageNameOverrides: null,
-            disallowUnsafeTypes: true);
+        public static readonly SerializerOptions Default = new SerializerOptions();
 
         internal static List<Func<string, string>> DefaultPackageNameOverrides()
         {
@@ -81,7 +73,8 @@ namespace Hyperion
         internal readonly Dictionary<Type, ushort> KnownTypesDict = new Dictionary<Type, ushort>();
         internal readonly List<Func<string, string>> CrossFrameworkPackageNameOverrides = DefaultPackageNameOverrides();
         internal readonly bool DisallowUnsafeTypes;
-
+        internal readonly ITypeFilter TypeFilter;
+        
         [Obsolete]
         public SerializerOptions(
             bool versionTolerance = false, 
@@ -102,7 +95,20 @@ namespace Hyperion
             IEnumerable<Type> knownTypes, 
             bool ignoreISerializable, 
             IEnumerable<Func<string, string>> packageNameOverrides)
-            : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, null, true)
+            : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, packageNameOverrides, true)
+        { }
+        
+        [Obsolete]
+        public SerializerOptions(
+            bool versionTolerance, 
+            bool preserveObjectReferences, 
+            IEnumerable<Surrogate> surrogates, 
+            IEnumerable<ValueSerializerFactory> serializerFactories, 
+            IEnumerable<Type> knownTypes, 
+            bool ignoreISerializable, 
+            IEnumerable<Func<string, string>> packageNameOverrides,
+            bool disallowUnsafeTypes)
+            : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, packageNameOverrides, disallowUnsafeTypes, DisabledTypeFilter.Instance)
         { }
         
         public SerializerOptions(
@@ -113,7 +119,8 @@ namespace Hyperion
             IEnumerable<Type> knownTypes, 
             bool ignoreISerializable, 
             IEnumerable<Func<string, string>> packageNameOverrides,
-            bool disallowUnsafeTypes)
+            bool disallowUnsafeTypes,
+            ITypeFilter typeFilter)
         {
             VersionTolerance = versionTolerance;
             Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
@@ -136,6 +143,7 @@ namespace Hyperion
                 CrossFrameworkPackageNameOverrides.AddRange(packageNameOverrides);
 
             DisallowUnsafeTypes = disallowUnsafeTypes;
+            TypeFilter = typeFilter ?? DisabledTypeFilter.Instance;
         }
 
         public SerializerOptions WithVersionTolerance(bool versionTolerance)
@@ -154,6 +162,8 @@ namespace Hyperion
             => Copy(packageNameOverrides: packageNameOverrides);
         public SerializerOptions WithDisallowUnsafeType(bool disallowUnsafeType)
             => Copy(disallowUnsafeType: disallowUnsafeType);
+        public SerializerOptions WithTypeFilter(ITypeFilter typeFilter)
+            => Copy(typeFilter: typeFilter);
 
         private SerializerOptions Copy(
             bool? versionTolerance = null,
@@ -163,7 +173,8 @@ namespace Hyperion
             IEnumerable<Type> knownTypes = null,
             bool? ignoreISerializable = null,
             IEnumerable<Func<string, string>> packageNameOverrides = null,
-            bool? disallowUnsafeType = null)
+            bool? disallowUnsafeType = null,
+            ITypeFilter typeFilter = null)
             => new SerializerOptions(
                 versionTolerance ?? VersionTolerance,
                 preserveObjectReferences ?? PreserveObjectReferences,
@@ -172,7 +183,8 @@ namespace Hyperion
                 knownTypes ?? KnownTypes,
                 ignoreISerializable ?? IgnoreISerializable,
                 packageNameOverrides ?? CrossFrameworkPackageNameOverrides,
-                disallowUnsafeType ?? DisallowUnsafeTypes
+                disallowUnsafeType ?? DisallowUnsafeTypes,
+                typeFilter ?? TypeFilter
             );
     }
 }
