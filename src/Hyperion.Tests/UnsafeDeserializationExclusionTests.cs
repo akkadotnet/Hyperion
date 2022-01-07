@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Hyperion.Extensions;
 using Hyperion.Internal;
 using Xunit;
@@ -50,7 +51,7 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassA(), stream);
                 stream.Position = 0;
-                var act = () => serializer.Deserialize<ClassA>(stream);
+                Action act = () => serializer.Deserialize<ClassA>(stream);
                 act.Should().NotThrow();
             }
 
@@ -58,7 +59,7 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassB(), stream);
                 stream.Position = 0;
-                var act = () => serializer.Deserialize<ClassB>(stream);
+                Action act = () => serializer.Deserialize<ClassB>(stream);
                 act.Should().NotThrow();
             }
             
@@ -66,7 +67,7 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassC(), stream);
                 stream.Position = 0;
-                var act = () => serializer.Deserialize<ClassC>(stream);
+                Action act = () => serializer.Deserialize<ClassC>(stream);
                 act.Should().Throw<UserEvilDeserializationException>();
             }
         }
