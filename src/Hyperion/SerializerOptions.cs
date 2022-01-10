@@ -75,7 +75,7 @@ namespace Hyperion
         internal readonly bool DisallowUnsafeTypes;
         internal readonly ITypeFilter TypeFilter;
         
-        [Obsolete]
+        [Obsolete(message:"This constructor is deprecated and will be removed in the future, please use the one with the packageNameOverrides argument")]
         public SerializerOptions(
             bool versionTolerance = false, 
             bool preserveObjectReferences = false, 
@@ -86,7 +86,7 @@ namespace Hyperion
             : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, null)
         { }
 
-        [Obsolete]
+        [Obsolete(message:"This constructor is deprecated and will be removed in the future, please use the one with the disallowUnsafeTypes argument")]
         public SerializerOptions(
             bool versionTolerance, 
             bool preserveObjectReferences, 
@@ -98,7 +98,7 @@ namespace Hyperion
             : this(versionTolerance, preserveObjectReferences, surrogates, serializerFactories, knownTypes, ignoreISerializable, packageNameOverrides, true)
         { }
         
-        [Obsolete]
+        [Obsolete(message:"This constructor is deprecated and will be removed in the future, please use the one with the typeFilter argument")]
         public SerializerOptions(
             bool versionTolerance, 
             bool preserveObjectReferences, 

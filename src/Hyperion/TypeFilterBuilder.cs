@@ -3,8 +3,15 @@ using System.Collections.Generic;
 
 namespace Hyperion
 {
+    /// <summary>
+    /// Helper class to programatically create a <see cref="TypeFilter"/> using fluent builder pattern.
+    /// </summary>
     public class TypeFilterBuilder
     {
+        /// <summary>
+        /// Create a new instance of <see cref="TypeFilterBuilder"/>
+        /// </summary>
+        /// <returns>a new instance of <see cref="TypeFilterBuilder"/> </returns>
         public static TypeFilterBuilder Create() => new TypeFilterBuilder();
 
         private readonly List<Type> _types = new List<Type>();

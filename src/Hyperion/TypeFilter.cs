@@ -6,6 +6,7 @@ using Hyperion.Extensions;
 
 namespace Hyperion
 {
+    /// <inheritdoc/>
     public sealed class TypeFilter : ITypeFilter
     {
         public ImmutableHashSet<string> FilteredTypes { get; }
@@ -19,7 +20,10 @@ namespace Hyperion
             => FilteredTypes.Any(t => t == typeName);
     }
 
-    internal sealed class DisabledTypeFilter : ITypeFilter
+    /// <summary>
+    /// A disabled type filter that always returns true
+    /// </summary>
+    public sealed class DisabledTypeFilter : ITypeFilter
     {
         public static readonly DisabledTypeFilter Instance = new DisabledTypeFilter();
         
