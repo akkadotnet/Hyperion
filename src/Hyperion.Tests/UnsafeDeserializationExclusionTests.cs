@@ -53,6 +53,10 @@ namespace Hyperion.Tests
                 stream.Position = 0;
                 Action act = () => serializer.Deserialize<ClassA>(stream);
                 act.Should().NotThrow();
+                
+                stream.Position = 0;
+                Action actObj = () => serializer.Deserialize<object>(stream);
+                actObj.Should().NotThrow();
             }
 
             using (var stream = new MemoryStream())
@@ -61,6 +65,10 @@ namespace Hyperion.Tests
                 stream.Position = 0;
                 Action act = () => serializer.Deserialize<ClassB>(stream);
                 act.Should().NotThrow();
+                
+                stream.Position = 0;
+                Action actObj = () => serializer.Deserialize<object>(stream);
+                actObj.Should().NotThrow();
             }
             
             using (var stream = new MemoryStream())
@@ -69,6 +77,10 @@ namespace Hyperion.Tests
                 stream.Position = 0;
                 Action act = () => serializer.Deserialize<ClassC>(stream);
                 act.Should().Throw<UserEvilDeserializationException>();
+                
+                stream.Position = 0;
+                Action actObj = () => serializer.Deserialize<object>(stream);
+                actObj.Should().Throw<UserEvilDeserializationException>();
             }
         }
     }
