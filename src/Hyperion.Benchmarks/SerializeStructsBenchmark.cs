@@ -21,6 +21,7 @@ namespace Hyperion.Benchmarks
         
         protected override void Init()
         {
+            base.Init();
             standardValue = new StandardStruct(1, "John", "Doe", isLoggedIn: false);
             blittableValue = new BlittableStruct(59, 92);
             testEnum = TestEnum.HatesAll;
