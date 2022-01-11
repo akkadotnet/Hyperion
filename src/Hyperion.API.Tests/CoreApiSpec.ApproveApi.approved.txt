@@ -41,6 +41,11 @@ namespace Hyperion
         public void TrackDeserializedType([Hyperion.Internal.NotNull] System.Type type) { }
         public void TrackDeserializedTypeWithVersion([Hyperion.Internal.NotNull] System.Type type, [Hyperion.Internal.NotNull] Hyperion.TypeVersionInfo versionInfo) { }
     }
+    public sealed class DisabledTypeFilter : Hyperion.ITypeFilter
+    {
+        public static readonly Hyperion.DisabledTypeFilter Instance;
+        public bool IsAllowed(string typeName) { }
+    }
     public delegate object FieldInfoReader(object obj);
     public delegate void FieldInfoWriter(object obj, object value);
     public delegate void FieldReader(System.IO.Stream stream, object obj, Hyperion.DeserializerSession session);
@@ -94,11 +99,14 @@ namespace Hyperion
     public class SerializerOptions
     {
         public static readonly Hyperion.SerializerOptions Default;
-        [System.Obsolete]
+        [System.Obsolete("This constructor is deprecated and will be removed in the future, please use the " +
+            "one with the packageNameOverrides argument")]
         public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates = null, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories = null, System.Collections.Generic.IEnumerable<System.Type> knownTypes = null, bool ignoreISerializable = false) { }
-        [System.Obsolete]
+        [System.Obsolete("This constructor is deprecated and will be removed in the future, please use the " +
+            "one with the disallowUnsafeTypes argument")]
         public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides) { }
-        [System.Obsolete]
+        [System.Obsolete("This constructor is deprecated and will be removed in the future, please use the " +
+            "one with the typeFilter argument")]
         public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides, bool disallowUnsafeTypes) { }
         public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides, bool disallowUnsafeTypes, Hyperion.ITypeFilter typeFilter) { }
         public Hyperion.SerializerOptions WithDisallowUnsafeType(bool disallowUnsafeType) { }
