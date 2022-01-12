@@ -1,3 +1,21 @@
+### 0.12.0 January 12 2022 ####
+
+* Allow explicit control over which types can be deserialized [#281](https://github.com/akkadotnet/Hyperion/pull/281)
+
+We've expanded our deserialization safety check to block dangerous types from being deserialized; we recommend this method as a best practice to prevent [deserialization of untrusted data](https://cwe.mitre.org/data/definitions/502.html). You can now create a custom deserialize layer type filter programmatically: 
+
+```c#
+var typeFilter = TypeFilterBuilder.Create()
+    .Include<AllowedClassA>()
+    .Include<AllowedClassB>()
+    .Build();
+var options = SerializerOptions.Default
+    .WithTypeFilter(typeFilter);
+var serializer = new Serializer(options);
+```
+
+For complete documentation, please read the [readme on filtering types for secure deserialization.](https://github.com/akkadotnet/Hyperion#whitelisting-types-on-deserialization)
+
 ### 0.11.2 October 7 2021 ####
 * Fix exception thrown during deserialization when preserve object reference was turned on 
   and a surrogate instance was inserted into a collection multiple times. [#264](https://github.com/akkadotnet/Hyperion/pull/264)
