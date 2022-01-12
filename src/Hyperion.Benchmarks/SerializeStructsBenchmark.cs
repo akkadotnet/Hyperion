@@ -7,6 +7,7 @@
 // -----------------------------------------------------------------------
 #endregion
 
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
 
@@ -15,6 +16,8 @@ namespace Hyperion.Benchmarks
     public class SerializeStructsBenchmark : HyperionBenchmark
     {
         #region init
+        private Serializer _filteredSerializer;
+        
         private StandardStruct standardValue;
         private BlittableStruct blittableValue;
         private TestEnum testEnum;
@@ -22,6 +25,16 @@ namespace Hyperion.Benchmarks
         protected override void Init()
         {
             base.Init();
+            
+            var filteredOptions = SerializerOptions.Default
+                .WithTypeFilter(
+                    TypeFilterBuilder.Create()
+                        .Include<StandardStruct>()
+                        .Include<BlittableStruct>()
+                        .Include<TestEnum>()
+                        .Build());
+            _filteredSerializer = new Serializer(filteredOptions);
+            
             standardValue = new StandardStruct(1, "John", "Doe", isLoggedIn: false);
             blittableValue = new BlittableStruct(59, 92);
             testEnum = TestEnum.HatesAll;
@@ -30,8 +43,21 @@ namespace Hyperion.Benchmarks
         #endregion
 
         [Benchmark] public void Enums() => SerializeAndDeserialize(testEnum);
+        [Benchmark] public void Filtered_Enums() => SerializeAndFilteredDeserialize(testEnum);
         [Benchmark] public void Standard_Value_Types() => SerializeAndDeserialize(standardValue);
+        [Benchmark] public void Filtered_Standard_Value_Types() => SerializeAndFilteredDeserialize(standardValue);
         [Benchmark] public void Blittable_Value_Types() => SerializeAndDeserialize(blittableValue);
+        [Benchmark] public void Filtered_Blittable_Value_Types() => SerializeAndFilteredDeserialize(blittableValue);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SerializeAndFilteredDeserialize<T>(T elem)
+        {
+            Serializer.Serialize(elem, Stream);
+            Stream.Position = 0;
+            
+            _filteredSerializer.Deserialize<T>(Stream);
+            Stream.Position = 0;
+        }
     }
 
     #region test data types
