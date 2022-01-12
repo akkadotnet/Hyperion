@@ -23,13 +23,20 @@ namespace Hyperion.Internal
     public class EvilDeserializationException : SecurityException
     {
         public EvilDeserializationException(string message,
-            string typeString) : base(message)
+            string typeString) : base($"{message} [type: {typeString}]")
         {
             BadTypeString = typeString;
         }
 
         public string BadTypeString { get; }
     }
+
+    public class UserEvilDeserializationException : EvilDeserializationException
+    {
+        public UserEvilDeserializationException(string message, string typeString) : base(message, typeString)
+        { }
+    }
+    
     /// <summary>
     /// Indicates that the value of the marked element could be <c>null</c> sometimes,
     /// so the check for <c>null</c> is necessary before its usage.

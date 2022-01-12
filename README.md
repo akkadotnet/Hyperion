@@ -48,6 +48,60 @@ var serializer = new Serializer(options);
 
 This is essential for frameworks like Akka.NET where we need to be able to resolve live Actor References in the deserializing system.
 
+## Whitelisting Types On Deserialization
+
+Sometimes we need to limit the types that are allowed to be deserialized for security reasons. For this reason, you can either pass a class instance that implements the `ITypeFilter` interface into the `SerializerOptions` or use the `TypeFilterBuilder` class to build a `TypeFilter` that Hyperion can use to filter out any possibly harmful injection attack during deserialization.
+
+using the `ITypeFilter` interface:
+
+```c#
+public sealed class TypeFilter : ITypeFilter
+{
+    public ImmutableHashSet<string> FilteredTypes { get; }
+
+    internal TypeFilter(IEnumerable<Type> types)
+    {
+        FilteredTypes = types.Select(t => t.GetShortAssemblyQualifiedName()).ToImmutableHashSet();
+    }
+    
+    public bool IsAllowed(string typeName)
+        => FilteredTypes.Any(t => t == typeName);
+}
+```
+
+using the `TypeFilterBuilder` convenience builder:
+
+```c#
+var typeFilter = TypeFilterBuilder.Create()
+    .Include<AllowedClassA>()
+    .Include<AllowedClassB>()
+    .Build();
+
+var options = SerializerOptions.Default
+    .WithTypeFilter(typeFilter);
+
+var serializer = new Serializer(options);
+```
+
+### Convert Whitelist To Blacklist
+
+To do blacklisting instead of whitelisting a list of types, you will need to do a slight modification to the TypeFilter class.
+
+```c#
+public sealed class TypeFilter : ITypeFilter
+{
+    public ImmutableHashSet<string> FilteredTypes { get; }
+
+    internal TypeFilter(IEnumerable<Type> types)
+    {
+        FilteredTypes = types.Select(t => t.GetShortAssemblyQualifiedName()).ToImmutableHashSet();
+    }
+    
+    public bool IsAllowed(string typeName)
+        => FilteredTypes.All(t => t != typeName);
+}
+```
+
 ## Version Tolerance
 
 Hyperion has been designed to work in multiple modes in terms of version tolerance vs. performance.
@@ -55,13 +109,13 @@ Hyperion has been designed to work in multiple modes in terms of version toleran
 1. Pre Register Types, when using "Pre registered types", Hyperion will only emit a type ID in the output stream.
 This results in the best performance, but is also fragile if different clients have different versions of the contract types.
 2. Non Versioned, this is largely the same as the above, but the serializer does not need to know about your types up front. it will embed the fully qualified typename
-in the outputstream. this results in a larger payload and some performance overhead.
+in the output stream. this results in a larger payload and some performance overhead.
 3. Versioned, in this mode, Hyperion will emit both type names and field information in the output stream.
 This allows systems to have slightly different versions of the contract types where some fields may have been added or removed.
 
 Hyperion has been designed as a wire format, point to point for soft realtime scenarios.
 If you need a format that is durable for persistence over time.
-e.g. EventSourcing or for message queues, then Protobuf or MS Bond is probably a better choise as those formats have been designed for true version tolerance.
+e.g. EventSourcing or for message queues, then Protobuf or MS Bond is probably a better choice as those formats have been designed for true version tolerance.
 
 ## Performance
 

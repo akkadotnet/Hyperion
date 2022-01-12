@@ -8,6 +8,7 @@
 #endregion
 
 using System;
+using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 
 namespace Hyperion.Benchmarks
@@ -20,9 +21,25 @@ namespace Hyperion.Benchmarks
         private LargeSealedClass sealedObject;
         private GenericClass<int, string, bool, DateTime, Guid> genericObject;
 
+        private Serializer _filteredSerializer;
+        
         protected override void Init()
         {
-            Serializer = new Serializer(new SerializerOptions(preserveObjectReferences:true));
+            var baseOptions = new SerializerOptions(preserveObjectReferences: true);
+            Serializer = new Serializer(baseOptions);
+
+            var filteredOptions = baseOptions
+                .WithTypeFilter(
+                    TypeFilterBuilder.Create()
+                        .Include<CyclicClassA>()
+                        .Include<CyclicClassB>()
+                        .Include<VirtualTestClass>()
+                        .Include<LargeSealedClass>()
+                        .Include<GenericClass<int, string, bool, DateTime, Guid>>()
+                        .Include<TestEnum>()
+                        .Build());
+            _filteredSerializer = new Serializer(filteredOptions);
+            
             var a = new CyclicClassA();
             var b = new CyclicClassB();
             a.B = b;
@@ -45,9 +62,23 @@ namespace Hyperion.Benchmarks
         #endregion
 
         [Benchmark] public void Cyclic_References() => SerializeAndDeserialize(cyclic);
+        [Benchmark] public void Filtered_Cyclic_References() => SerializeAndFilteredDeserialize(cyclic);
         [Benchmark] public void Virtual_Classes() => SerializeAndDeserialize(virtualObject);
+        [Benchmark] public void Filtered_Virtual_Classes() => SerializeAndFilteredDeserialize(virtualObject);
         [Benchmark] public void Large_Sealed_Classes() => SerializeAndDeserialize(sealedObject);
+        [Benchmark] public void Filtered_Large_Sealed_Classes() => SerializeAndFilteredDeserialize(sealedObject);
         [Benchmark] public void Generic_Classes() => SerializeAndDeserialize(genericObject);
+        [Benchmark] public void Filtered_Generic_Classes() => SerializeAndFilteredDeserialize(genericObject);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SerializeAndFilteredDeserialize<T>(T elem)
+        {
+            Serializer.Serialize(elem, Stream);
+            Stream.Position = 0;
+            
+            _filteredSerializer.Deserialize<T>(Stream);
+            Stream.Position = 0;
+        }
     }
 
     #region test data types

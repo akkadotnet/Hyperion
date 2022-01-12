@@ -162,7 +162,8 @@ namespace Hyperion.Extensions
                         break;
                 }
 
-                return LoadTypeByName(shortName, session.Serializer.Options.DisallowUnsafeTypes);
+                var options = session.Serializer.Options;
+                return LoadTypeByName(shortName, options.DisallowUnsafeTypes, options.TypeFilter);
             });
         }
 
@@ -192,12 +193,14 @@ namespace Hyperion.Extensions
             return false;
         }
         
-        public static Type LoadTypeByName(string name, bool disallowUnsafeTypes)
+        public static Type LoadTypeByName(string name, bool disallowUnsafeTypes, ITypeFilter typeFilter)
         {
-            if (disallowUnsafeTypes && UnsafeTypesDenySet.Any(name.Contains))
+            if (disallowUnsafeTypes)
             {
-                throw new EvilDeserializationException(
-                    "Unsafe Type Deserialization Detected!", name);
+                if(UnsafeTypesDenySet.Any(name.Contains))
+                    throw new EvilDeserializationException("Unsafe Type Deserialization Detected!", name);
+                if(!typeFilter.IsAllowed(name))
+                    throw new UserEvilDeserializationException("Unsafe Type Deserialization Detected!", name);
             }
             try
             {
@@ -210,7 +213,7 @@ namespace Hyperion.Extensions
                         "Unsafe Type Deserialization Detected!", name);
                 return type;
             }
-            catch (FileLoadException)
+            catch (IOException)
             {
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: true);
                 var type =  Type.GetType(typename, true);

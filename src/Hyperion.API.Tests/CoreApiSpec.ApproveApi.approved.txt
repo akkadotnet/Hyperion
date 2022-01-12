@@ -41,6 +41,11 @@ namespace Hyperion
         public void TrackDeserializedType([Hyperion.Internal.NotNull] System.Type type) { }
         public void TrackDeserializedTypeWithVersion([Hyperion.Internal.NotNull] System.Type type, [Hyperion.Internal.NotNull] Hyperion.TypeVersionInfo versionInfo) { }
     }
+    public sealed class DisabledTypeFilter : Hyperion.ITypeFilter
+    {
+        public static readonly Hyperion.DisabledTypeFilter Instance;
+        public bool IsAllowed(string typeName) { }
+    }
     public delegate object FieldInfoReader(object obj);
     public delegate void FieldInfoWriter(object obj, object value);
     public delegate void FieldReader(System.IO.Stream stream, object obj, Hyperion.DeserializerSession session);
@@ -48,6 +53,10 @@ namespace Hyperion
     public interface ICodeGenerator
     {
         void BuildSerializer(Hyperion.Serializer serializer, Hyperion.ValueSerializers.ObjectSerializer objectSerializer);
+    }
+    public interface ITypeFilter
+    {
+        bool IsAllowed(string typeName);
     }
     [System.AttributeUsage(System.AttributeTargets.Field | System.AttributeTargets.All, AllowMultiple=false, Inherited=true)]
     public sealed class IgnoreAttribute : System.Attribute
@@ -90,11 +99,16 @@ namespace Hyperion
     public class SerializerOptions
     {
         public static readonly Hyperion.SerializerOptions Default;
-        [System.Obsolete]
+        [System.Obsolete("This constructor is deprecated and will be removed in the future, please use the " +
+            "one with the packageNameOverrides argument")]
         public SerializerOptions(bool versionTolerance = false, bool preserveObjectReferences = false, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates = null, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories = null, System.Collections.Generic.IEnumerable<System.Type> knownTypes = null, bool ignoreISerializable = false) { }
-        [System.Obsolete]
+        [System.Obsolete("This constructor is deprecated and will be removed in the future, please use the " +
+            "one with the disallowUnsafeTypes argument")]
         public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides) { }
+        [System.Obsolete("This constructor is deprecated and will be removed in the future, please use the " +
+            "one with the typeFilter argument")]
         public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides, bool disallowUnsafeTypes) { }
+        public SerializerOptions(bool versionTolerance, bool preserveObjectReferences, System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates, System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories, System.Collections.Generic.IEnumerable<System.Type> knownTypes, bool ignoreISerializable, System.Collections.Generic.IEnumerable<System.Func<string, string>> packageNameOverrides, bool disallowUnsafeTypes, Hyperion.ITypeFilter typeFilter) { }
         public Hyperion.SerializerOptions WithDisallowUnsafeType(bool disallowUnsafeType) { }
         public Hyperion.SerializerOptions WithIgnoreSerializable(bool ignoreISerializable) { }
         public Hyperion.SerializerOptions WithKnownTypes(System.Collections.Generic.IEnumerable<System.Type> knownTypes) { }
@@ -102,6 +116,7 @@ namespace Hyperion
         public Hyperion.SerializerOptions WithPreserveObjectReferences(bool preserveObjectReferences) { }
         public Hyperion.SerializerOptions WithSerializerFactory(System.Collections.Generic.IEnumerable<Hyperion.SerializerFactories.ValueSerializerFactory> serializerFactories) { }
         public Hyperion.SerializerOptions WithSurrogates(System.Collections.Generic.IEnumerable<Hyperion.Surrogate> surrogates) { }
+        public Hyperion.SerializerOptions WithTypeFilter(Hyperion.ITypeFilter typeFilter) { }
         public Hyperion.SerializerOptions WithVersionTolerance(bool versionTolerance) { }
     }
     public class SerializerSession
@@ -129,6 +144,18 @@ namespace Hyperion
     public class Surrogate<TSource, TSurrogate> : Hyperion.Surrogate
     {
         public Surrogate(System.Func<TSource, TSurrogate> toSurrogate, System.Func<TSurrogate, TSource> fromSurrogate) { }
+    }
+    public sealed class TypeFilter : Hyperion.ITypeFilter
+    {
+        public System.Collections.Immutable.ImmutableHashSet<string> FilteredTypes { get; }
+        public bool IsAllowed(string typeName) { }
+    }
+    public class TypeFilterBuilder
+    {
+        public Hyperion.TypeFilter Build() { }
+        public Hyperion.TypeFilterBuilder Include(System.Type type) { }
+        public Hyperion.TypeFilterBuilder Include<T>() { }
+        public static Hyperion.TypeFilterBuilder Create() { }
     }
     public class TypeVersionInfo
     {
@@ -590,6 +617,10 @@ namespace Hyperion.Internal
         public UsedImplicitlyAttribute(Hyperion.Internal.ImplicitUseKindFlags useKindFlags, Hyperion.Internal.ImplicitUseTargetFlags targetFlags) { }
         public Hyperion.Internal.ImplicitUseTargetFlags TargetFlags { get; }
         public Hyperion.Internal.ImplicitUseKindFlags UseKindFlags { get; }
+    }
+    public class UserEvilDeserializationException : Hyperion.Internal.EvilDeserializationException
+    {
+        public UserEvilDeserializationException(string message, string typeString) { }
     }
     [System.AttributeUsage(System.AttributeTargets.Property | System.AttributeTargets.Field | System.AttributeTargets.Parameter | System.AttributeTargets.All)]
     public sealed class ValueProviderAttribute : System.Attribute
