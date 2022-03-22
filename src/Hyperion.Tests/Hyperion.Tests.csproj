@@ -18,17 +18,46 @@
     <DefineConstants>$(DefineConstants);NETFX</DefineConstants>
   </PropertyGroup>
 
-  
   <ItemGroup Condition="'$(TargetFramework)' == '$(NetFrameworkTestVersion)'">
-      <Reference Include="System.Drawing">
-        <Private>true</Private>
-      </Reference>
+    <Reference Include="System.Web">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Web.Mobile">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="PresentationFramework">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf">
+      <HintPath>./lib</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Drawing.Design">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.IdentityModel">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Activities.Presentation">
+      <Private>true</Private>
+    </Reference>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' != '$(NetFrameworkTestVersion)'">
+    <PackageReference Include="System.Management.Automation" Version="6.2.7" />
+  </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="$(FluentAssertionsVersion)" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(TestSdkVersion)" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="System.Security.Principal.Windows" Version="5.0.0" />
     <PackageReference Include="xunit" Version="$(XunitVersion)" />
     <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVersion)" />
   </ItemGroup>
