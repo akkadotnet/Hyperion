@@ -20,15 +20,19 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == '$(NetFrameworkTestVersion)'">
     <Reference Include="System.Web">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="System.Web.Mobile">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="System.Windows.Forms">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="PresentationFramework">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.Text.UI.Wpf">
@@ -36,15 +40,19 @@
       <Private>true</Private>
     </Reference>
     <Reference Include="System.Drawing.Design">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="System.Drawing">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="System.IdentityModel">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
     <Reference Include="System.Activities.Presentation">
+      <HintPath>./lib</HintPath>
       <Private>true</Private>
     </Reference>
   </ItemGroup>
