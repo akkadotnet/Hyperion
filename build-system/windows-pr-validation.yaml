@@ -21,18 +21,18 @@ jobs:
     scriptFileName: build.cmd
     scriptArgs: all
 
-    - template: azure-pipeline.template.yaml
-      parameters:
-        name: 'linux_pr_net_core'
-        displayName: 'Linux PR Validation (netcoreapp3.1)'
-        vmImage: 'ubuntu-16.04'
-        scriptFileName: ./build.sh
-        scriptArgs: runTestsNetCore
+- template: azure-pipeline.template.yaml
+  parameters:
+    name: 'linux_pr_net_core'
+    displayName: 'Linux PR Validation (netcoreapp3.1)'
+    vmImage: 'ubuntu-16.04'
+    scriptFileName: ./build.sh
+    scriptArgs: runTestsNetCore
 
-    - template: azure-pipeline.template.yaml
-      parameters:
-        name: 'linux_pr_net_5'
-        displayName: 'Linux PR Validation (net5.0)'
-        vmImage: 'ubuntu-16.04'
-        scriptFileName: ./build.sh
-        scriptArgs: runTestsNet
+- template: azure-pipeline.template.yaml
+  parameters:
+    name: 'linux_pr_net_5'
+    displayName: 'Linux PR Validation (net5.0)'
+    vmImage: 'ubuntu-16.04'
+    scriptFileName: ./build.sh
+    scriptArgs: runTestsNet
