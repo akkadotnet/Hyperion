@@ -34,6 +34,9 @@ namespace Hyperion
         
         public readonly SerializerOptions Options;
 
+        internal readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
+            new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
+        
         public Serializer() : this(new SerializerOptions())
         {
         }

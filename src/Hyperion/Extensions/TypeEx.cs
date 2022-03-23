@@ -133,9 +133,6 @@ namespace Hyperion.Extensions
             return type.IsArray && type.GetArrayRank() == 1 && type.GetElementType().IsHyperionPrimitive();
         }
 
-        private static readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
-            new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
-
         public static byte[] GetTypeManifest(IReadOnlyCollection<byte[]> fieldNames)
         {
             IEnumerable<byte> result = new[] { (byte)fieldNames.Count };
@@ -153,7 +150,7 @@ namespace Hyperion.Extensions
         {
             var bytes = stream.ReadLengthEncodedByteArray(session);
             var byteArr = ByteArrayKey.Create(bytes);
-            return TypeNameLookup.GetOrAdd(byteArr, b =>
+            return session.Serializer.TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
                 var overrides = session.Serializer.Options.CrossFrameworkPackageNameOverrides;
