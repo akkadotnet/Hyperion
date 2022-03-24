@@ -22,15 +22,52 @@ namespace Hyperion.Tests
         [Fact]
         public void CantDeserializeANaughtyType()
         {
-            var serializer = new Hyperion.Serializer();
-            var di =new System.IO.DirectoryInfo(@"c:\");
+            var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
+            var deserializer = new Serializer();
+            var di = new DirectoryInfo(@"c:\");
 
             using (var stream = new MemoryStream())
             {
                 serializer.Serialize(di, stream);
                 stream.Position = 0;
                 Assert.Throws<EvilDeserializationException>(() =>
-                    serializer.Deserialize<DirectoryInfo>(stream));
+                    deserializer.Deserialize<DirectoryInfo>(stream));
+            }
+        }
+
+        [Fact]
+        public void CacheShouldNotCrossPollinateBetweenInstances()
+        {
+            var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
+            var deserializer = new Serializer();
+            var di = new DirectoryInfo(@"c:\");
+
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(di, stream);
+                stream.Position = 0;
+                serializer.Deserialize<DirectoryInfo>(stream); // should not throw
+                serializer.TypeNameLookup.Values.Contains(typeof(DirectoryInfo)).Should().BeTrue(); // DirectoryInfo key should be cached
+                
+                stream.Position = 0;
+                Assert.Throws<EvilDeserializationException>(() =>
+                    deserializer.Deserialize<DirectoryInfo>(stream));
+                deserializer.TypeNameLookup.Values.Contains(typeof(DirectoryInfo)).Should().BeFalse(); // type cache should not bleed from serializer
+                deserializer.RejectedKeys.Count.Should().Be(1); // System rejected type should be cached
+                serializer.RejectedKeys.Count.Should().Be(0); // System rejected type cache should not bleed to serializer
+            }
+        }
+
+        [Fact]
+        public void CantSerializeANaughtyType()
+        {
+            var serializer = new Serializer();
+            var di = new DirectoryInfo(@"c:\");
+
+            using (var stream = new MemoryStream())
+            {
+                Assert.Throws<EvilDeserializationException>(() => serializer.Serialize(di, stream));
+                // System rejected type during serialization is not cached because there is no key lookup
             }
         }
 
@@ -121,17 +158,18 @@ namespace Hyperion.Tests
             var options = SerializerOptions.Default
                 .WithTypeFilter(typeFilter);
 
-            var serializer = new Serializer(options);
+            var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
+            var deserializer = new Serializer(options);
             
             using (var stream = new MemoryStream())
             {
                 serializer.Serialize(new ClassA(), stream);
                 stream.Position = 0;
-                Action act = () => serializer.Deserialize<ClassA>(stream);
+                Action act = () => deserializer.Deserialize<ClassA>(stream);
                 act.Should().NotThrow();
                 
                 stream.Position = 0;
-                Action actObj = () => serializer.Deserialize<object>(stream);
+                Action actObj = () => deserializer.Deserialize<object>(stream);
                 actObj.Should().NotThrow();
             }
 
@@ -139,11 +177,11 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassB(), stream);
                 stream.Position = 0;
-                Action act = () => serializer.Deserialize<ClassB>(stream);
+                Action act = () => deserializer.Deserialize<ClassB>(stream);
                 act.Should().NotThrow();
                 
                 stream.Position = 0;
-                Action actObj = () => serializer.Deserialize<object>(stream);
+                Action actObj = () => deserializer.Deserialize<object>(stream);
                 actObj.Should().NotThrow();
             }
             
@@ -151,11 +189,12 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassC(), stream);
                 stream.Position = 0;
-                Action act = () => serializer.Deserialize<ClassC>(stream);
+                Action act = () => deserializer.Deserialize<ClassC>(stream);
                 act.Should().Throw<UserEvilDeserializationException>();
+                deserializer.UserRejectedKeys.Count.Should().Be(1); // user rejected types should be cached
                 
                 stream.Position = 0;
-                Action actObj = () => serializer.Deserialize<object>(stream);
+                Action actObj = () => deserializer.Deserialize<object>(stream);
                 actObj.Should().Throw<UserEvilDeserializationException>();
             }
         }

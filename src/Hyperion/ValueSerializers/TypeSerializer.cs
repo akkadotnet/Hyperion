@@ -11,6 +11,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Hyperion.Extensions;
+using Hyperion.Internal;
 
 namespace Hyperion.ValueSerializers
 {
@@ -65,20 +66,48 @@ namespace Hyperion.ValueSerializers
             new ConcurrentDictionary<string, Type>();
         public override object ReadValue(Stream stream, DeserializerSession session)
         {
-            var shortname = stream.ReadString(session);
-            if (shortname == null)
+            var bytes = stream.ReadByteArrayKey(session);
+            if (bytes == null)
                 return null;
+            var byteArr = bytes.Value;
 
+            // Read possible rejected keys from the cache
+            if(session.Serializer.RejectedKeys.Contains(byteArr))
+                throw new EvilDeserializationException(
+                    "Unsafe Type Deserialization Detected!",
+                    StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length));
+            if(session.Serializer.UserRejectedKeys.Contains(byteArr))
+                throw new UserEvilDeserializationException(
+                    "Unsafe Type Deserialization Detected!", 
+                    StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length));
+            
+            var shortname = StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length);
             var options = session.Serializer.Options;
-            var type = TypeNameLookup.GetOrAdd(shortname,
-                name => TypeEx.LoadTypeByName(shortname, options.DisallowUnsafeTypes, options.TypeFilter));
-
-            //add the deserialized type to lookup
-            if (session.Serializer.Options.PreserveObjectReferences)
+            
+            try
             {
-                session.TrackDeserializedObject(type);
+                var type = TypeNameLookup.GetOrAdd(shortname,
+                    name => TypeEx.LoadTypeByName(shortname, options.DisallowUnsafeTypes, options.TypeFilter));
+
+                //add the deserialized type to lookup
+                if (session.Serializer.Options.PreserveObjectReferences)
+                {
+                    session.TrackDeserializedObject(type);
+                }
+                return type;
             }
-            return type;
+            catch (UserEvilDeserializationException)
+            {
+                // Store rejected types in the cache (optimization)
+                session.Serializer.UserRejectedKeys.Add(byteArr);
+                throw;
+            }
+            catch (EvilDeserializationException)
+            {
+                // Store rejected types in the cache (optimization)
+                session.Serializer.RejectedKeys.Add(byteArr);
+                throw;
+            }
         }
 
         public override Type GetElementType()

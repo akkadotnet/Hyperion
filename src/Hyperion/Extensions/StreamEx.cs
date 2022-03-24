@@ -172,6 +172,26 @@ namespace Hyperion.Extensions
             return value;
         }
 
+        internal static ByteArrayKey? ReadByteArrayKey(this Stream stream, DeserializerSession session)
+        {
+            var length = stream.ReadByte();
+            switch (length)
+            {
+                case 0:
+                    return null;
+                case 255:
+                    length = stream.ReadInt32(session);
+                    break;
+                default:
+                    length--;
+                    break;
+            }
+
+            var buffer = new byte[length];
+            stream.ReadFull(buffer, 0, length);
+            return new ByteArrayKey(buffer);
+        }
+
         public static string ReadString(this Stream stream, DeserializerSession session)
         {
             var length = stream.ReadByte();

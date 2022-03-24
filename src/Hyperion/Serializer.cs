@@ -9,6 +9,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -37,6 +38,9 @@ namespace Hyperion
         internal readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
             new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
         
+        internal readonly HashSet<ByteArrayKey> RejectedKeys = new HashSet<ByteArrayKey>(ByteArrayKeyComparer.Instance);
+        internal readonly HashSet<ByteArrayKey> UserRejectedKeys = new HashSet<ByteArrayKey>(ByteArrayKeyComparer.Instance);
+
         public Serializer() : this(new SerializerOptions())
         {
         }
@@ -203,6 +207,15 @@ namespace Hyperion
 
         public ValueSerializer GetSerializerByType([NotNull] Type type)
         {
+            // Filter for disallowed types
+            if (Options.DisallowUnsafeTypes)
+            {
+                if(TypeEx.IsDisallowedType(type) || TypeEx.UnsafeInheritanceCheck(type))
+                    throw new EvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
+                if(!Options.TypeFilter.IsAllowed(type.AssemblyQualifiedName))
+                    throw new UserEvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
+            }
+            
             //do we already have a serializer for this type?
             if (_serializers.TryGetValue(type, out var serializer))
                 return serializer;
