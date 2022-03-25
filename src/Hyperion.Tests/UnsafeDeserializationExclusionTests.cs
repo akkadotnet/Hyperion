@@ -35,29 +35,6 @@ namespace Hyperion.Tests
             }
         }
 
-        [Fact]
-        public void CacheShouldNotCrossPollinateBetweenInstances()
-        {
-            var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
-            var deserializer = new Serializer();
-            var di = new DirectoryInfo(@"c:\");
-
-            using (var stream = new MemoryStream())
-            {
-                serializer.Serialize(di, stream);
-                stream.Position = 0;
-                serializer.Deserialize<DirectoryInfo>(stream); // should not throw
-                serializer.TypeNameLookup.Values.Contains(typeof(DirectoryInfo)).Should().BeTrue(); // DirectoryInfo key should be cached
-                
-                stream.Position = 0;
-                Assert.Throws<EvilDeserializationException>(() =>
-                    deserializer.Deserialize<DirectoryInfo>(stream));
-                deserializer.TypeNameLookup.Values.Contains(typeof(DirectoryInfo)).Should().BeFalse(); // type cache should not bleed from serializer
-                deserializer.RejectedKeys.Count.Should().Be(1); // System rejected type should be cached
-                serializer.RejectedKeys.Count.Should().Be(0); // System rejected type cache should not bleed to serializer
-            }
-        }
-
         [Theory]
         [MemberData(nameof(DangerousObjectFactory))]
         public void DetectNaughtyTypesByDefault(Type dangerousType)
@@ -178,7 +155,6 @@ namespace Hyperion.Tests
                 stream.Position = 0;
                 Action act = () => deserializer.Deserialize<ClassC>(stream);
                 act.Should().Throw<UserEvilDeserializationException>();
-                deserializer.UserRejectedKeys.Count.Should().Be(1); // user rejected types should be cached
                 
                 stream.Position = 0;
                 Action actObj = () => deserializer.Deserialize<object>(stream);

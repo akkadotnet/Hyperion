@@ -71,43 +71,18 @@ namespace Hyperion.ValueSerializers
                 return null;
             var byteArr = bytes.Value;
 
-            // Read possible rejected keys from the cache
-            if(session.Serializer.RejectedKeys.Contains(byteArr))
-                throw new EvilDeserializationException(
-                    "Unsafe Type Deserialization Detected!",
-                    StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length));
-            if(session.Serializer.UserRejectedKeys.Contains(byteArr))
-                throw new UserEvilDeserializationException(
-                    "Unsafe Type Deserialization Detected!", 
-                    StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length));
-            
             var shortname = StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length);
             var options = session.Serializer.Options;
             
-            try
-            {
-                var type = TypeNameLookup.GetOrAdd(shortname,
-                    name => TypeEx.LoadTypeByName(shortname, options.DisallowUnsafeTypes, options.TypeFilter));
+            var type = TypeNameLookup.GetOrAdd(shortname,
+                name => TypeEx.LoadTypeByName(shortname, options.DisallowUnsafeTypes, options.TypeFilter));
 
-                //add the deserialized type to lookup
-                if (session.Serializer.Options.PreserveObjectReferences)
-                {
-                    session.TrackDeserializedObject(type);
-                }
-                return type;
-            }
-            catch (UserEvilDeserializationException)
+            //add the deserialized type to lookup
+            if (session.Serializer.Options.PreserveObjectReferences)
             {
-                // Store rejected types in the cache (optimization)
-                session.Serializer.UserRejectedKeys.Add(byteArr);
-                throw;
+                session.TrackDeserializedObject(type);
             }
-            catch (EvilDeserializationException)
-            {
-                // Store rejected types in the cache (optimization)
-                session.Serializer.RejectedKeys.Add(byteArr);
-                throw;
-            }
+            return type;
         }
 
         public override Type GetElementType()

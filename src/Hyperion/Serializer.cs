@@ -38,9 +38,6 @@ namespace Hyperion
         internal readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
             new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
         
-        internal readonly HashSet<ByteArrayKey> RejectedKeys = new HashSet<ByteArrayKey>(ByteArrayKeyComparer.Instance);
-        internal readonly HashSet<ByteArrayKey> UserRejectedKeys = new HashSet<ByteArrayKey>(ByteArrayKeyComparer.Instance);
-
         public Serializer() : this(new SerializerOptions())
         {
         }

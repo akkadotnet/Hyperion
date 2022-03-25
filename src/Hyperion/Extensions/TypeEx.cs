@@ -151,47 +151,22 @@ namespace Hyperion.Extensions
             var bytes = stream.ReadLengthEncodedByteArray(session);
             var byteArr = ByteArrayKey.Create(bytes);
 
-            // Read possible rejected keys from the cache
-            if(session.Serializer.RejectedKeys.Contains(byteArr))
-                throw new EvilDeserializationException(
-                    "Unsafe Type Deserialization Detected!",
-                    StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length));
-            if(session.Serializer.UserRejectedKeys.Contains(byteArr))
-                throw new UserEvilDeserializationException(
-                    "Unsafe Type Deserialization Detected!", 
-                    StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length));
-
-            try
+            return session.Serializer.TypeNameLookup.GetOrAdd(byteArr, b =>
             {
-                return session.Serializer.TypeNameLookup.GetOrAdd(byteArr, b =>
+                var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
+                var overrides = session.Serializer.Options.CrossFrameworkPackageNameOverrides;
+
+                var oldName = shortName;
+                foreach (var adapter in overrides)
                 {
-                    var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
-                    var overrides = session.Serializer.Options.CrossFrameworkPackageNameOverrides;
+                    shortName = adapter(shortName);
+                    if (!ReferenceEquals(oldName, shortName))
+                        break;
+                }
 
-                    var oldName = shortName;
-                    foreach (var adapter in overrides)
-                    {
-                        shortName = adapter(shortName);
-                        if (!ReferenceEquals(oldName, shortName))
-                            break;
-                    }
-
-                    var options = session.Serializer.Options;
-                    return LoadTypeByName(shortName, options.DisallowUnsafeTypes, options.TypeFilter);
-                });
-            }
-            catch (UserEvilDeserializationException)
-            {
-                // Store rejected types in the cache (optimization)
-                session.Serializer.UserRejectedKeys.Add(byteArr);
-                throw;
-            }
-            catch (EvilDeserializationException)
-            {
-                // Store rejected types in the cache (optimization)
-                session.Serializer.RejectedKeys.Add(byteArr);
-                throw;
-            }
+                var options = session.Serializer.Options;
+                return LoadTypeByName(shortName, options.DisallowUnsafeTypes, options.TypeFilter);
+            });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
