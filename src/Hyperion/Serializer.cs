@@ -37,6 +37,9 @@ namespace Hyperion
         internal readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
             new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
         
+        internal readonly ConcurrentDictionary<Type, TypeAccepted> AcceptedTypes =
+            new ConcurrentDictionary<Type, TypeAccepted>();
+
         public Serializer() : this(new SerializerOptions())
         {
         }
@@ -150,6 +153,34 @@ namespace Hyperion
                 throw new ArgumentNullException(nameof(session));
 
             var type = obj.GetType();
+            if (Options.DisallowUnsafeTypes)
+            {
+                if (AcceptedTypes.TryGetValue(type, out var acceptance))
+                {
+                    if(!acceptance.Accepted)
+                    {
+                        if (acceptance.UserRejected)
+                            throw new UserEvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
+                        throw new EvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
+                    }
+                }
+                else
+                {
+                    if(TypeEx.IsDisallowedType(type))
+                    {
+                        AcceptedTypes[type] = new TypeAccepted(false, false);
+                        throw new EvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
+                    }
+                    if(!Options.TypeFilter.IsAllowed(type.AssemblyQualifiedName))
+                    {
+                        AcceptedTypes[type] = new TypeAccepted(false, true);
+                        throw new UserEvilDeserializationException("Unsafe Type Deserialization Detected!",
+                            type.FullName);
+                    }
+                    AcceptedTypes[type] = new TypeAccepted(true, false);
+                }
+            }
+            
             var s = GetSerializerByType(type);
             s.WriteManifest(stream, session);
             s.WriteValue(stream, obj, session);
@@ -292,6 +323,18 @@ namespace Hyperion
                 default:
                     throw new NotSupportedException("Unknown manifest value");
             }
+        }
+        
+        internal readonly struct TypeAccepted
+        {
+            public TypeAccepted(bool accepted, bool userRejected)
+            {
+                Accepted = accepted;
+                UserRejected = userRejected;
+            }
+
+            public bool Accepted { get; }
+            public bool UserRejected { get; }
         }
     }
 }

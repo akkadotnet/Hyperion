@@ -35,6 +35,19 @@ namespace Hyperion.Tests
             }
         }
 
+        [Fact]
+        public void CantSerializeANaughtyType()
+        {
+            var serializer = new Serializer();
+            var di = new FileInfo(@"c:\windows\windows32\dangerous.exe");
+
+            using (var stream = new MemoryStream())
+            {
+                Assert.Throws<EvilDeserializationException>(() =>
+                    serializer.Serialize(di, stream));
+            }
+        }
+
         [Theory]
         [MemberData(nameof(DangerousObjectFactory))]
         public void DetectNaughtyTypesByDefault(Type dangerousType)
