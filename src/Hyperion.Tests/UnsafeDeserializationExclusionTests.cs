@@ -161,6 +161,26 @@ namespace Hyperion.Tests
                 actObj.Should().Throw<UserEvilDeserializationException>();
             }
         }
+
+        [Fact]
+        public void TypeCacheShouldNotBleedBetweenInstances()
+        {
+            var serializer = new Serializer();
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(new ClassA(), stream);
+                stream.Position = 0;
+                serializer.Deserialize<ClassA>(stream);
+            }
+            
+            // Type should be cached when a serializer deserialize a message
+            serializer.TypeNameLookup.Values.Should().Contain(typeof(ClassA));
+
+            // Type cache should not be carried to other serializer instances
+            var newSerializer = new Serializer();
+            newSerializer.TypeNameLookup.Values.Should().NotContain(typeof(ClassA));
+        }
+        
     }
 }
 

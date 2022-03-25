@@ -11,7 +11,6 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Hyperion.Extensions;
-using Hyperion.Internal;
 
 namespace Hyperion.ValueSerializers
 {

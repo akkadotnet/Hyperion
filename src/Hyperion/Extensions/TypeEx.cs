@@ -202,7 +202,7 @@ namespace Hyperion.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDisallowedType(Type type)
-            => IsDisallowedType(type.FullName);
+            => IsDisallowedType(type.AssemblyQualifiedName);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDisallowedType(string name)

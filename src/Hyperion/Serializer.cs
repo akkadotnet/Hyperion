@@ -9,7 +9,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -147,6 +146,8 @@ namespace Hyperion
         {
             if (obj == null)
                 throw new ArgumentNullException(nameof(obj));
+            if(session == null)
+                throw new ArgumentNullException(nameof(session));
 
             var type = obj.GetType();
             var s = GetSerializerByType(type);
@@ -155,16 +156,7 @@ namespace Hyperion
         }
 
         public void Serialize(object obj, [NotNull] Stream stream)
-        {
-            if (obj == null)
-                throw new ArgumentNullException(nameof(obj));
-            SerializerSession session = GetSerializerSession();
-
-            var type = obj.GetType();
-            var s = GetSerializerByType(type);
-            s.WriteManifest(stream, session);
-            s.WriteValue(stream, obj, session);
-        }
+            => Serialize(obj, stream, GetSerializerSession());
 
         public SerializerSession GetSerializerSession()
         {
