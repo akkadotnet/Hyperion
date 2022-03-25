@@ -58,19 +58,6 @@ namespace Hyperion.Tests
             }
         }
 
-        [Fact]
-        public void CantSerializeANaughtyType()
-        {
-            var serializer = new Serializer();
-            var di = new DirectoryInfo(@"c:\");
-
-            using (var stream = new MemoryStream())
-            {
-                Assert.Throws<EvilDeserializationException>(() => serializer.Serialize(di, stream));
-                // System rejected type during serialization is not cached because there is no key lookup
-            }
-        }
-
         [Theory]
         [MemberData(nameof(DangerousObjectFactory))]
         public void DetectNaughtyTypesByDefault(Type dangerousType)

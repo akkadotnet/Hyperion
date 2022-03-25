@@ -207,15 +207,6 @@ namespace Hyperion
 
         public ValueSerializer GetSerializerByType([NotNull] Type type)
         {
-            // Filter for disallowed types
-            if (Options.DisallowUnsafeTypes)
-            {
-                if(TypeEx.IsDisallowedType(type) || TypeEx.UnsafeInheritanceCheck(type))
-                    throw new EvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
-                if(!Options.TypeFilter.IsAllowed(type.AssemblyQualifiedName))
-                    throw new UserEvilDeserializationException("Unsafe Type Deserialization Detected!", type.FullName);
-            }
-            
             //do we already have a serializer for this type?
             if (_serializers.TryGetValue(type, out var serializer))
                 return serializer;
