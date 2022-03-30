@@ -22,15 +22,29 @@ namespace Hyperion.Tests
         [Fact]
         public void CantDeserializeANaughtyType()
         {
-            var serializer = new Hyperion.Serializer();
-            var di =new System.IO.DirectoryInfo(@"c:\");
+            var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
+            var deserializer = new Serializer();
+            var di = new DirectoryInfo(@"c:\");
 
             using (var stream = new MemoryStream())
             {
                 serializer.Serialize(di, stream);
                 stream.Position = 0;
                 Assert.Throws<EvilDeserializationException>(() =>
-                    serializer.Deserialize<DirectoryInfo>(stream));
+                    deserializer.Deserialize<DirectoryInfo>(stream));
+            }
+        }
+
+        [Fact]
+        public void CantSerializeANaughtyType()
+        {
+            var serializer = new Serializer();
+            var di = new FileInfo(@"c:\windows\windows32\dangerous.exe");
+
+            using (var stream = new MemoryStream())
+            {
+                Assert.Throws<EvilDeserializationException>(() =>
+                    serializer.Serialize(di, stream));
             }
         }
 
@@ -121,17 +135,18 @@ namespace Hyperion.Tests
             var options = SerializerOptions.Default
                 .WithTypeFilter(typeFilter);
 
-            var serializer = new Serializer(options);
+            var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
+            var deserializer = new Serializer(options);
             
             using (var stream = new MemoryStream())
             {
                 serializer.Serialize(new ClassA(), stream);
                 stream.Position = 0;
-                Action act = () => serializer.Deserialize<ClassA>(stream);
+                Action act = () => deserializer.Deserialize<ClassA>(stream);
                 act.Should().NotThrow();
                 
                 stream.Position = 0;
-                Action actObj = () => serializer.Deserialize<object>(stream);
+                Action actObj = () => deserializer.Deserialize<object>(stream);
                 actObj.Should().NotThrow();
             }
 
@@ -139,11 +154,11 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassB(), stream);
                 stream.Position = 0;
-                Action act = () => serializer.Deserialize<ClassB>(stream);
+                Action act = () => deserializer.Deserialize<ClassB>(stream);
                 act.Should().NotThrow();
                 
                 stream.Position = 0;
-                Action actObj = () => serializer.Deserialize<object>(stream);
+                Action actObj = () => deserializer.Deserialize<object>(stream);
                 actObj.Should().NotThrow();
             }
             
@@ -151,14 +166,34 @@ namespace Hyperion.Tests
             {
                 serializer.Serialize(new ClassC(), stream);
                 stream.Position = 0;
-                Action act = () => serializer.Deserialize<ClassC>(stream);
+                Action act = () => deserializer.Deserialize<ClassC>(stream);
                 act.Should().Throw<UserEvilDeserializationException>();
                 
                 stream.Position = 0;
-                Action actObj = () => serializer.Deserialize<object>(stream);
+                Action actObj = () => deserializer.Deserialize<object>(stream);
                 actObj.Should().Throw<UserEvilDeserializationException>();
             }
         }
+
+        [Fact]
+        public void TypeCacheShouldNotBleedBetweenInstances()
+        {
+            var serializer = new Serializer();
+            using (var stream = new MemoryStream())
+            {
+                serializer.Serialize(new ClassA(), stream);
+                stream.Position = 0;
+                serializer.Deserialize<ClassA>(stream);
+            }
+            
+            // Type should be cached when a serializer deserialize a message
+            serializer.TypeNameLookup.Values.Should().Contain(typeof(ClassA));
+
+            // Type cache should not be carried to other serializer instances
+            var newSerializer = new Serializer();
+            newSerializer.TypeNameLookup.Values.Should().NotContain(typeof(ClassA));
+        }
+        
     }
 }
 

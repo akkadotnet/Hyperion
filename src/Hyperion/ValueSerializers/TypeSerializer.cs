@@ -65,11 +65,14 @@ namespace Hyperion.ValueSerializers
             new ConcurrentDictionary<string, Type>();
         public override object ReadValue(Stream stream, DeserializerSession session)
         {
-            var shortname = stream.ReadString(session);
-            if (shortname == null)
+            var bytes = stream.ReadByteArrayKey(session);
+            if (bytes == null)
                 return null;
+            var byteArr = bytes.Value;
 
+            var shortname = StringEx.FromUtf8Bytes(byteArr.Bytes, 0, byteArr.Bytes.Length);
             var options = session.Serializer.Options;
+            
             var type = TypeNameLookup.GetOrAdd(shortname,
                 name => TypeEx.LoadTypeByName(shortname, options.DisallowUnsafeTypes, options.TypeFilter));
 

@@ -150,6 +150,7 @@ namespace Hyperion.Extensions
         {
             var bytes = stream.ReadLengthEncodedByteArray(session);
             var byteArr = ByteArrayKey.Create(bytes);
+
             return session.Serializer.TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
@@ -169,7 +170,7 @@ namespace Hyperion.Extensions
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool UnsafeInheritanceCheck(Type type)
+        internal static bool UnsafeInheritanceCheck(Type type)
         {
 #if NETSTANDARD1_6
             if (type.IsValueType())
@@ -201,7 +202,7 @@ namespace Hyperion.Extensions
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDisallowedType(Type type)
-            => IsDisallowedType(type.FullName);
+            => IsDisallowedType(type.AssemblyQualifiedName);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsDisallowedType(string name)

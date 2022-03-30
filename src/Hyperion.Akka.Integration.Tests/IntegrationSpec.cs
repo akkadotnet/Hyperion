@@ -132,11 +132,19 @@ akka {
             
             try
             {
-                var serializer = system.Serialization.FindSerializerForType(typeof(DirectoryInfo));
+                var deserializer = system.Serialization.FindSerializerForType(typeof(DirectoryInfo));
                 var di = new DirectoryInfo(@"c:\");
+
+                byte[] serialized;
+                using (var stream = new MemoryStream())
+                {
+                    var serializer = new Serializer(SerializerOptions.Default.WithDisallowUnsafeType(false));
+                    serializer.Serialize(di, stream);
+                    stream.Position = 0;
+                    serialized = stream.ToArray();
+                }
                 
-                var serialized = serializer.ToBinary(di);
-                var ex = Assert.Throws<SerializationException>(() => serializer.FromBinary<DirectoryInfo>(serialized));
+                var ex = Assert.Throws<SerializationException>(() => deserializer.FromBinary<DirectoryInfo>(serialized));
                 ex.InnerException.Should().BeOfType<EvilDeserializationException>();
             }
             finally
