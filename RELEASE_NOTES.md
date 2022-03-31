@@ -1,3 +1,7 @@
+### 0.12.2 March 31 2022 ####
+
+* Fix [deserialization type cache was shared between multiple serializer instances](https://github.com/akkadotnet/Hyperion/pull/306) 
+
 ### 0.12.1 March 23 2022 ####
 
 * Fix disallow-unsafe-type Akka.NET settings and harden unsafe type detection [301](https://github.com/akkadotnet/Hyperion/pull/301)
