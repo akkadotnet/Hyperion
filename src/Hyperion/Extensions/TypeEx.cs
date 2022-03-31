@@ -14,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using Hyperion.Internal;
 
@@ -51,11 +52,12 @@ namespace Hyperion.Extensions
             {
                 "System.Security.Claims.ClaimsIdentity",
                 "System.Windows.Forms.AxHost.State",
+                "System.Windows.Forms.AxHost+State",
                 "System.Windows.Data.ObjectDataProvider",
                 "System.Management.Automation.PSObject",
                 "System.Web.Security.RolePrincipal",
                 "System.IdentityModel.Tokens.SessionSecurityToken",
-                "SessionViewStateHistoryItem",
+                "System.Web.UI.MobileControls.SessionViewState+SessionViewStateHistoryItem",
                 "TextFormattingRunProperties",
                 "ToolboxItemContainer",
                 "System.Security.Principal.WindowsClaimsIdentity",
@@ -63,12 +65,14 @@ namespace Hyperion.Extensions
                 "System.Security.Principal.WindowsPrincipal",
                 "System.CodeDom.Compiler.TempFileCollection",
                 "System.IO.FileSystemInfo",
+                "System.IO.FileInfo",
                 "System.Activities.Presentation.WorkflowDesigner",
                 "System.Windows.ResourceDictionary",
                 "System.Windows.Forms.BindingSource",
                 "Microsoft.Exchange.Management.SystemManager.WinForms.ExchangeSettingsProvider",
                 "System.Diagnostics.Process",
-                "System.Management.IWbemClassObjectFreeThreaded"
+                "System.Management.IWbemClassObjectFreeThreaded",
+                "System.Configuration.Install.AssemblyInstaller"
             });
         
         public static bool IsHyperionPrimitive(this Type type)
@@ -129,9 +133,6 @@ namespace Hyperion.Extensions
             return type.IsArray && type.GetArrayRank() == 1 && type.GetElementType().IsHyperionPrimitive();
         }
 
-        private static readonly ConcurrentDictionary<ByteArrayKey, Type> TypeNameLookup =
-            new ConcurrentDictionary<ByteArrayKey, Type>(ByteArrayKeyComparer.Instance);
-
         public static byte[] GetTypeManifest(IReadOnlyCollection<byte[]> fieldNames)
         {
             IEnumerable<byte> result = new[] { (byte)fieldNames.Count };
@@ -149,7 +150,8 @@ namespace Hyperion.Extensions
         {
             var bytes = stream.ReadLengthEncodedByteArray(session);
             var byteArr = ByteArrayKey.Create(bytes);
-            return TypeNameLookup.GetOrAdd(byteArr, b =>
+
+            return session.Serializer.TypeNameLookup.GetOrAdd(byteArr, b =>
             {
                 var shortName = StringEx.FromUtf8Bytes(b.Bytes, 0, b.Bytes.Length);
                 var overrides = session.Serializer.Options.CrossFrameworkPackageNameOverrides;
@@ -167,7 +169,8 @@ namespace Hyperion.Extensions
             });
         }
 
-        private static bool UnsafeInheritanceCheck(Type type)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static bool UnsafeInheritanceCheck(Type type)
         {
 #if NETSTANDARD1_6
             if (type.IsValueType())
@@ -181,7 +184,7 @@ namespace Hyperion.Extensions
             
             while (currentBase != null)
             {
-                if (UnsafeTypesDenySet.Any(r => currentBase.FullName?.Contains(r) ?? false))
+                if (IsDisallowedType(currentBase))
                     return true;
 #if NETSTANDARD1_6
                 currentBase = currentBase.DeclaringType;
@@ -192,12 +195,25 @@ namespace Hyperion.Extensions
 
             return false;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsDisallowedType<TType>()
+            => IsDisallowedType(typeof(TType));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsDisallowedType(Type type)
+            => IsDisallowedType(type.AssemblyQualifiedName);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsDisallowedType(string name)
+            => UnsafeTypesDenySet.Any(name.Contains);
         
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Type LoadTypeByName(string name, bool disallowUnsafeTypes, ITypeFilter typeFilter)
         {
             if (disallowUnsafeTypes)
             {
-                if(UnsafeTypesDenySet.Any(name.Contains))
+                if(IsDisallowedType(name))
                     throw new EvilDeserializationException("Unsafe Type Deserialization Detected!", name);
                 if(!typeFilter.IsAllowed(name))
                     throw new UserEvilDeserializationException("Unsafe Type Deserialization Detected!", name);
@@ -208,7 +224,7 @@ namespace Hyperion.Extensions
                 // i.e. if there are different version available in GAC and locally
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: false);
                 var type = Type.GetType(typename, true);
-                if (UnsafeInheritanceCheck(type))
+                if (disallowUnsafeTypes && UnsafeInheritanceCheck(type))
                     throw new EvilDeserializationException(
                         "Unsafe Type Deserialization Detected!", name);
                 return type;
@@ -216,8 +232,8 @@ namespace Hyperion.Extensions
             catch (IOException)
             {
                 var typename = ToQualifiedAssemblyName(name, ignoreAssemblyVersion: true);
-                var type =  Type.GetType(typename, true);
-                if (UnsafeInheritanceCheck(type))
+                var type = Type.GetType(typename, true);
+                if (disallowUnsafeTypes && UnsafeInheritanceCheck(type))
                     throw new EvilDeserializationException(
                         "Unsafe Type Deserialization Detected!", name);
                 return type;
