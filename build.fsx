@@ -71,6 +71,8 @@ Target "Clean" (fun _ ->
 
     CleanDirs !! "./**/bin"
     CleanDirs !! "./**/obj"
+    
+    CreateDir "bin/nuget"
 )
 
 Target "AssemblyInfo" (fun _ ->
