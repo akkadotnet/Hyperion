@@ -22,7 +22,7 @@ Please report any serialization problem that occurs after an upgrade to this ver
     <NetFrameworkTestVersion>net471</NetFrameworkTestVersion>
     <NetStandardLibVersion>netstandard2.0</NetStandardLibVersion>
     <AkkaVersion>1.4.35</AkkaVersion>
-    <FluentAssertionsVersion>6.5.1</FluentAssertionsVersion>
+    <FluentAssertionsVersion>6.6.0</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
     <TestSdkVersion>17.1.0</TestSdkVersion>
