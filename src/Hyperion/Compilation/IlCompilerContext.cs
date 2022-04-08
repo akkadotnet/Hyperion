@@ -14,7 +14,6 @@ using System.Text;
 
 namespace Hyperion.Compilation
 {
-#if NET45
     internal sealed class IlCompilerContext
     {
         private int _stackDepth;
@@ -94,5 +93,4 @@ namespace Hyperion.Compilation
             _il.EmitCall(opcode, method, optionalTypes);
         }
     }
-#endif
 }

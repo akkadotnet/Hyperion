@@ -105,7 +105,7 @@ namespace Hyperion.Tests
                 })
             };
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions(surrogates: surrogates));
+            var serializer = new Serializer(SerializerOptions.Default.WithSurrogates(surrogates));
             var foo = new Foo
             {
                 Bar = "I will be replaced!"
@@ -131,7 +131,7 @@ namespace Hyperion.Tests
                 })
             };
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions(surrogates: surrogates));
+            var serializer = new Serializer(SerializerOptions.Default.WithSurrogates(surrogates));
             var foo = new Foo
             {
                 Bar = "I will be replaced!"
@@ -157,7 +157,7 @@ namespace Hyperion.Tests
                 })
             };
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions(surrogates: surrogates));
+            var serializer = new Serializer(SerializerOptions.Default.WithSurrogates(surrogates));
             var key = new SurrogatedKey("test key");
             var foo = new Foo
             {

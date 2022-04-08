@@ -16,17 +16,26 @@ namespace Hyperion
 {
     public class SerializerOptions
     {
-        public static readonly SerializerOptions Default = new SerializerOptions();
+        public static readonly SerializerOptions Default = new SerializerOptions(
+            versionTolerance: false,
+            preserveObjectReferences: false,
+            surrogates: null,
+            serializerFactories: null,
+            knownTypes: null,
+            ignoreISerializable: false,
+            packageNameOverrides: null,
+            disallowUnsafeTypes: true,
+            typeFilter: null);
 
         internal static List<Func<string, string>> DefaultPackageNameOverrides()
         {
             return new List<Func<string, string>>
             {
-#if NET45
+#if NETFX
                 str => str.Contains("System.Private.CoreLib,%core%")
                     ? str.Replace("System.Private.CoreLib,%core%", "mscorlib,%core%") 
                     : str
-#elif NETSTANDARD
+#else
                 str => str.Contains("mscorlib,%core%")
                     ? str.Replace("mscorlib,%core%", "System.Private.CoreLib,%core%") 
                     : str
@@ -34,35 +43,43 @@ namespace Hyperion
             };
         }
 
-        internal static readonly Surrogate[] EmptySurrogates = new Surrogate[0];
+        internal static Surrogate[] EmptySurrogates() => Array.Empty<Surrogate>();
 
-        private static readonly ValueSerializerFactory[] DefaultValueSerializerFactories =
+        private static ValueSerializerFactory[] _defaultValueSerializerFactories;
+        private static ValueSerializerFactory[] DefaultValueSerializerFactories
         {
-            new ConsistentArraySerializerFactory(), 
-            new MethodInfoSerializerFactory(),
-            new PropertyInfoSerializerFactory(), 
-            new ConstructorInfoSerializerFactory(),
-            new FieldInfoSerializerFactory(),
-            new DelegateSerializerFactory(), 
-            new ToSurrogateSerializerFactory(),
-            new FromSurrogateSerializerFactory(),
-            new FSharpMapSerializerFactory(), 
-            new FSharpListSerializerFactory(), 
-            //order is important, try dictionaries before enumerables as dicts are also enumerable
-            new AggregateExceptionSerializerFactory(),
-            new ExceptionSerializerFactory(), 
-            new ImmutableCollectionsSerializerFactory(),
-            new ExpandoObjectSerializerFactory(),
-            new DefaultDictionarySerializerFactory(),
-            new DictionarySerializerFactory(),
-            new ArraySerializerFactory(),
-            new MultipleDimensionalArraySerialzierFactory(),
+            get
+            {
+                if(_defaultValueSerializerFactories == null)
+                    _defaultValueSerializerFactories = new ValueSerializerFactory[]
+                    {
+                        new ConsistentArraySerializerFactory(),
+                        new MethodInfoSerializerFactory(),
+                        new PropertyInfoSerializerFactory(),
+                        new ConstructorInfoSerializerFactory(),
+                        new FieldInfoSerializerFactory(),
+                        new DelegateSerializerFactory(),
+                        new ToSurrogateSerializerFactory(),
+                        new FromSurrogateSerializerFactory(),
+                        new FSharpMapSerializerFactory(),
+                        new FSharpListSerializerFactory(),
+                        //order is important, try dictionaries before enumerables as dicts are also enumerable
+                        new AggregateExceptionSerializerFactory(),
+                        new ExceptionSerializerFactory(),
+                        new ImmutableCollectionsSerializerFactory(),
+                        new ExpandoObjectSerializerFactory(),
+                        new DefaultDictionarySerializerFactory(),
+                        new DictionarySerializerFactory(),
+                        new ArraySerializerFactory(),
+                        new MultipleDimensionalArraySerialzierFactory(),
 #if SERIALIZATION
-            new ISerializableSerializerFactory(), //TODO: this will mess up the indexes in the serializer payload
+                        new ISerializableSerializerFactory(), //TODO: this will mess up the indexes in the serializer payload
 #endif
-            new EnumerableSerializerFactory(),
-            
-        };
+                        new EnumerableSerializerFactory(),
+                    };
+                return _defaultValueSerializerFactories;
+            }
+        }
 
         internal readonly bool IgnoreISerializable;
         internal readonly bool PreserveObjectReferences;
@@ -123,12 +140,12 @@ namespace Hyperion
             ITypeFilter typeFilter)
         {
             VersionTolerance = versionTolerance;
-            Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
+            Surrogates = surrogates?.ToArray() ?? EmptySurrogates();
 
             //use the default factories + any user defined
-	        ValueSerializerFactories = serializerFactories == null
-		        ? DefaultValueSerializerFactories
-		        : serializerFactories.Concat(DefaultValueSerializerFactories).ToArray();
+	        ValueSerializerFactories = 
+                serializerFactories?.Concat(DefaultValueSerializerFactories).ToArray() ??
+		        DefaultValueSerializerFactories;
 
             KnownTypes = knownTypes?.ToArray() ?? new Type[] {};
             for (var i = 0; i < KnownTypes.Length; i++)

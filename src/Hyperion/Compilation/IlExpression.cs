@@ -14,7 +14,6 @@ using Hyperion.Extensions;
 
 namespace Hyperion.Compilation
 {
-#if NET45
     internal abstract class IlExpression
     {
         public abstract void Emit(IlCompilerContext ctx);
@@ -323,5 +322,4 @@ namespace Hyperion.Compilation
 
         public override Type Type() => _method.ReturnType;
     }
-#endif
 }

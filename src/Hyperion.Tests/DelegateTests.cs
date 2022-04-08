@@ -34,7 +34,7 @@ namespace Hyperion.Tests
         public void CanSerializeMemberMethod()
         {
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions());
+            var serializer = new Serializer(SerializerOptions.Default);
 
             Func<string> a = 123.ToString;
             serializer.Serialize(a, stream);
@@ -49,7 +49,7 @@ namespace Hyperion.Tests
         public void CanSerializeDelegate()
         {
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions());
+            var serializer = new Serializer(SerializerOptions.Default);
 
             Action<Dummy> a = dummy => dummy.Prop = 1;
             serializer.Serialize(a,stream);
@@ -71,7 +71,7 @@ namespace Hyperion.Tests
         public void CanSerializeStaticDelegate()
         {
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions());
+            var serializer = new Serializer(SerializerOptions.Default);
 
             Func<int, int> fun = StaticFunc;
 
@@ -88,7 +88,7 @@ namespace Hyperion.Tests
         public void CanSerializeObjectWithClosure()
         {
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions());
+            var serializer = new Serializer(SerializerOptions.Default);
 
             var hasClosure = new HasClosure();
             hasClosure.Create();

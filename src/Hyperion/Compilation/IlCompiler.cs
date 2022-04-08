@@ -14,7 +14,6 @@ using System.Reflection.Emit;
 
 namespace Hyperion.Compilation
 {
-#if NET45
     internal sealed class IlCompiler<TDel> : IlBuilder, ICompiler<TDel>
     {
         public TDel Compile()
@@ -93,5 +92,4 @@ namespace Hyperion.Compilation
             return self;
         }
     }
-#endif
 }

@@ -7,7 +7,6 @@
 // -----------------------------------------------------------------------
 #endregion
 
-#if NET45
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -67,7 +66,7 @@ namespace Hyperion.Tests
             var a = c.Compile();
             var dummy = new Dummy();
             a(dummy);
-            Assert.Equal(true, dummy.BoolField);
+            Assert.True(dummy.BoolField);
         }
 
         [Fact]
@@ -79,7 +78,7 @@ namespace Hyperion.Tests
             var a = c.Compile();
             var dummy = new Dummy();
             a(dummy);
-            Assert.Equal(true, dummy.BoolField);
+            Assert.True(dummy.BoolField);
         }
 
 
@@ -93,7 +92,7 @@ namespace Hyperion.Tests
             var a = c.Compile();
             var dummy = new Dummy();
             a(dummy);
-            Assert.Equal(true,dummy.BoolField);
+            Assert.True(dummy.BoolField);
         }
 
         [Fact]
@@ -112,7 +111,7 @@ namespace Hyperion.Tests
             c.Emit(b);
             var a = c.Compile();
             var res = a();
-            Assert.Equal(true,res);
+            Assert.True(res);
         }
 
         [Fact]
@@ -190,7 +189,7 @@ namespace Hyperion.Tests
         {
             var value = new FakeTupleString("Hello");
             var type = value.GetType();
-            var serializer = new Serializer(new SerializerOptions(knownTypes: new List<Type>() { type }));
+            var serializer = new Serializer(SerializerOptions.Default.WithKnownTypes(new List<Type>() { type }));
             var session = new DeserializerSession(serializer);
             var stream = new MemoryStream();
 
@@ -211,7 +210,7 @@ namespace Hyperion.Tests
         {
             var value = FSharpOption<string>.Some("abc");
             var type = value.GetType();
-            var serializer = new Serializer(new SerializerOptions(knownTypes: new List<Type>() { type }));
+            var serializer = new Serializer(SerializerOptions.Default.WithKnownTypes(new List<Type>() { type }));
             var session = new DeserializerSession(serializer);
             var stream = new MemoryStream();
 
@@ -230,7 +229,7 @@ namespace Hyperion.Tests
         {
             var value = Tuple.Create("Hello");
             var type = value.GetType();
-            var serializer = new Serializer(new SerializerOptions(knownTypes: new List<Type>() { type }));
+            var serializer = new Serializer(SerializerOptions.Default.WithKnownTypes(new List<Type>() { type }));
             var session = new DeserializerSession(serializer);
             var stream = new MemoryStream();
 
@@ -248,7 +247,7 @@ namespace Hyperion.Tests
         [Fact]
         public void ReadSimulation()
         {
-            var serializer = new Serializer(new SerializerOptions(knownTypes:new List<Type>() {typeof(Poco)}));
+            var serializer = new Serializer(SerializerOptions.Default.WithKnownTypes(new List<Type>() {typeof(Poco)}));
             var session = new DeserializerSession(serializer);
             var stream = new MemoryStream();
             var poco = new Poco()
@@ -306,4 +305,3 @@ namespace Hyperion.Tests
         }
     }
 }
-#endif

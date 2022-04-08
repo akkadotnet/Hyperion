@@ -39,29 +39,15 @@ namespace Hyperion.SerializerFactories
         }
 
         public override bool CanSerialize(Serializer serializer, Type type) => 
-#if NETSTANDARD16
-            false;
-#else
             AggregateExceptionTypeInfo.IsAssignableFrom(type.GetTypeInfo());
-#endif
 
         public override bool CanDeserialize(Serializer serializer, Type type) => CanSerialize(serializer, type);
 
-#if NETSTANDARD16
-        // Workaround for CoreCLR where FormatterServices.GetUninitializedObject is not public
-        private static readonly Func<Type, object> GetUninitializedObject =
-            (Func<Type, object>)
-                typeof(string).GetTypeInfo().Assembly.GetType("System.Runtime.Serialization.FormatterServices")
-                    .GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
-                    .CreateDelegate(typeof(Func<Type, object>));
-#else
         private static readonly Func<Type,object> GetUninitializedObject = System.Runtime.Serialization.FormatterServices.GetUninitializedObject;
-#endif
 
         public override ValueSerializer BuildSerializer(Serializer serializer, Type type,
             ConcurrentDictionary<Type, ValueSerializer> typeMapping)
         {
-#if !NETSTANDARD1_6
             var exceptionSerializer = new ObjectSerializer(type);
             exceptionSerializer.Initialize((stream, session) =>
             {
@@ -121,9 +107,6 @@ namespace Hyperion.SerializerFactories
             else
                 typeMapping.TryAdd(type, exceptionSerializer);
             return exceptionSerializer;
-#else
-            return null;
-#endif
         }
     }
 }

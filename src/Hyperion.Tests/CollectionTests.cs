@@ -398,7 +398,9 @@ namespace Hyperion.Tests
         public void Issue18()
         {
             var msg = new byte[] {1, 2, 3, 4};
-            var serializer = new Serializer(new SerializerOptions(true, true));
+            var serializer = new Serializer(SerializerOptions.Default
+	            .WithVersionTolerance(true)
+	            .WithPreserveObjectReferences(true));
 
             byte[] serialized;
             using (var ms = new MemoryStream())
@@ -420,9 +422,9 @@ namespace Hyperion.Tests
         public void Issue263_CanSerializeArrayOfSurrogate_WhenPreservingObjectReference()
         {
 	        var invoked = new List<SurrogatedClass.ClassSurrogate>();
-	        var serializer = new Serializer(new SerializerOptions(
-		        preserveObjectReferences: true, 
-		        surrogates: new []
+	        var serializer = new Serializer(SerializerOptions.Default
+		        .WithPreserveObjectReferences(true)
+		        .WithSurrogates(new []
 		        {
 			        Surrogate.Create<SurrogatedClass, SurrogatedClass.ClassSurrogate>( 
 				        to => to.ToSurrogate(),
@@ -562,7 +564,9 @@ namespace Hyperion.Tests
 
 		public abstract class BaseContainer : IList<NotKnown>, ICollection<NotKnown>, IEnumerable<NotKnown>, IEnumerable, IList, ICollection
 		{
+#pragma warning disable CS0649
 			private List<NotKnown> _inner;
+#pragma warning restore CS0649
 
 			#region interfaces methods
 
@@ -663,9 +667,9 @@ namespace Hyperion.Tests
 	    [Fact]
 	    public void CanInstantiateSerializerForCollectionWithAmbiguousAddMethod()
 	    {
-		    var serializer = new Serializer(
-			    new SerializerOptions(knownTypes: new List<Type> {typeof(DerivedContainer)},
-				    serializerFactories: new List<ValueSerializerFactory> {new DerivedContainerSerializerFactory()}));
+		    var serializer = new Serializer(SerializerOptions.Default
+			    .WithKnownTypes(new List<Type> {typeof(DerivedContainer)})
+			    .WithSerializerFactory(new List<ValueSerializerFactory> {new DerivedContainerSerializerFactory()}));
 		    var init = new DerivedContainer();
 		    serializer.Serialize(init, new MemoryStream());
 		    // we're done if AmbiguousMatchException wasn't fired
