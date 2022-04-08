@@ -43,7 +43,16 @@ namespace Hyperion
             };
         }
 
-        internal static Surrogate[] EmptySurrogates() => Array.Empty<Surrogate>();
+        private static Surrogate[] _emptySurrogate;
+        internal static Surrogate[] EmptySurrogates
+        {
+            get
+            {
+                if (_emptySurrogate == null)
+                    _emptySurrogate = new Surrogate[0];
+                return _emptySurrogate;
+            }
+        }
 
         private static ValueSerializerFactory[] _defaultValueSerializerFactories;
         private static ValueSerializerFactory[] DefaultValueSerializerFactories
@@ -140,7 +149,7 @@ namespace Hyperion
             ITypeFilter typeFilter)
         {
             VersionTolerance = versionTolerance;
-            Surrogates = surrogates?.ToArray() ?? EmptySurrogates();
+            Surrogates = surrogates?.ToArray() ?? EmptySurrogates;
 
             //use the default factories + any user defined
 	        ValueSerializerFactories = 
