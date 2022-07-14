@@ -222,7 +222,7 @@ namespace Hyperion.Tests
         [Fact]
         public void CanSerializeObjectsKnownTypes()
         {
-            CustomInit(new Serializer(new SerializerOptions(knownTypes: new[] { typeof(Something) })));
+            CustomInit(new Serializer(SerializerOptions.Default.WithKnownTypes(new[] { typeof(Something) })));
             var expected1 = new Something
             {
                 StringProp = "First"

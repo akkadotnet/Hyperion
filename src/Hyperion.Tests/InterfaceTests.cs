@@ -43,7 +43,7 @@ namespace Hyperion.Tests
                 }
             };
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions());
+            var serializer = new Serializer(SerializerOptions.Default);
             serializer.Serialize(b, stream);
             stream.Position = 0;
             var res = serializer.Deserialize(stream);

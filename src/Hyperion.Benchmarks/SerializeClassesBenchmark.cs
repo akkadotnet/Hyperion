@@ -25,7 +25,8 @@ namespace Hyperion.Benchmarks
         
         protected override void Init()
         {
-            var baseOptions = new SerializerOptions(preserveObjectReferences: true);
+            var baseOptions = SerializerOptions.Default
+                .WithPreserveObjectReferences(true);
             Serializer = new Serializer(baseOptions);
 
             var filteredOptions = baseOptions

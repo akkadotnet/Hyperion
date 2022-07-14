@@ -15,7 +15,6 @@ using Hyperion.Extensions;
 
 namespace Hyperion.Compilation
 {
-#if NET45
     internal class IlBuilder
     {
         private readonly List<IlExpression> _expressions = new List<IlExpression>();
@@ -181,5 +180,4 @@ namespace Hyperion.Compilation
             return _expressions.Count - 1;
         }
     }
-#endif
 }

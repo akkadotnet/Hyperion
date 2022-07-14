@@ -40,7 +40,7 @@ namespace Hyperion
         internal readonly ConcurrentDictionary<Type, TypeAccepted> AcceptedTypes =
             new ConcurrentDictionary<Type, TypeAccepted>();
 
-        public Serializer() : this(new SerializerOptions())
+        public Serializer() : this(SerializerOptions.Default)
         {
         }
 

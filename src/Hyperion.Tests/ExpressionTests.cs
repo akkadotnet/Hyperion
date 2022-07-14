@@ -478,7 +478,7 @@ namespace Hyperion.Tests
         [Fact]
         public void CanSerializeLambdaExpressionContainingGenericMethod() {
             Expression<Func<Dummy, bool>> expr = dummy => dummy.TestField.Contains('s');
-            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true));
+            var serializer = new Serializer(SerializerOptions.Default.WithPreserveObjectReferences(true));
             using (var ms = new MemoryStream())
             {
                 serializer.Serialize(expr, ms);

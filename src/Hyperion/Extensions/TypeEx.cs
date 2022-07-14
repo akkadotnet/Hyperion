@@ -97,31 +97,7 @@ namespace Hyperion.Extensions
             //add TypeSerializer with null support
         }
 
-#if NETSTANDARD16
-        //HACK: IsValueType does not exist for netstandard1.6
-        private static bool IsValueType(this Type type)
-            => type.IsSubclassOf(typeof(ValueType));
-        
-        private static bool IsSubclassOf(this Type p, Type c)
-            =>  c.IsAssignableFrom(p);
-        
-        //HACK: the GetUnitializedObject actually exists in .NET Core, its just not public
-        private static readonly Func<Type, object> GetUninitializedObjectDelegate = (Func<Type, object>)
-            typeof(string)
-                .GetTypeInfo()
-                .Assembly
-                .GetType("System.Runtime.Serialization.FormatterServices")
-                ?.GetTypeInfo()
-                ?.GetMethod("GetUninitializedObject", BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static)
-                ?.CreateDelegate(typeof(Func<Type, object>));
-
-        public static object GetEmptyObject(this Type type)
-        {
-            return GetUninitializedObjectDelegate(type);
-        }
-#else
         public static object GetEmptyObject(this Type type) => System.Runtime.Serialization.FormatterServices.GetUninitializedObject(type);
-#endif
 
         public static bool IsOneDimensionalArray(this Type type)
         {
@@ -172,25 +148,15 @@ namespace Hyperion.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool UnsafeInheritanceCheck(Type type)
         {
-#if NETSTANDARD1_6
-            if (type.IsValueType())
-                return false;
-            var currentBase = type.DeclaringType;
-#else
             if (type.IsValueType)
                 return false;
             var currentBase = type.BaseType;
-#endif
             
             while (currentBase != null)
             {
                 if (IsDisallowedType(currentBase))
                     return true;
-#if NETSTANDARD1_6
-                currentBase = currentBase.DeclaringType;
-#else
                 currentBase = currentBase.BaseType;
-#endif
             }
 
             return false;

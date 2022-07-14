@@ -31,7 +31,7 @@ namespace Hyperion.ValueSerializers
             _write = GetStatic(writeStaticMethod, typeof(void));
             _read = GetStatic(readStaticMethod, typeof(TElementType));
 
-#if NET45
+#if NETFX
             var c = new IlCompiler<Action<Stream, object>>();
 #else
             var c = new Compiler<Action<Stream, object>>();
@@ -44,7 +44,7 @@ namespace Hyperion.ValueSerializers
 
             _writeCompiled = c.Compile();
 
-#if NET45
+#if NETFX
             var c2 = new IlCompiler<Func<Stream, TElementType>>();
 #else
             var c2 = new Compiler<Func<Stream, TElementType>>();

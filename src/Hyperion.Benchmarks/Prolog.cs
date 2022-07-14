@@ -21,9 +21,9 @@ namespace Hyperion.Benchmarks
     {
         public HyperionConfig()
         {
-            Add(StatisticColumn.Mean, StatisticColumn.Min, StatisticColumn.Max, StatisticColumn.OperationsPerSecond);
-            Add(MarkdownExporter.GitHub);
-            Add(MemoryDiagnoser.Default);
+            AddColumn(StatisticColumn.Mean, StatisticColumn.Min, StatisticColumn.Max, StatisticColumn.OperationsPerSecond);
+            AddExporter(MarkdownExporter.GitHub);
+            AddDiagnoser(MemoryDiagnoser.Default);
         }
     }
 

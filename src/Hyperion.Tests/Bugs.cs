@@ -95,7 +95,9 @@ namespace Hyperion.Tests
         {
             var stream = new MemoryStream();
             var msg = new ByteMessage(DateTime.UtcNow, 1, 2);
-            var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
+            var serializer = new Serializer(SerializerOptions.Default
+                .WithVersionTolerance(true)
+                .WithPreserveObjectReferences(true));
             serializer.Serialize(msg, stream);
             stream.Position = 0;
             var res = serializer.Deserialize(stream);
@@ -107,7 +109,9 @@ namespace Hyperion.Tests
         [Fact]
         public void CanFindTypeByManifest_WhenManifestContainsUnknownAssemblyVersion()
         {
-            var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
+            var serializer = new Serializer(SerializerOptions.Default
+                .WithVersionTolerance(true)
+                .WithPreserveObjectReferences(true));
             var type = typeof(ByteMessage);
             
             MemoryStream GetStreamForManifest(string manifest)
@@ -168,7 +172,9 @@ namespace Hyperion.Tests
         public void CanSerialieCustomType_bug()
         {
             var stream = new MemoryStream();
-            var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
+            var serializer = new Serializer(SerializerOptions.Default
+                .WithVersionTolerance(true)
+                .WithPreserveObjectReferences(true));
             var root = new Recover(SnapshotSelectionCriteria.Latest);
 
             serializer.Serialize(root, stream);
@@ -179,7 +185,9 @@ namespace Hyperion.Tests
         [Fact]
         public void CanSerializeImmutableGenericInterfaces()
         {
-            var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
+            var serializer = new Serializer(SerializerOptions.Default
+                .WithVersionTolerance(true)
+                .WithPreserveObjectReferences(true));
             var names = new List<Container<string>>
             {
                 new Container<string>("Mr", TrustLevel.Partial),
@@ -210,7 +218,9 @@ namespace Hyperion.Tests
         {
             var stream = new MemoryStream();
             var msg = new Uri("http://localhost:9202/", UriKind.RelativeOrAbsolute);
-            var serializer = new Serializer(new SerializerOptions(preserveObjectReferences: true, versionTolerance: true));
+            var serializer = new Serializer(SerializerOptions.Default
+                .WithVersionTolerance(true)
+                .WithPreserveObjectReferences(true));
             serializer.Serialize(msg, stream);
             stream.Position = 0;
             var res = serializer.Deserialize(stream);
@@ -458,7 +468,7 @@ namespace Hyperion.Tests
                     { 42, "iMaGiNe" }
                 }.ToImmutableDictionary(),
             };
-            var serializer = new Serializer(new SerializerOptions(knownTypes: new[]
+            var serializer = new Serializer(SerializerOptions.Default.WithKnownTypes(new[]
             {
                 typeof(object[]),
                 typeof(int[]),
@@ -494,8 +504,11 @@ namespace Hyperion.Tests
 
         class FieldsToOrder
         {
+#pragma warning disable CS0649
             public string A2;
+            // ReSharper disable once InconsistentNaming
             public string a1;
+#pragma warning restore CS0649
         }
 
         [Fact]
