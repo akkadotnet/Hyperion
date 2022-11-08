@@ -25,7 +25,7 @@ Please report any serialization problem that occurs after an upgrade to this ver
     <FluentAssertionsVersion>6.5.1</FluentAssertionsVersion>
     <XunitVersion>2.4.1</XunitVersion>
     <XunitRunnerVersion>2.4.3</XunitRunnerVersion>
-    <TestSdkVersion>17.1.0</TestSdkVersion>
+    <TestSdkVersion>17.4.0</TestSdkVersion>
     <NBenchVersion>1.2.2</NBenchVersion>
   </PropertyGroup>
 </Project>
