@@ -18,7 +18,7 @@ jobs:
     parameters:
       name: 'windows_pr'
       displayName: 'Windows PR Validation'
-      vmImage: 'windows-2019'
+      vmImage: 'windows-latest'
       scriptFileName: build.cmd
       scriptArgs: all
       
@@ -26,7 +26,7 @@ jobs:
     parameters:
       name: 'linux_pr_net_core'
       displayName: 'Linux PR Validation (netcoreapp3.1)'
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
       scriptFileName: ./build.sh
       scriptArgs: runTestsNetCore
       
@@ -34,6 +34,6 @@ jobs:
     parameters:
       name: 'linux_pr_net_5'
       displayName: 'Linux PR Validation (net5.0)'
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
       scriptFileName: ./build.sh
       scriptArgs: runTestsNet
