@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\common.props" />
   <Import Project="..\xunitSettings.props" />
 
@@ -58,7 +58,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' != '$(NetFrameworkTestVersion)'">
-    <PackageReference Include="System.Management.Automation" Version="6.2.7" />
+    <PackageReference Include="System.Management.Automation" Version="7.3.4" />
   </ItemGroup>
   
   <ItemGroup>
