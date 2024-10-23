@@ -24,7 +24,7 @@ Please report any serialization problem that occurs after an upgrade to this ver
     <AkkaVersion>1.5.6</AkkaVersion>
     <FluentAssertionsVersion>6.11.0</FluentAssertionsVersion>
     <XunitVersion>2.4.2</XunitVersion>
-    <XunitRunnerVersion>2.4.5</XunitRunnerVersion>
+    <XunitRunnerVersion>2.8.2</XunitRunnerVersion>
     <TestSdkVersion>17.7.0</TestSdkVersion>
     <NBenchVersion>2.0.1</NBenchVersion>
   </PropertyGroup>
