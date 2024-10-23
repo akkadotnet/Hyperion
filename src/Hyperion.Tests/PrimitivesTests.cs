@@ -8,7 +8,9 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using FluentAssertions;
 using Xunit;
 
 namespace Hyperion.Tests
@@ -85,28 +87,61 @@ namespace Hyperion.Tests
             SerializeAndAssert(Guid.NewGuid());
         }
 
-        [Fact]
-        public void CanSerializeDateTimeUtc()
+        [Theory]
+        [MemberData(nameof(DateTimeData))]
+        public void CanSerializeDateTime(DateTime expected)
         {
-            SerializeAndAssert(DateTime.UtcNow);
+            SerializeAndAssert(expected);
         }
 
-        [Fact]
-        public void CanSerializeDateTimeLocal()
+        public static IEnumerable<object[]> DateTimeData()
         {
-            SerializeAndAssert(new DateTime(DateTime.Now.Ticks, DateTimeKind.Local));
+            yield return new object[] { DateTime.UtcNow };
+            yield return new object[] { DateTime.Now };
+            yield return new object[] { DateTime.MinValue };
+            yield return new object[] { DateTime.MaxValue };
+            var now = DateTime.Now;
+            yield return new object[] { DateTime.SpecifyKind(now, DateTimeKind.Unspecified) };
+            yield return new object[] { DateTime.SpecifyKind(now, DateTimeKind.Local) };
+            yield return new object[] { DateTime.SpecifyKind(now, DateTimeKind.Utc) };
         }
 
-        [Fact]
-        public void CanSerializeDateTimeOffsetNow()
+        [Theory]
+        [MemberData(nameof(DateTimeOffsetData))]
+        public void CanSerializeDateTimeOffset(DateTimeOffset expected)
         {
-            SerializeAndAssert(DateTimeOffset.Now);
+            SerializeAndAssert(expected);
         }
 
-        [Fact]
-        public void CanSerializeDateTimeOffsetUtc()
+        public static IEnumerable<object[]> DateTimeOffsetData()
         {
-            SerializeAndAssert(DateTimeOffset.UtcNow);
+            yield return new object[] { DateTimeOffset.UtcNow };
+            yield return new object[] { DateTimeOffset.Now };
+            yield return new object[] { DateTimeOffset.MinValue };
+            yield return new object[] { DateTimeOffset.MaxValue };
+            yield return new object[] { new DateTimeOffset(DateTime.MinValue, TimeSpan.Zero) };
+            yield return new object[] { new DateTimeOffset(DateTime.MaxValue, TimeSpan.Zero) };
+            
+            var now = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+            var increment = TimeSpan.FromMinutes(10);
+            var offset = TimeSpan.FromHours(-14) - increment;
+            
+            // Over the whole possible timezone offsets (-14 to 14), incremented by 10 minutes
+            while (offset.TotalHours < 14.0)
+            {
+                offset += increment;
+                yield return new object[] { new DateTimeOffset(now, offset) };
+            }
+            
+            increment = TimeSpan.FromMinutes(1);
+            offset = TimeSpan.FromHours(-1);
+            
+            // Over the span of -1 to 1 hours, incremented by 1 minute
+            while (offset.TotalHours < 1.0)
+            {
+                offset += increment;
+                yield return new object[] { new DateTimeOffset(now, offset) };
+            }
         }
 
         [Fact]
@@ -182,12 +217,12 @@ namespace Hyperion.Tests
             SerializeAndAssert("hello");
         }
 
-        private void SerializeAndAssert(object expected)
+        private void SerializeAndAssert<T>(T expected)
         {
             Serialize(expected);
             Reset();
-            var res = Deserialize<object>();
-            Assert.Equal(expected, res);
+            var res = Deserialize<T>();
+            expected.Should().Be(res);
             AssertMemoryStreamConsumed();
         }
     }
