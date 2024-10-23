@@ -39,8 +39,9 @@ namespace Hyperion.ValueSerializers
         {
             stream.ReadFull(bytes, 0, Size);
             var dateTimeTicks = BitConverter.ToInt64(bytes, 0);
-            var offsetTicks = BitConverter.ToInt64(bytes, sizeof(long));
-            var dateTimeOffset = new DateTimeOffset(dateTimeTicks, TimeSpan.FromTicks(offsetTicks));
+            var offset = TimeSpan.FromTicks(BitConverter.ToInt64(bytes, sizeof(long)));
+            var offsetMinutes = TimeSpan.FromMinutes(Math.Round(offset.TotalMinutes));
+            var dateTimeOffset = new DateTimeOffset(dateTimeTicks, offsetMinutes);
             return dateTimeOffset;
         }
 
