@@ -7,12 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hyperion", "src\Hyperion\Hy
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2F3D4EC4-3A41-48C2-9DEA-0510B0FF89B4}"
 	ProjectSection(SolutionItems) = preProject
-		build.cmd = build.cmd
-		build.fsx = build.fsx
 		build.ps1 = build.ps1
-		build.sh = build.sh
 		README.md = README.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
+		global.json = global.json
+		NuGet.Config = NuGet.Config
+		src\common.props = src\common.props
 	EndProjectSection
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Hyperion.Tests.FSharpData", "src\Hyperion.Tests.FSharpData\Hyperion.Tests.FSharpData.fsproj", "{1E406A85-C7F5-4F62-9D72-88C67FF2D743}"
@@ -24,6 +24,20 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hyperion.Akka.Integration.Tests", "src\Hyperion.Akka.Integration.Tests\Hyperion.Akka.Integration.Tests.csproj", "{3DA946AF-0CCD-49A9-AA77-67FA515A83EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hyperion.API.Tests", "src\Hyperion.API.Tests\Hyperion.API.Tests.csproj", "{767FBBD2-869C-4AAD-ABF4-F23EC0D381AA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{CFD6961A-9F66-4BF6-AE27-EE5B5013E6B1}"
+	ProjectSection(SolutionItems) = preProject
+		scripts\bumpVersion.ps1 = scripts\bumpVersion.ps1
+		scripts\getReleaseNotes.ps1 = scripts\getReleaseNotes.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build-system", "build-system", "{A5AA04A4-1B47-40CF-BDFB-08ADB09BF647}"
+	ProjectSection(SolutionItems) = preProject
+		build-system\azure-pipeline.template.yaml = build-system\azure-pipeline.template.yaml
+		build-system\nightly-builds.yaml = build-system\nightly-builds.yaml
+		build-system\pr-validation.yaml = build-system\pr-validation.yaml
+		build-system\windows-release.yaml = build-system\windows-release.yaml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -61,5 +75,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B1C59E88-286D-4AD0-B5FC-94C8F95BF0FA}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CFD6961A-9F66-4BF6-AE27-EE5B5013E6B1} = {2F3D4EC4-3A41-48C2-9DEA-0510B0FF89B4}
+		{A5AA04A4-1B47-40CF-BDFB-08ADB09BF647} = {2F3D4EC4-3A41-48C2-9DEA-0510B0FF89B4}
 	EndGlobalSection
 EndGlobal

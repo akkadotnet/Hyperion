@@ -1,5 +1,3 @@
-# Pull request validation for Windows against the `dev` and `master` branches
-# See https://docs.microsoft.com/en-us/azure/devops/pipelines/yaml-schema for reference
 trigger:
   branches:
     include:
@@ -11,7 +9,7 @@ pr:
   branches:
     include: [ dev, master ] # branch names which will trigger a build
 
-name: $(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
+name: $(SourceBranchName)_$(Year:yyyy).$(Month).$(DayOfMonth)$(Rev:.r)
 
 jobs:
   - template: azure-pipeline.template.yaml
@@ -19,21 +17,13 @@ jobs:
       name: 'windows_pr'
       displayName: 'Windows PR Validation'
       vmImage: 'windows-latest'
-      scriptFileName: build.cmd
-      scriptArgs: all
-      
+      outputDirectory: 'bin/nuget'
+      artifactName: 'nuget_pack-$(Build.BuildId)'
+
   - template: azure-pipeline.template.yaml
     parameters:
-      name: 'linux_pr_net_core'
-      displayName: 'Linux PR Validation (netcoreapp3.1)'
+      name: 'linux_pr'
+      displayName: 'Linux PR Validation'
       vmImage: 'ubuntu-latest'
-      scriptFileName: ./build.sh
-      scriptArgs: runTestsNetCore
-      
-  - template: azure-pipeline.template.yaml
-    parameters:
-      name: 'linux_pr_net_5'
-      displayName: 'Linux PR Validation (net5.0)'
-      vmImage: 'ubuntu-latest'
-      scriptFileName: ./build.sh
-      scriptArgs: runTestsNet
+      outputDirectory: 'bin/nuget'
+      artifactName: 'nuget_pack-$(Build.BuildId)'
