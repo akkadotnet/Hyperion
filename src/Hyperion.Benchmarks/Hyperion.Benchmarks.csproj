@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
-    <TargetFrameworks>$(NetTestVersion);$(NetCoreTestVersion)</TargetFrameworks>
+    <TargetFramework>$(NetTestVersion)</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
