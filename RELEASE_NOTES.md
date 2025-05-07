@@ -1,13 +1,13 @@
-### 0.12.2 March 31 2022 ####
+#### 0.12.2 March 31 2022 ####
 
 * Fix [deserialization type cache was shared between multiple serializer instances](https://github.com/akkadotnet/Hyperion/pull/306) 
 
-### 0.12.1 March 23 2022 ####
+#### 0.12.1 March 23 2022 ####
 
 * Fix disallow-unsafe-type Akka.NET settings and harden unsafe type detection [301](https://github.com/akkadotnet/Hyperion/pull/301)
 * Bump [Akka version from 1.4.34 to 1.4.35](https://github.com/akkadotnet/akka.net/releases/tag/1.4.35)
 
-### 0.12.0 January 12 2022 ####
+#### 0.12.0 January 12 2022 ####
 
 * Allow explicit control over which types can be deserialized [#281](https://github.com/akkadotnet/Hyperion/pull/281)
 
@@ -25,12 +25,12 @@ var serializer = new Serializer(options);
 
 For complete documentation, please read the [readme on filtering types for secure deserialization.](https://github.com/akkadotnet/Hyperion#whitelisting-types-on-deserialization)
 
-### 0.11.2 October 7 2021 ####
+#### 0.11.2 October 7 2021 ####
 * Fix exception thrown during deserialization when preserve object reference was turned on 
   and a surrogate instance was inserted into a collection multiple times. [#264](https://github.com/akkadotnet/Hyperion/pull/264)
 * Add support for AggregateException serialization. [#266](https://github.com/akkadotnet/Hyperion/pull/266)
 
-### 0.11.1 August 17 2021 ####
+#### 0.11.1 August 17 2021 ####
 * Add [unsafe deserialization type blacklist](https://github.com/akkadotnet/Hyperion/pull/242)
 * Bump [Akka version from 1.4.21 to 1.4.23](https://github.com/akkadotnet/Hyperion/pull/246)
 
@@ -60,7 +60,7 @@ The unsafe types that are currently blocked are:
 - System.Diagnostics.Process
 - System.Management.IWbemClassObjectFreeThreaded
 
-### 0.11.0 July 8 2021 ####
+#### 0.11.0 July 8 2021 ####
 * [Fix array of user defined structs serialization failure](https://github.com/akkadotnet/Hyperion/pull/235)
 * [Remove dynamic keyword usage from array serializer](https://github.com/akkadotnet/Hyperion/pull/139)
 * [Change field ordering to ordinal](https://github.com/akkadotnet/Hyperion/pull/236)
@@ -73,9 +73,9 @@ that are serialized using the Hyperion serializer.
 Please report any serialization problem that occurs after an upgrade to this version at the
 [issue tracker](https://github.com/akkadotnet/Hyperion/issues)
 
-### 0.10.2 June 30 2021 ####
+#### 0.10.2 June 30 2021 ####
 * [Update Akka version to 1.4.21](https://github.com/akkadotnet/akka.net/releases/tag/1.4.21)
 * [Add exception rethrow to help with debugging](https://github.com/akkadotnet/Hyperion/pull/229)
 
-### 0.10.1 April 20 2021 ####
+#### 0.10.1 April 20 2021 ####
 * [Fix SerializerOptions constructor backward compatibility issue with Akka.NET](https://github.com/akkadotnet/Hyperion/pull/214)
