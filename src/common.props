@@ -18,7 +18,7 @@ Please report any serialization problem that occurs after an upgrade to this ver
   </PropertyGroup>
   <PropertyGroup>
     <NetCoreTestVersion>netcoreapp3.1</NetCoreTestVersion>
-    <NetTestVersion>net5.0</NetTestVersion>
+    <NetTestVersion>net8.0</NetTestVersion>
     <NetFrameworkTestVersion>net471</NetFrameworkTestVersion>
     <NetStandardLibVersion>netstandard2.0</NetStandardLibVersion>
     <AkkaVersion>1.5.6</AkkaVersion>
