@@ -33,7 +33,7 @@ namespace Hyperion.Tests
         {
             _output = output;
         }
-        
+
         #region issue 58
 
         public enum TrustLevel { Unknown, Suspicious, Partial, Fully }
@@ -109,7 +109,7 @@ namespace Hyperion.Tests
         {
             var serializer = new Serializer(new SerializerOptions(versionTolerance: true, preserveObjectReferences: true));
             var type = typeof(ByteMessage);
-            
+
             MemoryStream GetStreamForManifest(string manifest)
             {
                 var stream = new MemoryStream();
@@ -117,7 +117,7 @@ namespace Hyperion.Tests
                 stream.Position = 0;
                 return stream;
             }
-            
+
             // This is used in serialized manifest, should be something like 'Hyperion.Tests.Bugs+ByteMessage, Hyperion.Tests'
             var shortName = type.GetShortAssemblyQualifiedName();
             var shortNameStream = GetStreamForManifest(shortName);
@@ -148,11 +148,11 @@ namespace Hyperion.Tests
             var coreAssemblyName = typeof(TypeEx).GetField("CoreAssemblyName", BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null);
             if (coreAssemblyName == null)
                 throw new Exception($"CoreAssemblyName private static field does not exist in {nameof(TypeEx)} class anymore");
-            
+
             version.Should().Be("System.Collections.Immutable.ImmutableDictionary`2" +
                                 $"[[System.String, mscorlib{coreAssemblyName}],[System.Int32, mscorlib{coreAssemblyName}]], System.Collections.Immutable");
         }
-        
+
         [Fact]
         public void TypeEx_ToQualifiedAssemblyName_should_strip_version_correctly_for_multiple_versions_specified()
         {
@@ -280,16 +280,17 @@ namespace Hyperion.Tests
             public int[,] IntIntArray { get; set; }
             public Poco Poco { get; set; }
             public string String { get; set; }
-            public Dictionary<int,string> Dictionary { get; set; }
+            public Dictionary<int, string> Dictionary { get; set; }
             public TestDelegate Delegate { get; set; }
             public IEnumerable<int> TestEnum { get; set; }
             public Exception Exception { get; set; }
             public ImmutableList<int> ImmutableList { get; set; }
             public ImmutableDictionary<int, string> ImmutableDictionary { get; set; }
+            public List<Poco> PocoList { get; set; }
 
             public bool Equals(Temp other)
             {
-                if (other == null) 
+                if (other == null)
                     throw new Exception("Equals failed.");
                 if (ReferenceEquals(this, other))
                     throw new Exception("Equals failed.");
@@ -305,11 +306,11 @@ namespace Hyperion.Tests
                     }
                 }
 
-                if (Exception.GetType() != other.Exception.GetType()) 
+                if (Exception.GetType() != other.Exception.GetType())
                     throw new Exception("Equals failed.");
                 if (Exception.Message != other.Exception.Message)
                     throw new Exception("Equals failed.");
-                if(Exception.InnerException != null 
+                if (Exception.InnerException != null
                    && Exception.InnerException.GetType() != other.Exception.InnerException.GetType())
                     throw new Exception("Equals failed.");
 
@@ -317,7 +318,7 @@ namespace Hyperion.Tests
                 {
                     if (SubArray[i].GetType() != other.SubArray[i].GetType())
                         throw new Exception("Equals failed.");
-                    
+
                     if (SubArray[i] is Array arr)
                     {
                         var oArr = (Array)other.SubArray[i];
@@ -326,7 +327,8 @@ namespace Hyperion.Tests
                             if (!arr.GetValue(j).Equals(oArr.GetValue(j)))
                                 throw new Exception("Equals failed.");
                         }
-                    } else if (!SubArray[i].Equals(other.SubArray[i]))
+                    }
+                    else if (!SubArray[i].Equals(other.SubArray[i]))
                         throw new Exception("Equals failed.");
                 }
 
@@ -345,15 +347,17 @@ namespace Hyperion.Tests
                 if (other.Delegate(2, 2) != 4)
                     throw new Exception("Equals failed.");
 
-                if(!IntArray.SequenceEqual(other.IntArray))
+                if (!IntArray.SequenceEqual(other.IntArray))
                     throw new Exception("Equals failed.");
-                if(!Equals(Poco, other.Poco))
+                if (!Equals(Poco, other.Poco))
                     throw new Exception("Equals failed.");
                 if (String != other.String)
                     throw new Exception("Equals failed.");
-                if(!TestEnum.SequenceEqual(other.TestEnum))
+                if (!TestEnum.SequenceEqual(other.TestEnum))
                     throw new Exception("Equals failed.");
-                if(!ImmutableList.SequenceEqual(other.ImmutableList))
+                if (!ImmutableList.SequenceEqual(other.ImmutableList))
+                    throw new Exception("Equals failed.");
+                if (!PocoList.SequenceEqual(other.PocoList))
                     throw new Exception("Equals failed.");
 
                 return true;
@@ -364,7 +368,7 @@ namespace Hyperion.Tests
                 if (obj == null) throw new Exception("Equals failed.");
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) throw new Exception("Equals failed.");
-                return Equals((Temp) obj);
+                return Equals((Temp)obj);
             }
 
             public override int GetHashCode()
@@ -381,6 +385,7 @@ namespace Hyperion.Tests
                     hashCode = (hashCode * 397) ^ (TestEnum != null ? TestEnum.GetHashCode() : 0);
                     hashCode = (hashCode * 397) ^ (Exception != null ? Exception.GetHashCode() : 0);
                     hashCode = (hashCode * 397) ^ (ImmutableList != null ? ImmutableList.GetHashCode() : 0);
+                    hashCode = (hashCode * 397) ^ (PocoList != null ? PocoList.GetHashCode() : 0);
                     return hashCode;
                 }
             }
@@ -402,13 +407,13 @@ namespace Hyperion.Tests
 
             public bool Equals(Poco other)
             {
-                if (ReferenceEquals(null, other)) 
+                if (ReferenceEquals(null, other))
                     throw new Exception("Equals failed.");
-                if (ReferenceEquals(this, other)) 
+                if (ReferenceEquals(this, other))
                     throw new Exception("Equals failed.");
-                if(Int != other.Int)
+                if (Int != other.Int)
                     throw new Exception("Equals failed.");
-                if(String != other.String)
+                if (String != other.String)
                     throw new Exception("Equals failed.");
                 return true;
             }
@@ -418,7 +423,7 @@ namespace Hyperion.Tests
                 if (ReferenceEquals(null, obj)) throw new Exception("Equals failed.");
                 if (ReferenceEquals(this, obj)) return true;
                 if (obj.GetType() != this.GetType()) throw new Exception("Equals failed.");
-                return Equals((Poco) obj);
+                return Equals((Poco)obj);
             }
 
             public override int GetHashCode()
@@ -437,20 +442,20 @@ namespace Hyperion.Tests
             var msg = new Temp
             {
                 SubArray = new object[] { 1, (byte)2, new object[] { 3 } },
-                IntArray = new [] {1, 2, 3, 4, 5},
-                IntIntArray = new [,] {{1, 2}, {3,4}, {5,6}, {7,8}},
+                IntArray = new[] { 1, 2, 3, 4, 5 },
+                IntIntArray = new[,] { { 1, 2 }, { 3, 4 }, { 5, 6 }, { 7, 8 } },
                 Poco = new Poco(999, "666"),
-                String = "huhu", 
+                String = "huhu",
                 Dictionary = new Dictionary<int, string>
                 {
                     { 666, "b" },
                     { 999, "testString" },
                     { 42, "iMaGiNe" }
-                }, 
+                },
                 Delegate = (x, y) => x * y,
-                TestEnum = new[]{4,8,9,3,2},
+                TestEnum = new[] { 4, 8, 9, 3, 2 },
                 Exception = new ArgumentException("Test Exception", new IndexOutOfRangeException("-999")),
-                ImmutableList = new [] {9, 4, 6, 2, 5}.ToImmutableList(),
+                ImmutableList = new[] { 9, 4, 6, 2, 5 }.ToImmutableList(),
                 ImmutableDictionary = new Dictionary<int, string>
                 {
                     { 666, "b" },
@@ -466,7 +471,7 @@ namespace Hyperion.Tests
                 typeof(Dictionary<int, string>),
                 typeof(DictionaryEntry),
                 typeof(KeyValuePair<int,string>),
-                typeof(Temp), 
+                typeof(Temp),
                 typeof(TestDelegate),
                 typeof(Enumerable),
                 typeof(IEnumerable<int>),
@@ -507,5 +512,30 @@ namespace Hyperion.Tests
         }
 
         #endregion
+
+        [Fact]
+        public void DontWriteManifestForCollectionOfKnownTypes()
+        {
+            var stream = new MemoryStream();
+            var msg = new Temp
+            {
+                PocoList = new List<Poco>() {
+                    new Poco(999, "666"),
+                },
+            };
+            var serializer = new Serializer(new SerializerOptions(knownTypes: new[]
+            {
+                typeof(Temp),
+                typeof(Poco),
+            }));
+            serializer.Serialize(msg, stream);
+            stream.Position = 0;
+            var a = stream.ToArray();
+            var text = string.Join("", a.Select(x => x < 32 || x > 126 ? "" : ((char)x).ToString()));
+            _output.WriteLine(text);
+            var res = (Temp)serializer.Deserialize(stream);
+            Assert.DoesNotContain("System.Collections.Generic.List", text);
+            Assert.Equal(msg, res);
+        }
     }
 }
